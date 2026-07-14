@@ -1,0 +1,45 @@
+<div class="search-select">
+  <input
+    type="text"
+    class="search-select__input"
+    role="combobox"
+    aria-autocomplete="list"
+    [attr.aria-expanded]="isOpen()"
+    [placeholder]="placeholder()"
+    [value]="isOpen() ? query() : selectedLabel()"
+    [disabled]="isFieldDisabled()"
+    [attr.maxlength]="maxLength()"
+    (focus)="onFocus()"
+    (input)="onInput($any($event.target).value)"
+    (focusout)="onFocusOut($event)"
+    (keydown)="onKeydown($event)"
+    autocomplete="off"
+  />
+  <span class="material-symbols-outlined search-select__icon" aria-hidden="true">expand_more</span>
+
+  @if (isOpen() && dropdownPosition(); as position) {
+    <ul
+      class="search-select__list"
+      role="listbox"
+      [style.top.px]="position.top"
+      [style.left.px]="position.left"
+      [style.width.px]="position.width"
+    >
+      @if (filteredOptions().length === 0) {
+        <li class="search-select__empty">{{ emptyMessage() }}</li>
+      }
+      @for (option of filteredOptions(); track option.value; let i = $index) {
+        <li
+          class="search-select__option"
+          [class.search-select__option--highlighted]="i === highlightedIndex()"
+          [class.search-select__option--selected]="option.value === value()"
+          role="option"
+          [attr.aria-selected]="option.value === value()"
+          (mousedown)="$event.preventDefault(); selectOption(option)"
+        >
+          {{ option.label }}
+        </li>
+      }
+    </ul>
+  }
+</div>

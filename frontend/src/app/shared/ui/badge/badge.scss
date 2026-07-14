@@ -1,0 +1,40 @@
+:host {
+  display: inline-flex;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding-inline: var(--ppam-space-sm);
+  border-radius: var(--ppam-radius-full);
+  font-size: var(--ppam-label-size);
+  font-weight: 600;
+  letter-spacing: var(--ppam-label-tracking);
+  white-space: nowrap;
+}
+
+.badge--neutral {
+  background: var(--ppam-surface-container-high);
+  color: var(--ppam-on-surface-variant);
+}
+
+.badge--info {
+  background: color-mix(in srgb, var(--ppam-semantic-info) 15%, white);
+  color: var(--ppam-semantic-info);
+}
+
+.badge--warning {
+  background: color-mix(in srgb, var(--ppam-semantic-warning) 15%, white);
+  color: var(--ppam-semantic-warning);
+}
+
+.badge--success {
+  background: color-mix(in srgb, var(--ppam-semantic-success) 15%, white);
+  color: var(--ppam-semantic-success);
+}
+
+.badge--error {
+  background: color-mix(in srgb, var(--ppam-semantic-error) 15%, white);
+  color: var(--ppam-semantic-error);
+}

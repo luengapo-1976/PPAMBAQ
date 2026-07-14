@@ -1,0 +1,212 @@
+:host {
+  display: block;
+  height: 100dvh;
+}
+
+.login {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* La imagen ocupa todo el fondo de la pantalla; su propia composición ya
+   deja una zona blanca del lado derecho pensada para alojar el formulario. */
+.login__bg-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+.login__panel {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: var(--ppam-space-lg);
+}
+
+.login__panel-inner {
+  width: 100%;
+  max-width: 380px;
+}
+
+.login__card {
+  background: transparent;
+  padding: var(--ppam-space-xl) var(--ppam-space-lg);
+}
+
+.login__brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ppam-space-sm);
+  margin-bottom: var(--ppam-space-lg);
+}
+
+.login__brand-logo {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.login__brand-text {
+  font-size: var(--ppam-h2-size);
+  font-weight: 700;
+  color: var(--ppam-primary);
+}
+
+.login__title {
+  font-size: var(--ppam-h1-mobile-size);
+  line-height: var(--ppam-h1-mobile-line);
+  font-weight: var(--ppam-h1-weight);
+  color: var(--ppam-on-surface);
+  text-align: center;
+}
+
+.login__subtitle {
+  color: var(--ppam-on-surface-variant);
+  text-align: center;
+  margin-top: var(--ppam-space-xs);
+  margin-bottom: var(--ppam-space-lg);
+}
+
+.login__alert {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ppam-space-sm);
+  padding: var(--ppam-space-sm) var(--ppam-space-md);
+  margin-bottom: var(--ppam-space-md);
+  border-radius: var(--ppam-radius-control);
+  background: var(--ppam-semantic-error-container);
+  color: var(--ppam-on-error-container);
+  font-size: var(--ppam-small-size);
+}
+
+.login__alert .material-symbols-outlined {
+  color: var(--ppam-semantic-error);
+  flex-shrink: 0;
+}
+
+.login__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ppam-space-md);
+}
+
+.ppam-input {
+  width: 100%;
+  height: 44px;
+  padding-inline: var(--ppam-space-sm);
+  border-radius: var(--ppam-radius-control);
+  border: 1px solid var(--ppam-border-quiet);
+  background: var(--ppam-surface-container-lowest);
+  color: var(--ppam-on-surface);
+  font-family: inherit;
+  font-size: var(--ppam-body-size);
+  box-sizing: border-box;
+}
+
+.ppam-input:focus-visible {
+  outline: 2px solid var(--ppam-primary-container);
+  outline-offset: 1px;
+  border-color: var(--ppam-primary-container);
+}
+
+.login__password-field {
+  position: relative;
+  display: flex;
+}
+
+.login__password-field .ppam-input {
+  padding-right: 44px;
+}
+
+.login__password-toggle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  color: var(--ppam-on-surface-variant);
+  cursor: pointer;
+  border-radius: var(--ppam-radius-control);
+}
+
+.login__password-toggle:hover {
+  background: var(--ppam-surface-container);
+}
+
+.login__submit {
+  margin-top: var(--ppam-space-sm);
+}
+
+app-button.login__submit {
+  display: flex;
+  width: 100%;
+}
+
+::ng-deep app-button.login__submit .ppam-button {
+  width: 100%;
+}
+
+.login__forgot-link {
+  display: block;
+  width: 100%;
+  min-height: var(--ppam-touch-target-min);
+  margin-top: var(--ppam-space-xs);
+  border: 0;
+  background: transparent;
+  color: var(--ppam-primary);
+  font-family: inherit;
+  font-size: var(--ppam-small-size);
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  border-radius: var(--ppam-radius-control);
+}
+
+.login__forgot-link:hover {
+  text-decoration: underline;
+  background: var(--ppam-surface-container);
+}
+
+.login__forgot-hint {
+  color: var(--ppam-on-surface-variant);
+  margin-bottom: var(--ppam-space-md);
+}
+
+.login__forgot-feedback {
+  padding: var(--ppam-space-sm) var(--ppam-space-md);
+  margin-bottom: var(--ppam-space-md);
+  border-radius: var(--ppam-radius-control);
+  background: var(--ppam-semantic-info-container);
+  color: var(--ppam-on-surface);
+  font-size: var(--ppam-small-size);
+}
+
+.login__forgot-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ppam-space-md);
+}
+
+@media (min-width: 900px) {
+  .login__panel {
+    position: absolute;
+    inset: 0 0 0 auto;
+    width: 48%;
+    justify-content: center;
+    padding: var(--ppam-space-3xl) var(--ppam-space-lg);
+  }
+}

@@ -1,0 +1,66 @@
+:host {
+  display: inline-flex;
+}
+
+.ppam-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ppam-space-sm);
+  min-height: var(--ppam-touch-target-min);
+  padding-inline: var(--ppam-space-md);
+  border-radius: var(--ppam-radius-control);
+  border: 1px solid transparent;
+  background: var(--ppam-primary-container);
+  color: var(--ppam-on-primary);
+  font-family: inherit;
+  font-size: var(--ppam-body-size);
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background var(--ppam-motion-fast),
+    border-color var(--ppam-motion-fast),
+    opacity var(--ppam-motion-fast);
+  white-space: nowrap;
+}
+
+.ppam-button:hover:not(:disabled) {
+  background: var(--ppam-primary);
+}
+
+.ppam-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ppam-button--secondary {
+  background: transparent;
+  color: var(--ppam-primary-container);
+  border-color: var(--ppam-primary-container);
+}
+
+.ppam-button--secondary:hover:not(:disabled) {
+  background: var(--ppam-surface-container);
+}
+
+.ppam-button--ghost {
+  background: transparent;
+  color: var(--ppam-on-surface-variant);
+}
+
+.ppam-button--ghost:hover:not(:disabled) {
+  background: var(--ppam-surface-container);
+}
+
+.ppam-button--whatsapp {
+  background: #25d366;
+  color: #ffffff;
+}
+
+.ppam-button--whatsapp:hover:not(:disabled) {
+  background: #1ebe5b;
+}
+
+.ppam-button .material-symbols-outlined {
+  color: currentColor;
+}

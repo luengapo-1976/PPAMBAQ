@@ -1,0 +1,67 @@
+<nav class="sidebar" [class.sidebar--collapsed]="collapsed()" aria-label="Menú principal">
+  <div class="sidebar__brand">
+    <img class="sidebar__brand-logo" src="images/LOGO.png" alt="" aria-hidden="true" />
+    @if (!collapsed()) {
+      <span class="sidebar__brand-text">PPAM BAQ</span>
+    }
+  </div>
+
+  <ul class="sidebar__list">
+    @for (item of mainItems(); track item.label) {
+      @if (item.children) {
+        <li class="sidebar__section-title" [attr.title]="collapsed() ? item.label : null">
+          @if (!collapsed()) {
+            <span>{{ item.label }}</span>
+          }
+        </li>
+        @for (child of item.children; track child.label) {
+          <li class="sidebar__item">
+            <a
+              class="sidebar__link"
+              [routerLink]="child.route"
+              routerLinkActive="sidebar__link--active"
+              [attr.title]="collapsed() ? child.label : null"
+            >
+              <span class="material-symbols-outlined" aria-hidden="true">{{ child.icon }}</span>
+              @if (!collapsed()) {
+                <span class="sidebar__label">{{ child.label }}</span>
+              }
+            </a>
+          </li>
+        }
+      } @else {
+        <li class="sidebar__item">
+          <a
+            class="sidebar__link"
+            [routerLink]="item.route"
+            routerLinkActive="sidebar__link--active"
+            [attr.title]="collapsed() ? item.label : null"
+          >
+            <span class="material-symbols-outlined" aria-hidden="true">{{ item.icon }}</span>
+            @if (!collapsed()) {
+              <span class="sidebar__label">{{ item.label }}</span>
+            }
+          </a>
+        </li>
+      }
+    }
+  </ul>
+
+  <ul class="sidebar__list sidebar__list--footer">
+    @for (item of actionItems; track item.label) {
+      <li class="sidebar__item">
+        <button
+          type="button"
+          class="sidebar__link"
+          [attr.title]="collapsed() ? item.label : null"
+          (click)="onItemClick(item)"
+        >
+          <span class="material-symbols-outlined" aria-hidden="true">{{ item.icon }}</span>
+          @if (!collapsed()) {
+            <span class="sidebar__label">{{ item.label }}</span>
+          }
+        </button>
+      </li>
+    }
+  </ul>
+</nav>

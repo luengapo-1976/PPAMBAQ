@@ -1,0 +1,19 @@
+<ul class="recent-activity">
+  @for (item of items(); track item.id) {
+    <li class="recent-activity__item">
+      <span class="recent-activity__icon material-symbols-outlined" aria-hidden="true">
+        {{ item.accion === 'Registrado' ? 'person_add' : 'edit' }}
+      </span>
+      <span class="recent-activity__body">
+        <span class="recent-activity__title">
+          <strong>{{ item.nombre }}</strong>
+          {{ item.accion === 'Registrado' ? 'se registró' : 'fue modificado' }}
+        </span>
+        <span class="recent-activity__meta">{{ item.congregacion }} · {{ formatDateShort(item.fecha) }}</span>
+      </span>
+      <app-badge [tone]="estadoConfig[item.estado].tone">{{ estadoConfig[item.estado].label }}</app-badge>
+    </li>
+  } @empty {
+    <li class="recent-activity__empty">No hay actividad reciente para el filtro actual.</li>
+  }
+</ul>

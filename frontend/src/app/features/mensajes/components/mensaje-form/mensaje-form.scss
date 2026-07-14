@@ -1,0 +1,117 @@
+.mensaje-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ppam-space-md);
+  padding: var(--ppam-space-lg);
+  background: var(--ppam-surface-container-lowest);
+  border: 1px solid var(--ppam-border-quiet);
+  border-radius: var(--ppam-radius-card);
+}
+
+.mensaje-form__toolbar {
+  display: flex;
+  gap: var(--ppam-space-sm);
+  flex-wrap: wrap;
+}
+
+.mensaje-form__row {
+  display: flex;
+  gap: var(--ppam-space-lg);
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.mensaje-form__tipo {
+  flex: 1;
+  min-width: 240px;
+  max-width: 360px;
+}
+
+.mensaje-form__adjunto {
+  flex: 1;
+  min-width: 280px;
+}
+
+.mensaje-form__adjunto-control {
+  display: flex;
+  align-items: center;
+  gap: var(--ppam-space-xs);
+}
+
+.mensaje-form__adjunto-name {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  padding-inline: var(--ppam-space-sm);
+  border-radius: var(--ppam-radius-control);
+  border: 1px solid var(--ppam-border-quiet);
+  background: var(--ppam-surface-container);
+  color: var(--ppam-on-surface);
+  font-size: var(--ppam-body-size);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+.mensaje-form__adjunto-name--empty {
+  color: var(--ppam-outline);
+}
+
+.mensaje-form__file-input {
+  display: none;
+}
+
+.mensaje-form__editor {
+  border: 1px solid var(--ppam-border-quiet);
+  border-radius: var(--ppam-radius-control);
+  overflow: hidden;
+}
+
+.mensaje-form__editor-toolbar {
+  display: flex;
+  gap: var(--ppam-space-xs);
+  padding: var(--ppam-space-xs);
+  background: var(--ppam-surface-container-low);
+  border-bottom: 1px solid var(--ppam-border-quiet);
+}
+
+.mensaje-form__style-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: var(--ppam-radius-sm);
+  background: transparent;
+  color: var(--ppam-on-surface-variant);
+  cursor: pointer;
+}
+
+.mensaje-form__style-btn:hover {
+  background: var(--ppam-surface-container);
+  color: var(--ppam-primary-container);
+}
+
+.mensaje-form__textarea {
+  display: block;
+  width: 100%;
+  min-height: 320px;
+  padding: var(--ppam-space-md);
+  border: 0;
+  background: var(--ppam-surface-container-lowest);
+  color: var(--ppam-on-surface);
+  font-family: inherit;
+  font-size: var(--ppam-body-size);
+  line-height: var(--ppam-body-line);
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.mensaje-form__textarea:focus-visible {
+  outline: 2px solid var(--ppam-primary-container);
+  outline-offset: -2px;
+}

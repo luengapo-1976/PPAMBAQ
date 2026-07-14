@@ -1,0 +1,73 @@
+<div class="dashboard-page">
+  <app-dashboard-filters
+    [departamentos]="departamentos()"
+    [municipios]="municipios()"
+    [circuitos]="circuitos()"
+    [filters]="filters()"
+    (filtersChange)="onFiltersChange($event)"
+  />
+
+  @if (loading()) {
+    <div class="dashboard-page__kpis">
+      @for (i of skeletonKpis; track i) {
+        <div class="skeleton-block skeleton-block--kpi"></div>
+      }
+    </div>
+    <div class="dashboard-page__charts">
+      @for (i of skeletonCharts; track i) {
+        <div class="skeleton-block skeleton-block--chart"></div>
+      }
+    </div>
+  } @else {
+    <section class="dashboard-page__kpis">
+      <app-stat-card icon="groups" label="Total de solicitudes" [count]="kpis().total" />
+      <app-stat-card icon="hourglass_top" label="Pendientes" [count]="kpis().pendientes" />
+      <app-stat-card icon="verified" label="Cumple requisitos" [count]="kpis().aprobados" />
+      <app-stat-card icon="school" label="Pendientes de entrenamiento" [count]="kpis().pendientesEntrenamiento" />
+      <app-stat-card icon="calendar_month" label="Nuevas este mes" [count]="kpis().nuevasEsteMes" />
+      <app-stat-card icon="church" label="Congregaciones activas" [count]="kpis().congregacionesActivas" />
+    </section>
+
+    <section class="dashboard-page__charts">
+      <div class="dashboard-card">
+        <h2 class="dashboard-card__title">Distribución por estado</h2>
+        <div class="dashboard-card__chart">
+          <app-chart-canvas type="doughnut" [data]="estadoChartData()" [options]="donutOptions" />
+        </div>
+      </div>
+
+      <div class="dashboard-card">
+        <h2 class="dashboard-card__title">Distribución por sexo</h2>
+        <div class="dashboard-card__chart">
+          <app-chart-canvas type="doughnut" [data]="sexoChartData()" [options]="donutOptions" />
+        </div>
+      </div>
+
+      <div class="dashboard-card dashboard-card--wide">
+        <h2 class="dashboard-card__title">Solicitudes por congregación (top 8)</h2>
+        <div class="dashboard-card__chart">
+          <app-chart-canvas type="bar" [data]="topCongregacionesChartData()" [options]="horizontalBarOptions" />
+        </div>
+      </div>
+
+      <div class="dashboard-card">
+        <h2 class="dashboard-card__title">Distribución por estado civil</h2>
+        <div class="dashboard-card__chart">
+          <app-chart-canvas type="bar" [data]="estadoCivilChartData()" [options]="barOptions" />
+        </div>
+      </div>
+
+      <div class="dashboard-card dashboard-card--wide">
+        <h2 class="dashboard-card__title">Tendencia mensual (últimos 12 meses)</h2>
+        <div class="dashboard-card__chart">
+          <app-chart-canvas type="line" [data]="trendChartData()" [options]="lineOptions" />
+        </div>
+      </div>
+    </section>
+
+    <section class="dashboard-card">
+      <h2 class="dashboard-card__title">Actividad reciente</h2>
+      <app-recent-activity [items]="recentActivityItems()" />
+    </section>
+  }
+</div>

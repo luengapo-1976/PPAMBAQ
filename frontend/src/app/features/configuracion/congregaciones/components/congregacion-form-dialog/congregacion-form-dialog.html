@@ -1,0 +1,61 @@
+<app-dialog
+  [open]="open()"
+  [title]="dialogTitle()"
+  position="right"
+  rightWidth="50vw"
+  panelBackground="var(--ppam-surface)"
+  (closed)="onCancel()"
+>
+  <app-button dialogToolbar type="button" icon="save" [disabled]="form.invalid || saving()" (click)="onSave()">
+    Guardar
+  </app-button>
+  <app-button dialogToolbar type="button" variant="secondary" icon="close" (click)="onCancel()">
+    Cancelar
+  </app-button>
+  <app-button dialogToolbar type="button" variant="ghost" icon="restart_alt" (click)="onClear()">
+    Limpiar
+  </app-button>
+
+  <form class="form-grid" [formGroup]="form" (ngSubmit)="onSave()">
+    <app-form-field label="Código" [required]="true" [control]="form.controls.codigo_congregacion">
+      <input type="number" formControlName="codigo_congregacion" class="ppam-input" />
+    </app-form-field>
+
+    <app-form-field
+      label="Nombre"
+      [required]="true"
+      [control]="form.controls.nombre_congregacion"
+      class="form-field--wide"
+    >
+      <input type="text" formControlName="nombre_congregacion" class="ppam-input" maxlength="100" />
+    </app-form-field>
+
+    <app-form-field label="Departamento" [required]="true" [control]="form.controls.codigo_departamento">
+      <app-search-select
+        formControlName="codigo_departamento"
+        [options]="departamentoOptions()"
+        placeholder="Buscar departamento…"
+      />
+    </app-form-field>
+
+    <app-form-field label="Municipio" [required]="true" [control]="form.controls.codigo_municipio">
+      <app-search-select
+        formControlName="codigo_municipio"
+        [options]="municipioOptions()"
+        placeholder="Buscar municipio…"
+      />
+    </app-form-field>
+
+    <app-form-field label="Circuito" [control]="form.controls.codigo_circuito">
+      <app-search-select
+        formControlName="codigo_circuito"
+        [options]="circuitoOptions()"
+        placeholder="Buscar circuito…"
+      />
+    </app-form-field>
+
+    <app-form-field label="Correo de la congregación" [control]="form.controls.correo_congregacion">
+      <input type="email" formControlName="correo_congregacion" class="ppam-input" maxlength="100" />
+    </app-form-field>
+  </form>
+</app-dialog>

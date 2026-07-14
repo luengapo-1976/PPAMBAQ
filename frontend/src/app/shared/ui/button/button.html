@@ -1,0 +1,13 @@
+<button
+  class="ppam-button"
+  [class.ppam-button--secondary]="variant() === 'secondary'"
+  [class.ppam-button--ghost]="variant() === 'ghost'"
+  [class.ppam-button--whatsapp]="variant() === 'whatsapp'"
+  [type]="type()"
+  [disabled]="disabled()"
+>
+  @if (icon()) {
+    <span class="material-symbols-outlined" aria-hidden="true">{{ icon() }}</span>
+  }
+  <ng-content />
+</button>

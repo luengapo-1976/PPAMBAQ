@@ -1,0 +1,43 @@
+<div class="solicitudes-page">
+  <app-estado-summary
+    [publicadores]="publicadores()"
+    [activeCards]="activeCards()"
+    [subOptionPendiente1]="subOptionPendiente1()"
+    [subOptionPendiente2]="subOptionPendiente2()"
+    [subOptionCumple]="subOptionCumple()"
+    (toggleCard)="toggleCard($event)"
+    (subOptionPendiente1Change)="subOptionPendiente1.set($event)"
+    (subOptionPendiente2Change)="subOptionPendiente2.set($event)"
+    (subOptionCumpleChange)="subOptionCumple.set($event)"
+  />
+
+  <section class="solicitudes-page__grid">
+    <app-publicadores-table
+      [rows]="filteredPublicadores()"
+      [cumpleRequisitosActive]="activeCards().has('cumple')"
+      (newRecord)="onNewRecord()"
+      (editRecord)="onEditRecord($event)"
+      (sendMessage)="onSendMessage($event)"
+    />
+  </section>
+</div>
+
+<app-publicador-form-dialog
+  [open]="dialogOpen()"
+  [mode]="dialogMode()"
+  [record]="editingRecord()"
+  [departamentos]="departamentos()"
+  [municipios]="municipios()"
+  [congregaciones]="congregaciones()"
+  [existingPublicadores]="publicadores()"
+  (closed)="onDialogClosed()"
+  (saved)="onSaved()"
+/>
+
+<app-enviar-mensaje-panel
+  [open]="sendMessagePanelOpen()"
+  [selectedPublicadorIds]="sendMessageSelectedIds()"
+  [publicadores]="publicadores()"
+  (closed)="onSendMessagePanelClosed()"
+  (sent)="onSaved()"
+/>

@@ -1,0 +1,45 @@
+<app-dialog
+  [open]="open()"
+  [title]="dialogTitle()"
+  position="right"
+  rightWidth="40vw"
+  panelBackground="var(--ppam-surface)"
+  (closed)="onCancel()"
+>
+  <app-button dialogToolbar type="button" icon="save" [disabled]="form.invalid || saving()" (click)="onSave()">
+    Guardar
+  </app-button>
+  <app-button dialogToolbar type="button" variant="secondary" icon="close" (click)="onCancel()">
+    Cancelar
+  </app-button>
+  <app-button dialogToolbar type="button" variant="ghost" icon="restart_alt" (click)="onClear()">
+    Limpiar
+  </app-button>
+
+  <form class="form-grid" [formGroup]="form" (ngSubmit)="onSave()">
+    <app-form-field label="Login" [required]="true" [control]="form.controls.login">
+      <input type="text" formControlName="login" class="ppam-input" maxlength="20" autocomplete="off" />
+    </app-form-field>
+
+    <app-form-field label="Rol" [required]="true" [control]="form.controls.rol">
+      <app-select formControlName="rol" [options]="rolOptions" placeholder="Seleccionar rol…" />
+    </app-form-field>
+
+    <app-form-field
+      label="Contraseña"
+      [required]="mode() === 'create'"
+      [control]="form.controls.password"
+      [hint]="passwordHint()"
+    >
+      <input type="password" formControlName="password" class="ppam-input" maxlength="100" autocomplete="new-password" />
+    </app-form-field>
+
+    <app-form-field label="Correo electrónico" [control]="form.controls.correo">
+      <input type="email" formControlName="correo" class="ppam-input" maxlength="100" autocomplete="off" />
+    </app-form-field>
+
+    <app-form-field label="Móvil" [control]="form.controls.movil">
+      <input type="tel" formControlName="movil" class="ppam-input" maxlength="10" inputmode="numeric" />
+    </app-form-field>
+  </form>
+</app-dialog>

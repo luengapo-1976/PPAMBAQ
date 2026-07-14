@@ -1,0 +1,89 @@
+<main class="login">
+  <img class="login__bg-image" src="images/Imagen_Login.png" alt="" aria-hidden="true" />
+
+  <section class="login__panel">
+    <div class="login__panel-inner">
+      <div class="login__card">
+        <div class="login__brand">
+          <img class="login__brand-logo" src="images/LOGO.png" alt="" />
+          <span class="login__brand-text">PPAM BAQ</span>
+        </div>
+
+        <h1 class="login__title">Iniciar sesión</h1>
+        <p class="login__subtitle">Ingresa con tu usuario para continuar.</p>
+
+        @if (errorMessage()) {
+          <div class="login__alert" role="alert">
+            <span class="material-symbols-outlined" aria-hidden="true">error</span>
+            <span>{{ errorMessage() }}</span>
+          </div>
+        }
+
+        <form class="login__form" [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="off">
+          <app-form-field label="Usuario" [required]="true" [control]="form.controls.login">
+            <input type="text" formControlName="login" class="ppam-input" autocomplete="off" />
+          </app-form-field>
+
+          <app-form-field label="Contraseña" [required]="true" [control]="form.controls.password">
+            <div class="login__password-field">
+              <input
+                [type]="passwordVisible() ? 'text' : 'password'"
+                formControlName="password"
+                class="ppam-input"
+                autocomplete="new-password"
+              />
+              <button
+                type="button"
+                class="login__password-toggle"
+                [attr.aria-label]="passwordVisible() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+                (click)="togglePasswordVisible()"
+              >
+                <span class="material-symbols-outlined" aria-hidden="true">
+                  {{ passwordVisible() ? 'visibility_off' : 'visibility' }}
+                </span>
+              </button>
+            </div>
+          </app-form-field>
+
+          <app-button type="submit" class="login__submit" [disabled]="submitting()">
+            {{ submitting() ? 'Ingresando…' : 'Ingresar' }}
+          </app-button>
+
+          <button type="button" class="login__forgot-link" (click)="onOpenForgotPassword()">
+            Recordar contraseña
+          </button>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+
+<app-dialog [open]="forgotPasswordOpen()" title="Recordar contraseña" (closed)="onCancelForgotPassword()">
+  <app-button
+    dialogToolbar
+    type="button"
+    icon="send"
+    [disabled]="forgotForm.invalid || forgotSubmitting()"
+    (click)="onSubmitForgotPassword()"
+  >
+    Enviar
+  </app-button>
+  <app-button dialogToolbar type="button" variant="secondary" icon="close" (click)="onCancelForgotPassword()">
+    Cancelar
+  </app-button>
+
+  <p class="login__forgot-hint">
+    Ingresa el correo electrónico registrado y, si coincide con una cuenta existente, te enviaremos una contraseña
+    temporal.
+  </p>
+
+  @if (forgotFeedback()) {
+    <div class="login__forgot-feedback" role="status">{{ forgotFeedback() }}</div>
+  }
+
+  <form class="login__forgot-form" [formGroup]="forgotForm" (ngSubmit)="onSubmitForgotPassword()">
+    <app-form-field label="Correo electrónico" [required]="true" [control]="forgotForm.controls.correo">
+      <input type="email" formControlName="correo" class="ppam-input" maxlength="100" autocomplete="email" />
+    </app-form-field>
+  </form>
+</app-dialog>

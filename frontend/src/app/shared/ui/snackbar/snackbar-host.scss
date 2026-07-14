@@ -1,0 +1,29 @@
+.snackbar {
+  position: fixed;
+  z-index: 200;
+  left: 50%;
+  bottom: var(--ppam-space-lg);
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: var(--ppam-space-sm);
+  max-width: calc(100vw - var(--ppam-space-lg) * 2);
+  padding: var(--ppam-space-sm) var(--ppam-space-md);
+  border-radius: var(--ppam-radius-control);
+  color: #ffffff;
+  font-size: var(--ppam-small-size);
+  font-weight: 500;
+  box-shadow: var(--ppam-elevation-2);
+}
+
+.snackbar--success {
+  background: var(--ppam-semantic-success);
+}
+
+.snackbar--error {
+  background: var(--ppam-semantic-error);
+}
+
+.snackbar--info {
+  background: var(--ppam-inverse-surface);
+}

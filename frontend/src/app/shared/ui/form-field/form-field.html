@@ -1,0 +1,14 @@
+<label class="form-field" [class.form-field--invalid]="showError()">
+  <span class="form-field__label">
+    {{ label() }}
+    @if (required()) {
+      <span class="form-field__required" aria-hidden="true">*</span>
+    }
+  </span>
+  <ng-content />
+  @if (showError()) {
+    <span class="form-field__error">{{ errorMessage() }}</span>
+  } @else if (hint()) {
+    <span class="form-field__hint">{{ hint() }}</span>
+  }
+</label>

@@ -1,0 +1,36 @@
+<app-dialog
+  [open]="open()"
+  [title]="dialogTitle()"
+  position="right"
+  rightWidth="40vw"
+  panelBackground="var(--ppam-surface)"
+  (closed)="onCancel()"
+>
+  <app-button dialogToolbar type="button" icon="save" [disabled]="form.invalid || saving()" (click)="onSave()">
+    Guardar
+  </app-button>
+  <app-button dialogToolbar type="button" variant="secondary" icon="close" (click)="onCancel()">
+    Cancelar
+  </app-button>
+  <app-button dialogToolbar type="button" variant="ghost" icon="restart_alt" (click)="onClear()">
+    Limpiar
+  </app-button>
+
+  <form class="form-grid" [formGroup]="form" (ngSubmit)="onSave()">
+    <app-form-field label="Código" [required]="true" [control]="form.controls.codigo_circuito">
+      <input type="text" formControlName="codigo_circuito" class="ppam-input" maxlength="10" />
+    </app-form-field>
+
+    <app-form-field label="Nombre del viajante" [control]="form.controls.nombre_viajante">
+      <input type="text" formControlName="nombre_viajante" class="ppam-input" maxlength="100" />
+    </app-form-field>
+
+    <app-form-field label="Móvil" [control]="form.controls.movil">
+      <input type="tel" formControlName="movil" class="ppam-input" maxlength="10" inputmode="numeric" />
+    </app-form-field>
+
+    <app-form-field label="Correo electrónico" [control]="form.controls.correo_electronico">
+      <input type="email" formControlName="correo_electronico" class="ppam-input" maxlength="100" />
+    </app-form-field>
+  </form>
+</app-dialog>

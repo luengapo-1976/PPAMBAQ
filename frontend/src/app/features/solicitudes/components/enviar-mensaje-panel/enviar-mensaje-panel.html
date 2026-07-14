@@ -1,0 +1,91 @@
+<app-dialog
+  [open]="open()"
+  title="Enviar mensaje"
+  position="right"
+  panelBackground="var(--ppam-surface)"
+  (closed)="onClose()"
+>
+  <app-button dialogToolbar type="button" icon="send" [disabled]="!canSend() || sending()" (click)="onEnviar()">
+    Enviar
+  </app-button>
+  <app-button dialogToolbar type="button" variant="secondary" icon="close" (click)="onClose()">Cerrar</app-button>
+
+  <div class="enviar-mensaje">
+    <p class="enviar-mensaje__count">
+      Destinatarios seleccionados: <strong>{{ selectedPublicadores().length }}</strong>
+    </p>
+
+    @if (recipientsWithoutMovil().length > 0) {
+      <p class="enviar-mensaje__warning">
+        {{ recipientsWithoutMovil().length }} destinatario(s) no tienen móvil registrado y no recibirán enlace.
+      </p>
+    }
+
+    <label class="enviar-mensaje__field">
+      <span class="enviar-mensaje__label">Tipo de mensaje</span>
+      <app-search-select [formControl]="tipoControl" [options]="tipoOptions()" placeholder="Buscar tipo…" />
+    </label>
+
+    <label class="enviar-mensaje__field">
+      <span class="enviar-mensaje__label">Mensaje</span>
+      <app-search-select
+        [formControl]="mensajeControl"
+        [options]="mensajeOptions()"
+        [disabled]="!tipoControl.value"
+        placeholder="Buscar mensaje…"
+      />
+    </label>
+
+    <label class="enviar-mensaje__field">
+      <span class="enviar-mensaje__label">Texto del mensaje</span>
+      <textarea
+        class="enviar-mensaje__textarea"
+        rows="8"
+        [value]="mensajeText()"
+        (input)="mensajeText.set($any($event.target).value)"
+        placeholder="Selecciona un mensaje arriba…"
+      ></textarea>
+      <span class="enviar-mensaje__hint">
+        Los textos entre &lt;&gt; (ej. &lt;primer_nombre&gt;) se reemplazan automáticamente por el dato de cada
+        destinatario al generar los enlaces.
+      </span>
+    </label>
+
+    <div class="enviar-mensaje__field">
+      <span class="enviar-mensaje__label">Adjunto asociado</span>
+      <div class="enviar-mensaje__adjunto">{{ adjuntoNombre() || 'Sin adjunto' }}</div>
+    </div>
+
+    @if (recipientLinks(); as links) {
+      <div class="enviar-mensaje__links">
+        <p class="enviar-mensaje__links-title">
+          Enlaces de WhatsApp — haz clic en cada uno para abrir el chat con el mensaje ya escrito y presionar enviar
+          dentro de WhatsApp.
+        </p>
+        <ul class="enviar-mensaje__links-list">
+          @for (item of links; track item.publicador.id) {
+            <li class="enviar-mensaje__link-item">
+              <span class="enviar-mensaje__link-name">
+                {{ nombreCompleto(item.publicador) }}
+                <small>({{ item.publicador.movil }})</small>
+              </span>
+              <a
+                class="enviar-mensaje__link-btn"
+                [class.enviar-mensaje__link-btn--opened]="item.opened"
+                [href]="item.link"
+                target="_blank"
+                rel="noopener"
+                (click)="markOpened(item.publicador.id)"
+              >
+                <span class="material-symbols-outlined" aria-hidden="true">
+                  {{ item.opened ? 'check_circle' : 'open_in_new' }}
+                </span>
+                {{ item.opened ? 'Abierto' : 'Abrir WhatsApp' }}
+              </a>
+            </li>
+          }
+        </ul>
+      </div>
+    }
+  </div>
+</app-dialog>

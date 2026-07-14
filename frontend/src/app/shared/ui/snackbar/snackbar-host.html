@@ -1,0 +1,8 @@
+@if (snackbarService.message(); as message) {
+  <div class="snackbar" [class]="'snackbar--' + message.tone" role="status" aria-live="polite">
+    <span class="material-symbols-outlined" aria-hidden="true">
+      {{ message.tone === 'success' ? 'check_circle' : message.tone === 'error' ? 'error' : 'info' }}
+    </span>
+    <span>{{ message.text }}</span>
+  </div>
+}

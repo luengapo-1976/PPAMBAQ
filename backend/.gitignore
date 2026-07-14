@@ -1,0 +1,15 @@
+# Compiled output
+/dist
+
+# Node
+/node_modules
+npm-debug.log
+
+# Tests
+/coverage
+
+# IDEs
+.idea/
+
+# System files
+.DS_Store

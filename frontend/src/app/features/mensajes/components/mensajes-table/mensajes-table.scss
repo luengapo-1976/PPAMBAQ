@@ -1,0 +1,67 @@
+:host {
+  display: block;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--ppam-border-quiet);
+  border-radius: var(--ppam-radius-card);
+  background: var(--ppam-surface-container-lowest);
+}
+
+.ppam-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--ppam-small-size);
+  table-layout: fixed;
+}
+
+.ppam-table th,
+.ppam-table td {
+  padding: var(--ppam-space-sm) var(--ppam-space-md);
+  text-align: left;
+  border-bottom: 1px solid var(--ppam-border-quiet);
+}
+
+.ppam-table thead th {
+  background: var(--ppam-surface-container-low);
+  color: var(--ppam-on-surface-variant);
+  font-weight: 600;
+}
+
+.ppam-table__tipo {
+  width: 200px;
+  font-weight: 600;
+  color: var(--ppam-on-surface);
+}
+
+.ppam-table__mensaje {
+  max-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ppam-on-surface-variant);
+}
+
+.ppam-table__edit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: var(--ppam-radius-control);
+  background: transparent;
+  color: var(--ppam-primary-container);
+  cursor: pointer;
+}
+
+.ppam-table__edit-btn:hover {
+  background: var(--ppam-surface-container);
+}
+
+.ppam-table__empty {
+  text-align: center;
+  color: var(--ppam-outline);
+  padding: var(--ppam-space-xl);
+}

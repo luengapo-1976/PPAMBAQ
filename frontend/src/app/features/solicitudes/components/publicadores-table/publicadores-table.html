@@ -1,0 +1,130 @@
+@if (cumpleRequisitosActive()) {
+  <div class="table-date-filters">
+    <label class="table-date-filters__field">
+      <span>Fecha de aprobación desde</span>
+      <input
+        type="date"
+        class="ppam-input"
+        [ngModel]="fechaAprobacionDesde()"
+        (ngModelChange)="fechaAprobacionDesde.set($event)"
+      />
+    </label>
+    <label class="table-date-filters__field">
+      <span>Fecha de aprobación hasta</span>
+      <input
+        type="date"
+        class="ppam-input"
+        [ngModel]="fechaAprobacionHasta()"
+        (ngModelChange)="fechaAprobacionHasta.set($event)"
+      />
+    </label>
+    <app-button class="table-date-filters__submit" icon="filter_alt" (click)="onFiltrarFechaAprobacion()">
+      Filtrar
+    </app-button>
+  </div>
+}
+
+<div class="table-toolbar">
+  <div class="table-toolbar__search">
+    <span class="material-symbols-outlined" aria-hidden="true">search</span>
+    <input
+      type="text"
+      placeholder="Buscar por nombre, correo, móvil o congregación…"
+      [ngModel]="searchText()"
+      (ngModelChange)="searchText.set($event)"
+      aria-label="Buscar solicitudes"
+    />
+  </div>
+  <span class="table-toolbar__count">{{ sortedRows().length }} {{ sortedRows().length === 1 ? 'registro' : 'registros' }}</span>
+  <div class="table-toolbar__actions">
+    <app-button variant="secondary" icon="table_view" [disabled]="exportingExcel()" (click)="onExportExcel()">
+      {{ exportingExcel() ? 'Exportando…' : 'Exportar filas' }}
+    </app-button>
+    <app-button variant="secondary" icon="download" (click)="onExportCsv()">Exportar csv</app-button>
+    <app-button variant="whatsapp" [disabled]="selectedIds().size === 0" (click)="onSendMessage()">
+      <svg class="whatsapp-icon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+        <path
+          d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.39 1.26 4.81L2 22l5.42-1.36a9.87 9.87 0 0 0 4.62 1.15h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.86 9.86 0 0 0 12.04 2Zm0 1.67c2.19 0 4.24.85 5.79 2.4a8.14 8.14 0 0 1 2.4 5.8c0 4.53-3.69 8.22-8.23 8.22a8.2 8.2 0 0 1-4.17-1.14l-.3-.17-3.22.81.86-3.13-.19-.32a8.16 8.16 0 0 1-1.26-4.35c0-4.54 3.7-8.24 8.23-8.24Zm-4.5 4.9c-.16 0-.42.06-.64.3-.22.24-.85.83-.85 2.03s.87 2.36 1 2.52c.12.16 1.68 2.68 4.15 3.65 2.05.81 2.47.65 2.92.61.44-.04 1.42-.58 1.62-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28-.24-.12-1.42-.7-1.64-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.02-.38-1.94-1.2-.72-.64-1.2-1.43-1.34-1.67-.14-.24-.02-.37.11-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.32-.75-1.8-.2-.48-.4-.4-.54-.41Z"
+        />
+      </svg>
+      Enviar mensaje
+    </app-button>
+    <app-button icon="add" (click)="newRecord.emit()">Nuevo registro</app-button>
+  </div>
+</div>
+
+<div class="table-scroll">
+  <table class="ppam-table">
+    <thead>
+      <tr>
+        <th class="ppam-table__checkbox-col">
+          <input
+            type="checkbox"
+            class="ppam-checkbox"
+            [checked]="allVisibleSelected()"
+            [indeterminate]="someVisibleSelected()"
+            (change)="toggleAll($any($event.target).checked)"
+            aria-label="Seleccionar todos"
+          />
+        </th>
+        @for (column of columns; track column.key) {
+          <th>
+            <button type="button" class="ppam-table__sort-btn" (click)="onSort(column.key)">
+              {{ column.label }}
+              @if (sortKey() === column.key) {
+                <span class="material-symbols-outlined" aria-hidden="true">
+                  {{ sortDir() === 'asc' ? 'arrow_upward' : 'arrow_downward' }}
+                </span>
+              }
+            </button>
+          </th>
+        }
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of sortedRows(); track row.id) {
+        <tr>
+          <td>
+            <input
+              type="checkbox"
+              class="ppam-checkbox"
+              [checked]="selectedIds().has(row.id)"
+              (change)="toggleRow(row.id, $any($event.target).checked)"
+              [attr.aria-label]="'Seleccionar ' + nombreCompleto(row)"
+            />
+          </td>
+          <td>{{ formatDateShort(row.fecha_solicitud) }}</td>
+          <td>{{ nombreCompleto(row) }}</td>
+          <td>{{ row.sexo === 'F' ? 'Femenino' : 'Masculino' }}</td>
+          <td>{{ row.estado_civil }}</td>
+          <td>{{ row.nombre_conyuge || '—' }}</td>
+          <td>{{ row.movil }}</td>
+          <td>{{ row.correo_electronico }}</td>
+          <td>{{ row.nombre_congregacion || '—' }}</td>
+          <td>{{ row.codigo_circuito || '—' }}</td>
+          <td>{{ row.entrenamiento_requerido }}</td>
+          <td>
+            <app-badge [tone]="estadoConfig[row.estado].tone">{{ row.estado }}</app-badge>
+          </td>
+          <td>
+            <button
+              type="button"
+              class="ppam-table__edit-btn"
+              [attr.aria-label]="'Editar ' + nombreCompleto(row)"
+              (click)="editRecord.emit(row)"
+            >
+              <span class="material-symbols-outlined" aria-hidden="true">edit</span>
+            </button>
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td [attr.colspan]="columns.length + 2" class="ppam-table__empty">
+            No hay solicitudes que coincidan con el filtro actual.
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,57 @@
+<div class="dashboard-filters">
+  <label class="dashboard-filters__field">
+    <span>Departamento</span>
+    <app-search-select
+      [options]="departamentoOptions()"
+      placeholder="Todos"
+      [ngModel]="filters().codigoDepartamento"
+      (ngModelChange)="onDepartamentoChange($event)"
+    />
+  </label>
+
+  <label class="dashboard-filters__field">
+    <span>Municipio</span>
+    <app-search-select
+      [options]="municipioOptions()"
+      placeholder="Todos"
+      [ngModel]="filters().codigoMunicipio"
+      (ngModelChange)="onMunicipioChange($event)"
+    />
+  </label>
+
+  <label class="dashboard-filters__field">
+    <span>Circuito</span>
+    <app-search-select
+      [options]="circuitoOptions()"
+      placeholder="Todos"
+      [ngModel]="filters().codigoCircuito"
+      (ngModelChange)="onCircuitoChange($event)"
+    />
+  </label>
+
+  <label class="dashboard-filters__field">
+    <span>Fecha solicitud desde</span>
+    <input
+      type="date"
+      class="ppam-input"
+      [ngModel]="filters().fechaSolicitudDesde"
+      (ngModelChange)="onFechaDesdeChange($event)"
+    />
+  </label>
+
+  <label class="dashboard-filters__field">
+    <span>Fecha solicitud hasta</span>
+    <input
+      type="date"
+      class="ppam-input"
+      [ngModel]="filters().fechaSolicitudHasta"
+      (ngModelChange)="onFechaHastaChange($event)"
+    />
+  </label>
+
+  @if (hasActiveFilters()) {
+    <app-button class="dashboard-filters__clear" variant="ghost" icon="filter_alt_off" (click)="onClear()">
+      Limpiar filtros
+    </app-button>
+  }
+</div>

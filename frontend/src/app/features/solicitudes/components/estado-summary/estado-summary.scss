@@ -1,0 +1,107 @@
+.estado-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--ppam-space-md);
+}
+
+@media (max-width: 1023px) {
+  .estado-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 599px) {
+  .estado-summary {
+    grid-template-columns: 1fr;
+  }
+}
+
+.summary-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--ppam-surface-container-lowest);
+  border: 1px solid var(--ppam-border-quiet);
+  border-radius: var(--ppam-radius-card);
+  overflow: hidden;
+  transition: border-color var(--ppam-motion-fast);
+}
+
+.summary-card--active {
+  border-color: var(--ppam-primary-container);
+}
+
+.summary-card__header {
+  display: flex;
+  align-items: center;
+  gap: var(--ppam-space-md);
+  width: 100%;
+  padding: var(--ppam-space-md);
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+}
+
+.summary-card--active .summary-card__header {
+  background: color-mix(in srgb, var(--ppam-primary-container) 8%, var(--ppam-surface-container-lowest));
+}
+
+.summary-card__header:hover {
+  background: var(--ppam-surface-container);
+}
+
+.summary-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--ppam-radius-control);
+  background: color-mix(in srgb, var(--ppam-primary-container) 16%, white);
+  color: var(--ppam-primary-container);
+  flex-shrink: 0;
+}
+
+.summary-card__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.summary-card__count {
+  font-size: var(--ppam-h2-size);
+  font-weight: 700;
+  line-height: var(--ppam-h2-line);
+  color: var(--ppam-on-surface);
+}
+
+.summary-card__label {
+  font-size: var(--ppam-small-size);
+  color: var(--ppam-on-surface-variant);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.summary-card__options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ppam-space-xs);
+  padding: var(--ppam-space-sm) var(--ppam-space-md) var(--ppam-space-md);
+  border-top: 1px solid var(--ppam-border-quiet);
+}
+
+.summary-card__option {
+  display: flex;
+  align-items: center;
+  gap: var(--ppam-space-xs);
+  font-size: var(--ppam-small-size);
+  color: var(--ppam-on-surface-variant);
+  cursor: pointer;
+}
+
+.summary-card__option input[type='radio'] {
+  accent-color: var(--ppam-primary-container);
+  cursor: pointer;
+}

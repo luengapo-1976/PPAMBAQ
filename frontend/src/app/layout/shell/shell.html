@@ -1,0 +1,28 @@
+<div class="shell" [style.--ppam-sidebar-current-width]="sidebarLayoutWidth()">
+  <aside
+    id="app-sidebar"
+    class="shell__sidebar"
+    [class.shell__sidebar--collapsed]="sidebarCollapsed()"
+    [class.shell__sidebar--mobile-open]="mobileOpen()"
+  >
+    <app-sidebar [collapsed]="sidebarCollapsed()" (logout)="onLogout()" />
+  </aside>
+
+  @if (mobileOpen()) {
+    <div class="shell__scrim" (click)="closeMobileMenu()"></div>
+  }
+
+  <div class="shell__body">
+    <app-header
+      [pageTitle]="pageTitle()"
+      [sidebarExpanded]="!sidebarCollapsed()"
+      [userName]="userName()"
+      (toggleSidebar)="onToggleSidebar()"
+    />
+    <main class="shell__main">
+      <router-outlet />
+    </main>
+  </div>
+
+  <app-snackbar-host />
+</div>

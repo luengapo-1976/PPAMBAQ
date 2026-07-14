@@ -1,0 +1,20 @@
+<div class="config-page">
+  <app-config-table
+    [rows]="circuitos()"
+    [columns]="columns"
+    [rowId]="rowId"
+    searchPlaceholder="Buscar por código, viajante, móvil o correo…"
+    newRecordLabel="Nuevo registro"
+    emptyMessage="No hay circuitos que coincidan con el filtro actual."
+    (newRecord)="onNewRecord()"
+    (editRecord)="onEditRecord($event)"
+  />
+</div>
+
+<app-circuito-form-dialog
+  [open]="dialogOpen()"
+  [mode]="dialogMode()"
+  [record]="editingRecord()"
+  (closed)="onDialogClosed()"
+  (saved)="onSaved()"
+/>

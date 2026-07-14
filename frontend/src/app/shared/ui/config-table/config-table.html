@@ -1,0 +1,60 @@
+<div class="table-toolbar">
+  <div class="table-toolbar__search">
+    <span class="material-symbols-outlined" aria-hidden="true">search</span>
+    <input
+      type="text"
+      [placeholder]="searchPlaceholder()"
+      [ngModel]="searchText()"
+      (ngModelChange)="searchText.set($event)"
+      aria-label="Buscar"
+    />
+  </div>
+  <div class="table-toolbar__actions">
+    <app-button icon="add" (click)="newRecord.emit()">{{ newRecordLabel() }}</app-button>
+  </div>
+</div>
+
+<div class="table-scroll">
+  <table class="ppam-table">
+    <thead>
+      <tr>
+        @for (column of columns(); track column.key) {
+          <th>
+            <button type="button" class="ppam-table__sort-btn" (click)="onSort(column.key)">
+              {{ column.label }}
+              @if (sortKey() === column.key) {
+                <span class="material-symbols-outlined" aria-hidden="true">
+                  {{ sortDir() === 'asc' ? 'arrow_upward' : 'arrow_downward' }}
+                </span>
+              }
+            </button>
+          </th>
+        }
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of sortedRows(); track rowId()(row)) {
+        <tr>
+          @for (column of columns(); track column.key) {
+            <td>{{ column.value(row) }}</td>
+          }
+          <td>
+            <button
+              type="button"
+              class="ppam-table__edit-btn"
+              aria-label="Editar registro"
+              (click)="editRecord.emit(row)"
+            >
+              <span class="material-symbols-outlined" aria-hidden="true">edit</span>
+            </button>
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td [attr.colspan]="columns().length + 1" class="ppam-table__empty">{{ emptyMessage() }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

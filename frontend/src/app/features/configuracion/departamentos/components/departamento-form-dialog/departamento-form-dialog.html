@@ -1,0 +1,28 @@
+<app-dialog
+  [open]="open()"
+  [title]="dialogTitle()"
+  position="right"
+  rightWidth="40vw"
+  panelBackground="var(--ppam-surface)"
+  (closed)="onCancel()"
+>
+  <app-button dialogToolbar type="button" icon="save" [disabled]="form.invalid || saving()" (click)="onSave()">
+    Guardar
+  </app-button>
+  <app-button dialogToolbar type="button" variant="secondary" icon="close" (click)="onCancel()">
+    Cancelar
+  </app-button>
+  <app-button dialogToolbar type="button" variant="ghost" icon="restart_alt" (click)="onClear()">
+    Limpiar
+  </app-button>
+
+  <form class="form-grid" [formGroup]="form" (ngSubmit)="onSave()">
+    <app-form-field label="Código" [required]="true" [control]="form.controls.codigo_departamento">
+      <input type="text" formControlName="codigo_departamento" class="ppam-input" maxlength="6" />
+    </app-form-field>
+
+    <app-form-field label="Nombre" [required]="true" [control]="form.controls.nombre_departamento">
+      <input type="text" formControlName="nombre_departamento" class="ppam-input" maxlength="100" />
+    </app-form-field>
+  </form>
+</app-dialog>

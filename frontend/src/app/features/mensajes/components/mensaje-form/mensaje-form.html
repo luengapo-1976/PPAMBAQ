@@ -1,0 +1,81 @@
+<form class="mensaje-form" [formGroup]="form" (ngSubmit)="onSave()">
+  <div class="mensaje-form__toolbar">
+    <app-button type="button" variant="secondary" icon="add" (click)="onNewMensaje()">Nuevo mensaje</app-button>
+    <app-button type="button" icon="save" [disabled]="form.invalid || saving()" (click)="onSave()">
+      {{ isEditing() ? 'Actualizar' : 'Guardar' }}
+    </app-button>
+  </div>
+
+  <div class="mensaje-form__row">
+    <app-form-field label="Tipo de mensaje" [required]="true" [control]="form.controls.tipo" class="mensaje-form__tipo">
+      <app-search-select
+        formControlName="tipo"
+        [options]="tipoOptions()"
+        [allowCustomValue]="true"
+        [maxLength]="50"
+        placeholder="Buscar o escribir un tipo nuevo…"
+      />
+    </app-form-field>
+
+    <app-form-field label="Adjunto asociado" class="mensaje-form__adjunto">
+      <div class="mensaje-form__adjunto-control">
+        <div class="mensaje-form__adjunto-name" [class.mensaje-form__adjunto-name--empty]="!adjuntoFileName()">
+          {{ adjuntoFileName() || 'Sin archivo seleccionado' }}
+        </div>
+        @if (adjuntoFileName()) {
+          <button
+            type="button"
+            class="mensaje-form__style-btn"
+            aria-label="Quitar adjunto"
+            title="Quitar adjunto"
+            (click)="onRemoveAdjunto()"
+          >
+            <span class="material-symbols-outlined" aria-hidden="true">close</span>
+          </button>
+        }
+        <app-button type="button" variant="secondary" [disabled]="uploading()" (click)="onExaminar()">
+          {{ uploading() ? 'Subiendo…' : 'Examinar' }}
+        </app-button>
+        <input
+          #adjuntoInput
+          type="file"
+          class="mensaje-form__file-input"
+          (change)="onFileSelected($event)"
+        />
+      </div>
+    </app-form-field>
+  </div>
+
+  <app-form-field label="Mensaje" [required]="true" [control]="form.controls.mensaje">
+    <div class="mensaje-form__editor">
+      <div class="mensaje-form__editor-toolbar">
+        <button
+          type="button"
+          class="mensaje-form__style-btn"
+          aria-label="Negrita"
+          title="Negrita"
+          (click)="onBold()"
+        >
+          <span class="material-symbols-outlined" aria-hidden="true">format_bold</span>
+        </button>
+        <button
+          type="button"
+          class="mensaje-form__style-btn"
+          aria-label="Cursiva"
+          title="Cursiva"
+          (click)="onItalic()"
+        >
+          <span class="material-symbols-outlined" aria-hidden="true">format_italic</span>
+        </button>
+      </div>
+      <textarea
+        #mensajeTextarea
+        formControlName="mensaje"
+        class="mensaje-form__textarea"
+        rows="14"
+        maxlength="2000"
+        placeholder="Escribe el mensaje que se enviará por WhatsApp…"
+      ></textarea>
+    </div>
+  </app-form-field>
+</form>

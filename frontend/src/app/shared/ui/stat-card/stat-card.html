@@ -1,0 +1,15 @@
+<button
+  type="button"
+  class="stat-card"
+  [class.stat-card--selected]="selected()"
+  [attr.aria-pressed]="selected()"
+  (click)="toggle.emit()"
+>
+  <span class="stat-card__icon">
+    <span class="material-symbols-outlined" aria-hidden="true">{{ icon() }}</span>
+  </span>
+  <span class="stat-card__text">
+    <span class="stat-card__count">{{ count() }}</span>
+    <span class="stat-card__label">{{ label() }}</span>
+  </span>
+</button>

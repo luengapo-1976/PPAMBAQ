@@ -1,0 +1,531 @@
+Vamos a desarrollar este proyecto llamado PPAM 
+
+
+# BASE DE DATOS
+
+Usaremos Supabase como BD. Esta contendrá las siguientes tablas:
+
+
+## DEPARTAMENTOS
+- Codigo_departamento (string 6)
+- Nombre_departamento (string 100)
+
+## MUNICIPIOS
+- Codigo_municipio (string 6)
+- Nombre_municipio (string 100)
+- Codigo_departamento (string 6) (Esta es la llave foránea que conecta con la tabla DEPARTAMENTOS)
+
+## CICRUITOS
+- Codigo_circuito (string 10)
+- Nombre_viajante (string 100)
+- Movil - (string 10)
+- Correo_electronico - (string 100)
+- Usuario_registra - (string 40)
+- Fecha_registro - (Date)
+- Usuario_modifica - (string 40)
+- Fecha_modificacion - (Date)
+
+
+## CONGREGACIONES
+- Codigo_congregacion - (número entero)
+- Nombre_congregacion (string 100)
+- Codigo_municipio (string 6)
+- Codigo_departamento (string 6)
+- Codigo_circuito (string 10) (Esta es la llave foránea que conecta con la tabla CIRCUITOS)
+- Correo_congregacion (string 100)
+- Usuario_registra - (string 40)
+- Fecha_registro - (Date)
+- Usuario_modifica - (string 40)
+- Fecha_modificacion - (Date)
+
+
+## PUBLICADORES:
+- Primer_apellido (string 20)
+- Segundo_apellido (string 20)
+- Primer_nombre (string 20)
+- Segundo_nombre (string 20)
+- Direccion (string 100)
+- Codigo_municipio (string 6) (Esta es la llave foránea que conecta con la tabla MUNICIPIOS)
+- Codigo_departamento (string 6) (Esta es la llave foránea que conecta con la tabla DEPARTAMENTOS)
+- Correo_electronico - (string 100)
+- Movil - (string 10)
+- Codigo_congregacion - (número entero) (Esta es la llave foránea que conecta con la tabla CONGREGACIONES)
+- Fecha_nacimiento - (Date)
+- Sexo - (string 1)
+- Fecha_bautismo (Date)
+- Estado_civil - (string 12)
+- Nombre_conyuge - (string 100)
+- Privilegio_Min - (string 40)
+- Privilegio_Ser - (string 40)
+- Participo_antes - (string 2)
+- Fecha_solicitud - (Date)
+- Estado - (string 12) (Va a manejar los estados: "REGISTRADO", "NOTIFICADO PRIMER ENTRENAMIENTO", "NOTIFICADO SEGUNDO ENTRENAMIENTO", "CUMPLE REQUISITOS")
+- Fecha_primer_entrenamiento - (Date)
+- Lugar_primer_entrenamiento - (string 100)
+- Fecha_segundo_entrenamiento - (Date)
+- Lugar_segundo_entrenamiento - (string 100)
+- Login - (string 20)
+- Usuario_registra - (string 40)
+- Fecha_registro - (Date)
+- Usuario_modifica - (string 40)
+- Fecha_modificacion - (Date)
+
+## MENSAJES
+- Tipo - (string 20)
+- Mensaje (string 2000)
+- Usuario_registra - (string 40)
+- Fecha_registro - (Date)
+- Usuario_modifica - (string 40)
+- Fecha_modificacion - (Date)
+
+## USUARIOS
+- Login - (string 20)
+- Rol - (string 20)
+
+
+# LOGICA DE NEGOCIO
+
+Directrices para la distribución de la lógica de negocio
+
+Toda la lógica de negocio deberá implementarse en NestJS. La base de datos PostgreSQL (Supabase) tendrá como responsabilidad principal el almacenamiento y la integridad de la información, evitando trasladar reglas de negocio complejas al motor de base de datos.
+
+En PostgreSQL únicamente se implementarán funciones, procedimientos o triggers cuando aporten un beneficio claro en términos de rendimiento, integridad o automatización de procesos propios de la base de datos.
+
+En particular:
+
+NestJS será responsable de:
+Validaciones de negocio.
+Flujos de aprobación.
+Reglas para cambios de estado.
+Autenticación y autorización.
+Gestión de roles y permisos.
+Procesamiento de solicitudes.
+Integración con servicios externos.
+Envío de notificaciones.
+Generación de reportes y consultas de negocio.
+Orquestación de transacciones entre múltiples entidades.
+PostgreSQL será responsable de:
+Almacenamiento persistente de la información.
+Integridad referencial mediante claves foráneas.
+Restricciones (CHECK, UNIQUE, NOT NULL).
+Índices para optimizar consultas.
+Vistas para simplificar consultas complejas.
+Funciones SQL únicamente cuando mejoren significativamente el rendimiento o reutilicen lógica de acceso a datos.
+Triggers exclusivamente para auditoría, actualización automática de campos (por ejemplo updated_at) o mantenimiento de información técnica.
+No se deberán implementar en la base de datos:
+Procesos de aprobación.
+Validaciones funcionales.
+Reglas de negocio.
+Cálculos propios del dominio.
+Flujo de estados.
+Lógica dependiente del perfil del usuario.
+Procesos que puedan implementarse de forma más clara y mantenible en NestJS.
+
+
+# FRONT END
+
+La aplicación deberá desarrollarse con una arquitectura moderna de tres capas. El frontend se implementará en Angular, siguiendo una arquitectura modular, componentes reutilizables, diseño responsive y comunicación exclusiva mediante APIs REST. El backend se desarrollará en NestJS con TypeScript, aplicando una arquitectura por módulos, separando claramente controladores, servicios y repositorios, e implementando autenticación basada en JWT, autorización por roles y validaciones de negocio. Como plataforma de datos se utilizará Supabase, aprovechando PostgreSQL como base de datos principal, Supabase Auth para la autenticación de usuarios, Storage para almacenar documentos o archivos adjuntos si son necesarios, y las políticas de Row Level Security (RLS) para reforzar la seguridad de acceso a los datos. La aplicación deberá diseñarse para operar 24x7, ser escalable, segura y fácilmente mantenible, utilizando variables de entorno para la configuración, migraciones para el control de cambios del esquema de la base de datos, auditoría de operaciones críticas, manejo centralizado de errores y registro de eventos (logging). La comunicación entre Angular, NestJS y Supabase deberá realizarse siempre mediante conexiones seguras (HTTPS), siguiendo buenas prácticas de desarrollo, seguridad y rendimiento.
+
+
+## Lineamientos UX/UI – Plataforma PPAM
+Objetivo
+
+Diseñar una aplicación web moderna, intuitiva, accesible y altamente responsiva, optimizada para tres perfiles de usuario:
+
+Participante
+Coordinador PPAM
+BackOffice
+
+La aplicación deberá ofrecer una experiencia consistente en dispositivos móviles y de escritorio, adaptando la interfaz según el perfil y el dispositivo utilizado.
+
+Filosofía de diseño
+
+El diseño deberá seguir los siguientes principios:
+
+Mobile First para participantes.
+Adaptive Design para escritorio.
+Minimalismo.
+Muy poca carga cognitiva.
+Procesos cortos.
+Interfaz limpia.
+Muy rápida de utilizar.
+Consistencia visual.
+Accesibilidad WCAG 2.2.
+
+El objetivo es que un usuario nuevo pueda aprender la aplicación prácticamente sin capacitación.
+
+Inspiración visual
+
+La identidad visual deberá inspirarse en la línea gráfica utilizada actualmente por JW.org.
+
+Se deben tomar como referencia:
+
+predominio del blanco
+grandes espacios en blanco
+navegación limpia
+colores sobrios
+tarjetas con imágenes
+iconografía simple
+botones discretos
+sensación de tranquilidad
+
+No se debe copiar el diseño, sino utilizarlo como inspiración.
+
+Estilo visual
+
+Debe transmitir:
+
+simplicidad
+confianza
+organización
+serenidad
+modernidad
+
+Evitar:
+
+colores estridentes
+sombras exageradas
+degradados fuertes
+exceso de animaciones
+interfaces sobrecargadas
+Paleta de colores
+
+Inspirada en JW.org.
+
+Color principal
+
+Azul institucional
+
+Color secundario
+
+Grises claros
+
+Color de éxito
+
+Verde suave
+
+Color de advertencia
+
+Ámbar
+
+Color de error
+
+Rojo moderado
+
+El blanco debe dominar toda la aplicación.
+
+Tipografía
+
+Fuente:
+
+Inter
+
+o
+
+Poppins
+
+Jerarquía muy clara.
+
+Mucho espacio entre componentes.
+
+Nunca utilizar textos pequeños.
+
+Componentes
+
+Construir un Design System reutilizable.
+
+Botones
+
+Cards
+
+Inputs
+
+Select
+
+Stepper
+
+Calendarios
+
+Badges
+
+Alertas
+
+Snackbars
+
+Tablas
+
+Diálogos
+
+Timeline
+
+Avatar
+
+Chips
+
+Todo componente deberá ser reutilizable.
+
+Navegación
+Participante
+
+La navegación debe ser extremadamente sencilla.
+
+No más de cinco opciones principales.
+
+Ejemplo:
+
+Inicio
+
+Mis solicitudes
+
+Agenda
+
+Mi perfil
+
+Ayuda
+
+No utilizar menús complejos.
+
+BackOffice
+
+Menú lateral.
+
+Dashboard.
+
+Tablas.
+
+Filtros.
+
+Búsquedas.
+
+Exportaciones.
+
+Paneles administrativos.
+
+Responsive
+
+No únicamente responsive.
+
+Adaptive.
+
+Desktop
+
+Tablet
+
+Celular
+
+Cada uno debe tener layouts diferentes.
+
+No basta con reorganizar componentes.
+
+Mobile First
+
+La aplicación debe diseñarse primero para móviles.
+
+Los procesos más frecuentes deberán poder completarse con una sola mano.
+
+Botones grandes.
+
+Áreas táctiles mínimas de 44 px.
+
+Accesibilidad
+
+Cumplir WCAG 2.2.
+
+Contraste AA.
+
+Tamaño mínimo de fuente de 16 px.
+
+No depender únicamente del color para comunicar estados.
+
+Compatible con navegación mediante teclado.
+
+Compatible con lectores de pantalla.
+
+Iconografía
+
+Material Symbols.
+
+Iconos sencillos.
+
+Siempre acompañados de texto.
+
+Animaciones
+
+Muy sutiles.
+
+Duración inferior a 250 ms.
+
+Sin animaciones innecesarias.
+
+Formularios
+
+Muy importantes.
+
+Dividir formularios largos en pasos.
+
+Mostrar siempre:
+
+Paso actual
+
+Validaciones inmediatas
+
+Mensajes claros
+
+Nunca mostrar errores técnicos.
+
+Dashboard
+
+BackOffice
+
+Indicadores.
+
+Gráficas.
+
+Solicitudes pendientes.
+
+Personas aprobadas.
+
+Entrenamientos.
+
+Disponibilidad de puntos.
+
+Actividad reciente.
+
+Rendimiento
+
+Toda pantalla debe cargar en menos de 2 segundos.
+
+No bloquear la interfaz.
+
+Mostrar Skeleton Loaders.
+
+No utilizar Spinner largos.
+
+Escalabilidad
+
+La interfaz deberá construirse mediante componentes reutilizables para facilitar la incorporación futura de nuevos módulos sin rediseñar la aplicación.
+
+Diseño emocional
+
+La aplicación debe transmitir la sensación de:
+
+"Todo está organizado."
+
+No debe parecer un ERP.
+
+Debe sentirse cercana.
+
+Sencilla.
+
+Elegante.
+
+Amigable.
+
+Silenciosa visualmente.
+
+
+
+# INSTRUCCIONES PARA CREACIÓN DEL FRONTEND
+
+Vamos a crear la página principal de esta aplicación. 
+
+El nombre de la aplicación es PPAM BAQ. 
+
+PPAM BAQ es una plataforma de gestión diseñada para administrar integralmente las solicitudes que ingresan para la participación en la predicación pública de área metropolitana de Barranquilla, pasando por el registro de las solicitudes, la actualización de los estados del ciclo de vida de las solicitudes, las notificaciones por WhatsApp de los mensajes de notificación de lugares y fechas de entrenamiento, hasta la asignación del login y password que usará el usuario final para acceder a la aplicación.
+
+La aplicación debe contar con un menú principal, lateral izquierdo, que se contraiga o expanda al dar clic sobre un ícono de menú hamburgesa que debe estar ubicado en la parte superior (cabecera de la página) a la derecha de este menú. Al expandir, debe mostrar un ícono a la izquierda y a la derecha el nombre de la opción y al contraerse solo debe mostrar el ícono. Los íconos deben ser de tamaña 24 x 24px.
+
+Las opciones del menú son las siguientes:
+
+# Dashboard
+# Gestión de solicitudes
+# Configuración
+  ## Circuitos
+  ## Congregaciones
+  ## Departamentos
+  ## Municipios
+  ## Mensajes
+  ## Usuarios
+# Salir
+
+En la cabecera se deberá mostrar la opción del menú que haya sido seleccionada y un avatar en forma de círculo para la foto del usuario.
+
+
+Color de fondo para el menú lateral #252525
+Color de contraste para las opciones seleccionadas #4A6DA7 con letra e íconos color #FFFFFF
+Color de contraste al pasar el puntero del moude por cada opción del menú lateral izquietdo #F1F1F1 con letra color #252525
+Color de fondo del body #F1F1F1
+Color de fondo para los formularios #EDF1F7
+Color de los botones #4A6DA7 con letra e íconos color #FFFFFF
+
+---- 
+
+Vamos a crear la página "Gestión de solicitudes". Ten en cuenta la siguientes instrucciones:
+
+- En la parte superior debe ubicarse una sección que muestre en tarjetas el resumen de los siguientes estados: "REGISTRADO", "NOTIFICADO PRIMER ENTRENAMIENTO", "NOTIFICADO SEGUNDO ENTRENAMIENTO", "CUMPLE REQUISITOS". Cada tarjeta debe tener un ícono alusivo, el número de registros en cada estado y debe funcionar como un filtro para alimentar una grilla que indicaré más abajo.
+
+- Debajo de la anterior, debe aparecer una sección que muestre una grilla con la relación de todos los registros al cargar inicialmente la página, con opciones de búsqueda, filtrado y ordenamiento por cualquier columna. En la cabecere ad el agrilla debe ubicarse un botón que diga "Nuevo registro". Esta grilla debe presentar los siguientes datos: 
+
+- Fecha_solicitud en formato AA-MM-DD
+- Nombre completo (concatenación de Primer_nombre, Segundo_nombre, Promer_apellido, Segundo_apellido con un espacio entre cada parte).
+- Sexo
+- Estado_civil
+- Nombre_conyuge
+- Movil
+- Correo_electronico
+- Nombre_congregacion
+- Codigo_circuito
+- Fecha_nacimiento
+- Edad (calculo a partir de Fecha_nacimiento)
+- Fecha_bautismo
+- Años bautismo (calculo a partir de Fecha_bautismo)
+- Privilegio_Min
+- Privilegio_Ser
+- Participo_antes
+- Estado
+- Acciones (con un ícono que represente edición)
+
+
+- Debe tener un formulario flotante que se muestre cuando se de clic En el botón "Nuevo registro" o cuando se de clic en el ícono edición en alguna fila de la grilla. LKa diferencia está en que en el primero caso mostrará el formulario sin ningún campo diligenciado para un nuevo registro y en el segundo llenará los campos del formulario con el registro seleccionado para poder hacer cambios sobre este. Los campos que debe mostrar este formulario sob los siguientes:
+
+- Primer_apellido (string 20) convertir primera letra de cada palabra en mayúsculas.
+- Segundo_apellido (string 20) convertir primera letra de cada palabra en mayúsculas.
+- Primer_nombre (string 20) convertir primera letra de cada palabra en mayúsculas.
+- Segundo_nombre (string 20) convertir primera letra de cada palabra en mayúsculas.
+- Direccion (string 100) convertir primera letra de cada palabra en mayúsculas.
+- Departamento (Combobox con opción de búsqueda que se llenará con la tabla departamentos, con los campos codigo_departamento y nombre_departamento). Al guardar el registro, usará codigo_departamento.
+- Ciudad (Combobox con opción de búsqueda que se llenará con la tabla municipios, con los campos codigo_municipio y nombre_municipio. Debe mostrar solo los que se filtren por codigo_departamento de acuerdo con lo seleccionado en el combobox departamento). Al guardar el registro, usará codigo_municipio.
+- Correo_electronico - (string 100) Validar expresión regular para correo electrónico
+- Movil - (string 10) Validar expresión regular para número de teléfono móvil (máximo 10 dígitos, solo números)
+- Congregación (Combobox con opción de búsqueda que se llenará con la tabla congregaciones, con los campos codigo_congregacion y nombre_congregacion). Al guardar el registro, usará codigo_congregacion.
+- Circuito (Campo de solo lectura que se poblará automáticamente con codigo_circuito al seleccionar una congregación en el combobox congregacón.
+- Fecha_nacimiento - (control tipo Date)
+- Edad (calculo a partir de Fecha_nacimiento)
+- Sexo - Combobox con valores ("Femenino","Masculino"). Al gusrdar el registro se debe usar "F" para "Femenino" y "M" para "Masculino".
+- Fecha_bautismo - (control tipo Date)
+- Edad (solo lectura. Calculo a partir de Fecha_nacimiento)
+- Años bautismo (solo lectura. Calculo a partir de Fecha_bautismo)
+- Estado_civil - (string 12) Comobox con valores "Casado", "Soltero", Divorciado", "Separado", "Viudo".
+- Nombre_conyuge - (string 100) Campo de texto. Solo es visible y obligatorio cuando Sexo = "Femenino" o "F" y Estado_civil = "Casado" o "Separado".
+- Privilegio_Min - (string 40) Combobox con opciones "Ninguno", "Anciano", "Siervo ministerial".
+- Privilegio_Ser - (string 40) Combobox con opciones "Publicador", "Precursor regular", "Precursor especial", "Misionero que sirve en el campo", "Miembro de la familia Betel".
+- Participo_antes - (string 2) Combobox con valores "SI", "NO"
+- Fecha_solicitud - (control tipo Date)
+- Estado - (string 12) (Combobox con los siguientes estados: "REGISTRADO", "NOTIFICADO PRIMER ENTRENAMIENTO", "NOTIFICADO SEGUNDO ENTRENAMIENTO", "CUMPLE REQUISITOS"). Al dar clic en el botón "Nuevo registro" este campo debe ser de solo lectura y debe seleccionar por defecto "REGISTRADO").
+- Fecha_primer_entrenamiento - (control tipo Date) este campo es opcional.
+- Lugar_primer_entrenamiento - (string 100) (control tipo campo de texto) este campo es opcional.
+- Fecha_segundo_entrenamiento - (control tipo Date) este campo es opcional.
+- Lugar_segundo_entrenamiento - (string 100) (control tipo campo de texto) este campo es opcional.
+
+Todos los campos deben tener un control de validación. Todos son obligatorios, teniendo en cuenta las consideraciones particulares suministradas en algunos casos en particupar. El botón "Guardar" debe estar hablitado solo cuando todos los campos obligatorios hayan sido poblados correctamente.
+
+En la parte superior del formulario debe tener los botónes "Guardar" (este hace el insert del registro en la tabla "Publicadores"), "Cancelar" (Este cierra la ventana y limpia el formulario), "Limpiar" (Este mantiene la ventana abierta, pero limpia el contenido de cada campo del formulario). 
+
+Al guardar el registro, si es un insert debe guardar los campos Usuario_registra (login del usuario logueado) y Fecha_registro (Fecha actual del sistema). Si es un update debe guardar los campos Usuario_modifica (login del usuario logueado) y Fecha_modificacion (Fecha actual del sistema).
+
+Al guardar debe cerrarse la ventana flotante del formulario, limpiarse sus campos y actualizar la grilla desplegada y el resumen de los registros por estado de la parte superior.
+
+
+
+
+

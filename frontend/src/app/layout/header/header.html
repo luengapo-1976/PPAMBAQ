@@ -1,0 +1,19 @@
+<header class="header">
+  <div class="header__start">
+    <button
+      type="button"
+      class="header__toggle"
+      [attr.aria-expanded]="sidebarExpanded()"
+      aria-controls="app-sidebar"
+      aria-label="Mostrar u ocultar el menú principal"
+      (click)="toggleSidebar.emit()"
+    >
+      <span class="material-symbols-outlined" aria-hidden="true">menu</span>
+    </button>
+    <h1 class="header__title">{{ pageTitle() }}</h1>
+  </div>
+
+  <div class="header__end">
+    <app-avatar [name]="userName()" [size]="40" />
+  </div>
+</header>

@@ -1,0 +1,34 @@
+@if (visible()) {
+  <div
+    class="dialog-scrim"
+    [class.dialog-scrim--right]="position() === 'right'"
+    [class.dialog-scrim--closing]="closing()"
+    (click)="onScrimClick()"
+  >
+    <div
+      class="dialog-panel"
+      [class.dialog-panel--full]="size() === 'full'"
+      [class.dialog-panel--right]="position() === 'right'"
+      [class.dialog-panel--closing]="closing()"
+      [style.background]="panelBackground()"
+      [style.--dialog-right-width]="rightWidth()"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-label]="title()"
+      (click)="$event.stopPropagation()"
+    >
+      <header class="dialog-panel__header">
+        <h2 class="dialog-panel__title">{{ title() }}</h2>
+        <button type="button" class="dialog-panel__close" aria-label="Cerrar" (click)="closed.emit()">
+          <span class="material-symbols-outlined" aria-hidden="true">close</span>
+        </button>
+      </header>
+      <div class="dialog-panel__toolbar">
+        <ng-content select="[dialogToolbar]" />
+      </div>
+      <div class="dialog-panel__body">
+        <ng-content />
+      </div>
+    </div>
+  </div>
+}

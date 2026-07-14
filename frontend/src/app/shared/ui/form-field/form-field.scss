@@ -1,0 +1,32 @@
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.form-field__label {
+  font-size: var(--ppam-small-size);
+  font-weight: 600;
+  color: var(--ppam-on-surface-variant);
+}
+
+.form-field__required {
+  color: var(--ppam-semantic-error);
+  margin-left: 2px;
+}
+
+.form-field__error {
+  font-size: var(--ppam-label-size);
+  color: var(--ppam-semantic-error);
+}
+
+.form-field__hint {
+  font-size: var(--ppam-label-size);
+  color: var(--ppam-outline);
+}
+
+.form-field--invalid ::ng-deep .ppam-select,
+.form-field--invalid ::ng-deep .search-select__input,
+.form-field--invalid ::ng-deep input {
+  border-color: var(--ppam-semantic-error);
+}

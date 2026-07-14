@@ -1,0 +1,20 @@
+<div class="config-page">
+  <app-config-table
+    [rows]="usuarios()"
+    [columns]="columns"
+    [rowId]="rowId"
+    searchPlaceholder="Buscar por login, rol, correo o móvil…"
+    newRecordLabel="Nuevo registro"
+    emptyMessage="No hay usuarios que coincidan con el filtro actual."
+    (newRecord)="onNewRecord()"
+    (editRecord)="onEditRecord($event)"
+  />
+</div>
+
+<app-usuario-form-dialog
+  [open]="dialogOpen()"
+  [mode]="dialogMode()"
+  [record]="editingRecord()"
+  (closed)="onDialogClosed()"
+  (saved)="onSaved()"
+/>

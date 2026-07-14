@@ -1,0 +1,54 @@
+:host {
+  display: block;
+}
+
+.dashboard-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--ppam-space-md);
+  padding: var(--ppam-space-md);
+  background: var(--ppam-surface-container-lowest);
+  border: 1px solid var(--ppam-border-quiet);
+  border-radius: var(--ppam-radius-card);
+}
+
+.dashboard-filters__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 220px;
+  font-size: var(--ppam-small-size);
+  font-weight: 600;
+  color: var(--ppam-on-surface-variant);
+}
+
+.dashboard-filters__field .ppam-input {
+  width: 100%;
+  height: 44px;
+  padding-inline: var(--ppam-space-sm);
+  border-radius: var(--ppam-radius-control);
+  border: 1px solid var(--ppam-border-quiet);
+  background: var(--ppam-surface-container-lowest);
+  color: var(--ppam-on-surface);
+  font-family: inherit;
+  font-size: var(--ppam-body-size);
+  font-weight: 400;
+  box-sizing: border-box;
+}
+
+.dashboard-filters__field .ppam-input:focus-visible {
+  outline: 2px solid var(--ppam-primary-container);
+  outline-offset: 1px;
+  border-color: var(--ppam-primary-container);
+}
+
+.dashboard-filters__clear {
+  flex-shrink: 0;
+}
+
+@media (max-width: 599px) {
+  .dashboard-filters__field {
+    width: 100%;
+  }
+}
