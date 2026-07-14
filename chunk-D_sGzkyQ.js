@@ -1,0 +1,1 @@
+function s(n){if(!n)return "\u2014";let t=new Date(n);if(Number.isNaN(t.getTime()))return "\u2014";let e=t.getFullYear(),r=String(t.getMonth()+1).padStart(2,"0"),o=String(t.getDate()).padStart(2,"0");return `${e}-${r}-${o}`}var a=/^[^\s@]+@[^\s@]+\.[^\s@]+$/,i=/^\d{1,10}$/;export{a,i,s};
