@@ -1,0 +1,1 @@
+var o=["Administrador","Coordinador"],n=["Activo","Inactivo"];export{n,o};
