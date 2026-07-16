@@ -14,6 +14,7 @@
         <span class="summary-card__label">Total</span>
       </span>
     </button>
+    <div class="summary-card__options" [class.summary-card__options--disabled]="!activeCards().has('total')"></div>
   </div>
 
   <div class="summary-card" [class.summary-card--active]="activeCards().has('pendiente1')">
@@ -31,13 +32,19 @@
         <span class="summary-card__label">Pendiente 1er entrenamiento</span>
       </span>
     </button>
-    <div class="summary-card__options" role="radiogroup" aria-label="Filtro Pendiente 1er entrenamiento">
+    <div
+      class="summary-card__options"
+      [class.summary-card__options--disabled]="!activeCards().has('pendiente1')"
+      role="radiogroup"
+      aria-label="Filtro Pendiente 1er entrenamiento"
+    >
       @for (opt of pendienteSubOptions; track opt.value) {
         <label class="summary-card__option">
           <input
             type="radio"
             name="sub-pendiente1"
             [checked]="subOptionPendiente1() === opt.value"
+            [disabled]="!activeCards().has('pendiente1')"
             (change)="subOptionPendiente1Change.emit(opt.value)"
           />
           {{ opt.label }}
@@ -61,13 +68,19 @@
         <span class="summary-card__label">Pendiente 2do entrenamiento</span>
       </span>
     </button>
-    <div class="summary-card__options" role="radiogroup" aria-label="Filtro Pendiente 2do entrenamiento">
+    <div
+      class="summary-card__options"
+      [class.summary-card__options--disabled]="!activeCards().has('pendiente2')"
+      role="radiogroup"
+      aria-label="Filtro Pendiente 2do entrenamiento"
+    >
       @for (opt of pendienteSubOptions; track opt.value) {
         <label class="summary-card__option">
           <input
             type="radio"
             name="sub-pendiente2"
             [checked]="subOptionPendiente2() === opt.value"
+            [disabled]="!activeCards().has('pendiente2')"
             (change)="subOptionPendiente2Change.emit(opt.value)"
           />
           {{ opt.label }}
@@ -91,13 +104,19 @@
         <span class="summary-card__label">Cumple requisitos</span>
       </span>
     </button>
-    <div class="summary-card__options" role="radiogroup" aria-label="Filtro Cumple requisitos">
+    <div
+      class="summary-card__options"
+      [class.summary-card__options--disabled]="!activeCards().has('cumple')"
+      role="radiogroup"
+      aria-label="Filtro Cumple requisitos"
+    >
       @for (opt of cumpleSubOptions; track opt.value) {
         <label class="summary-card__option">
           <input
             type="radio"
             name="sub-cumple"
             [checked]="subOptionCumple() === opt.value"
+            [disabled]="!activeCards().has('cumple')"
             (change)="subOptionCumpleChange.emit(opt.value)"
           />
           {{ opt.label }}

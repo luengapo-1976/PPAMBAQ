@@ -6,10 +6,11 @@
     aria-autocomplete="list"
     [attr.aria-expanded]="isOpen()"
     [placeholder]="placeholder()"
-    [value]="isOpen() ? query() : selectedLabel()"
+    [value]="displayValue()"
     [disabled]="isFieldDisabled()"
     [attr.maxlength]="maxLength()"
     (focus)="onFocus()"
+    (mousedown)="onMouseDown()"
     (input)="onInput($any($event.target).value)"
     (focusout)="onFocusOut($event)"
     (keydown)="onKeydown($event)"
@@ -19,11 +20,13 @@
 
   @if (isOpen() && dropdownPosition(); as position) {
     <ul
+      #dropdownList
       class="search-select__list"
       role="listbox"
       [style.top.px]="position.top"
       [style.left.px]="position.left"
       [style.width.px]="position.width"
+      [style.max-height.px]="position.maxHeight"
     >
       @if (filteredOptions().length === 0) {
         <li class="search-select__empty">{{ emptyMessage() }}</li>

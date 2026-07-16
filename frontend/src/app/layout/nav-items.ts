@@ -14,6 +14,7 @@ export const NAV_ITEMS: NavItem[] = [
       { label: 'Municipios', icon: 'location_city', route: '/configuracion/municipios' },
       { label: 'Mensajes', icon: 'mail', route: '/configuracion/mensajes' },
       { label: 'Usuarios', icon: 'group', route: '/configuracion/usuarios' },
+      { label: 'Puntos', icon: 'place', route: '/configuracion/puntos' },
     ],
   },
   { label: 'Salir', icon: 'logout', action: 'logout' },

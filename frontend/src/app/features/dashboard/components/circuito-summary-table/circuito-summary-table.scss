@@ -1,0 +1,115 @@
+:host {
+  display: block;
+}
+
+.circuito-summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ppam-space-md);
+}
+
+.circuito-summary__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ppam-space-md);
+  flex-wrap: wrap;
+}
+
+.circuito-summary__scroll {
+  overflow-x: auto;
+  border: 1px solid var(--ppam-border-quiet);
+  border-radius: var(--ppam-radius-card);
+  background: var(--ppam-surface-container-lowest);
+}
+
+.circuito-summary__table {
+  width: 100%;
+  min-width: 1200px;
+}
+
+.circuito-summary__group-header {
+  text-align: center;
+}
+
+.circuito-summary__label-col {
+  min-width: 260px;
+  position: sticky;
+  left: 0;
+  background: inherit;
+}
+
+thead .circuito-summary__label-col {
+  background: var(--ppam-surface-container-low);
+  z-index: 1;
+}
+
+.circuito-summary__row--circuito {
+  background: var(--ppam-surface-container-low);
+  font-weight: 600;
+}
+
+.circuito-summary__row--congregacion {
+  background: var(--ppam-surface-container-lowest);
+}
+
+.circuito-summary__row--publicador {
+  background: var(--ppam-surface-container-lowest);
+  color: var(--ppam-on-surface-variant);
+}
+
+.circuito-summary__row--total {
+  background: var(--ppam-surface-container-low);
+  font-weight: 700;
+  border-top: 2px solid var(--ppam-border-quiet);
+}
+
+.circuito-summary__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ppam-space-xs);
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: inherit;
+  cursor: pointer;
+  padding: var(--ppam-space-xs) 0;
+  min-height: 44px;
+  text-align: left;
+}
+
+.circuito-summary__toggle .material-symbols-outlined {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  color: var(--ppam-primary-container);
+  flex-shrink: 0;
+}
+
+.circuito-summary__toggle--nested {
+  padding-left: var(--ppam-space-lg);
+}
+
+.circuito-summary__publicador-name {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ppam-space-xs);
+  padding-left: calc(var(--ppam-space-lg) * 2);
+  min-height: 44px;
+}
+
+.circuito-summary__publicador-name .material-symbols-outlined {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: var(--ppam-on-surface-variant);
+}
+
+.circuito-summary__publicador-spacer {
+  background: transparent;
+}
+
+.circuito-summary__row--empty td {
+  color: var(--ppam-outline);
+}

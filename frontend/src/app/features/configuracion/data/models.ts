@@ -99,3 +99,37 @@ export interface UsuarioUpdatePayload {
   correo: string | null;
   movil: string | null;
 }
+
+export type PuntoEstado = 'Activo' | 'Inactivo';
+
+export const PUNTO_ESTADOS: PuntoEstado[] = ['Activo', 'Inactivo'];
+
+export interface Punto {
+  codigo_punto: number;
+  nombre_punto: string;
+  direccion: string | null;
+  encargado: string | null;
+  movil: string | null;
+  estado: PuntoEstado;
+  usuario_registra: string | null;
+  fecha_registro: string | null;
+  usuario_modifica: string | null;
+  fecha_modificacion: string | null;
+}
+
+export interface PuntoCreatePayload {
+  codigo_punto: number;
+  nombre_punto: string;
+  direccion: string | null;
+  encargado: string | null;
+  movil: string | null;
+  estado: PuntoEstado;
+}
+
+export interface PuntoUpdatePayload {
+  nombre_punto: string;
+  direccion: string | null;
+  encargado: string | null;
+  movil: string | null;
+  estado: PuntoEstado;
+}

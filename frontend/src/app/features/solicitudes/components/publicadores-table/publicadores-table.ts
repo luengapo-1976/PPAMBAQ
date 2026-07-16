@@ -70,7 +70,7 @@ export class PublicadoresTable {
 
   readonly newRecord = output<void>();
   readonly editRecord = output<Publicador>();
-  readonly sendMessage = output<string[]>();
+  readonly viewActions = output<string[]>();
 
   protected readonly columns = COLUMNS;
   protected readonly estadoConfig = ESTADO_CONFIG;
@@ -122,13 +122,16 @@ export class PublicadoresTable {
       const hasta = this.appliedFechaAprobacionHasta();
       if (desde || hasta) {
         result = result.filter((row) => {
-          if (!row.fecha_aprobacion) {
+          // Se filtra por fecha_cumple_requisitos; si está nula, se usa fecha_aprobacion
+          // como respaldo para no perder registros aprobados que aún no tengan esa fecha.
+          const fecha = row.fecha_cumple_requisitos ?? row.fecha_aprobacion;
+          if (!fecha) {
             return false;
           }
-          if (desde && row.fecha_aprobacion < desde) {
+          if (desde && fecha < desde) {
             return false;
           }
-          if (hasta && row.fecha_aprobacion > hasta) {
+          if (hasta && fecha > hasta) {
             return false;
           }
           return true;
@@ -196,8 +199,8 @@ export class PublicadoresTable {
     });
   }
 
-  protected onSendMessage(): void {
-    this.sendMessage.emit([...this.selectedIds()]);
+  protected onViewActions(): void {
+    this.viewActions.emit([...this.selectedIds()]);
   }
 
   protected readonly exportingExcel = signal(false);

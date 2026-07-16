@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CircuitosRepository } from './circuitos.repository';
 import { CreateCircuitoDto } from './dto/create-circuito.dto';
 import { UpdateCircuitoDto } from './dto/update-circuito.dto';
-import { CURRENT_USER_LOGIN, todayIsoDate } from '../common/audit/audit.util';
+import { todayIsoDate } from '../common/audit/audit.util';
 
 @Injectable()
 export class CircuitosService {
@@ -12,18 +12,18 @@ export class CircuitosService {
     return this.circuitosRepository.findAll();
   }
 
-  create(dto: CreateCircuitoDto) {
+  create(dto: CreateCircuitoDto, usuarioLogin: string) {
     return this.circuitosRepository.create({
       ...dto,
-      usuario_registra: CURRENT_USER_LOGIN,
+      usuario_registra: usuarioLogin,
       fecha_registro: todayIsoDate(),
     });
   }
 
-  update(codigo: string, dto: UpdateCircuitoDto) {
+  update(codigo: string, dto: UpdateCircuitoDto, usuarioLogin: string) {
     return this.circuitosRepository.update(codigo, {
       ...dto,
-      usuario_modifica: CURRENT_USER_LOGIN,
+      usuario_modifica: usuarioLogin,
       fecha_modificacion: todayIsoDate(),
     });
   }

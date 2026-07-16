@@ -27,7 +27,11 @@ export const ESTADO_VALUES = [
   'NOTIFICADO SEGUNDO ENTRENAMIENTO',
   'CUMPLE REQUISITOS',
 ] as const;
-const ENTRENAMIENTO_REQUERIDO_VALUES = ['Primer entrenamiento', 'Segundo entrenamiento', 'Ninguno'] as const;
+const ENTRENAMIENTO_REQUERIDO_VALUES = [
+  'Primer entrenamiento',
+  'Segundo entrenamiento',
+  'Entrenamiento completado',
+] as const;
 
 export class CreatePublicadorDto {
   @IsString()
@@ -120,4 +124,8 @@ export class CreatePublicadorDto {
   @IsOptional()
   @IsDateString()
   fecha_aprobacion?: string | null;
+
+  @IsOptional()
+  @IsDateString()
+  fecha_cumple_requisitos?: string | null;
 }

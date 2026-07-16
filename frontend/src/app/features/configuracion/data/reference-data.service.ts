@@ -14,6 +14,9 @@ import {
   Municipio,
   MunicipioCreatePayload,
   MunicipioUpdatePayload,
+  Punto,
+  PuntoCreatePayload,
+  PuntoUpdatePayload,
   Usuario,
   UsuarioCreatePayload,
   UsuarioUpdatePayload,
@@ -69,6 +72,18 @@ export class ReferenceDataService {
 
   updateCongregacion(codigo: number, payload: CongregacionUpdatePayload): Observable<Congregacion> {
     return this.api.patch<Congregacion>(`congregaciones/${codigo}`, payload);
+  }
+
+  listPuntos(): Observable<Punto[]> {
+    return this.api.get<Punto[]>('puntos');
+  }
+
+  createPunto(payload: PuntoCreatePayload): Observable<Punto> {
+    return this.api.post<Punto>('puntos', payload);
+  }
+
+  updatePunto(codigo: number, payload: PuntoUpdatePayload): Observable<Punto> {
+    return this.api.patch<Punto>(`puntos/${codigo}`, payload);
   }
 
   listUsuarios(): Observable<Usuario[]> {

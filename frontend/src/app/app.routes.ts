@@ -65,6 +65,12 @@ export const routes: Routes = [
         title: 'Usuarios · PPAM BAQ',
         data: { title: 'Usuarios' },
       },
+      {
+        path: 'configuracion/puntos',
+        loadComponent: () => import('./features/configuracion/puntos/puntos').then((m) => m.Puntos),
+        title: 'Puntos · PPAM BAQ',
+        data: { title: 'Puntos' },
+      },
     ],
   },
   { path: '**', redirectTo: '/dashboard' },

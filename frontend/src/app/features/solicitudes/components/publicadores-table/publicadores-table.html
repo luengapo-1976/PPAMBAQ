@@ -41,13 +41,8 @@
       {{ exportingExcel() ? 'Exportando…' : 'Exportar filas' }}
     </app-button>
     <app-button variant="secondary" icon="download" (click)="onExportCsv()">Exportar csv</app-button>
-    <app-button variant="whatsapp" [disabled]="selectedIds().size === 0" (click)="onSendMessage()">
-      <svg class="whatsapp-icon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
-        <path
-          d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.39 1.26 4.81L2 22l5.42-1.36a9.87 9.87 0 0 0 4.62 1.15h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.86 9.86 0 0 0 12.04 2Zm0 1.67c2.19 0 4.24.85 5.79 2.4a8.14 8.14 0 0 1 2.4 5.8c0 4.53-3.69 8.22-8.23 8.22a8.2 8.2 0 0 1-4.17-1.14l-.3-.17-3.22.81.86-3.13-.19-.32a8.16 8.16 0 0 1-1.26-4.35c0-4.54 3.7-8.24 8.23-8.24Zm-4.5 4.9c-.16 0-.42.06-.64.3-.22.24-.85.83-.85 2.03s.87 2.36 1 2.52c.12.16 1.68 2.68 4.15 3.65 2.05.81 2.47.65 2.92.61.44-.04 1.42-.58 1.62-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28-.24-.12-1.42-.7-1.64-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.02-.38-1.94-1.2-.72-.64-1.2-1.43-1.34-1.67-.14-.24-.02-.37.11-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.32-.75-1.8-.2-.48-.4-.4-.54-.41Z"
-        />
-      </svg>
-      Enviar mensaje
+    <app-button icon="tune" [disabled]="selectedIds().size === 0" (click)="onViewActions()">
+      Ver acciones
     </app-button>
     <app-button icon="add" (click)="newRecord.emit()">Nuevo registro</app-button>
   </div>

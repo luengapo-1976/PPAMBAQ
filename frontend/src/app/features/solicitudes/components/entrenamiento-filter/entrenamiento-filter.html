@@ -1,0 +1,74 @@
+<div class="entrenamiento-filter">
+  <div class="entrenamiento-filter__header">
+    <span class="entrenamiento-filter__icon material-symbols-outlined" aria-hidden="true">fact_check</span>
+    <div class="entrenamiento-filter__header-text">
+      <h2 class="entrenamiento-filter__title">Lista de chequeo por entrenamiento</h2>
+      <p class="entrenamiento-filter__hint">
+        Filtra por tipo, fecha y lugar de entrenamiento para ver a los publicadores asignados, y descarga el reporte
+        para el encargado del punto.
+      </p>
+    </div>
+    <button
+      type="button"
+      class="entrenamiento-filter__close"
+      aria-label="Cerrar lista de chequeo por entrenamiento"
+      (click)="closed.emit()"
+    >
+      <span class="material-symbols-outlined" aria-hidden="true">close</span>
+    </button>
+  </div>
+
+  <div class="entrenamiento-filter__fields">
+    <label class="entrenamiento-filter__field">
+      <span>Tipo de entrenamiento</span>
+      <app-select
+        [options]="tipoOptions"
+        placeholder="Seleccione un tipo"
+        [ngModel]="selectedTipoValue()"
+        (ngModelChange)="onTipoChange($event)"
+      />
+    </label>
+
+    <label class="entrenamiento-filter__field">
+      <span>Fecha</span>
+      <app-select
+        [options]="fechaOptions()"
+        placeholder="Seleccione un tipo primero"
+        [disabled]="!isActive()"
+        [ngModel]="selectedFechaValue()"
+        (ngModelChange)="onFechaChange($event)"
+      />
+    </label>
+
+    <label class="entrenamiento-filter__field">
+      <span>Lugar</span>
+      <app-select
+        [options]="lugarOptions()"
+        placeholder="Seleccione un tipo primero"
+        [disabled]="!isActive()"
+        [ngModel]="selectedLugarValue()"
+        (ngModelChange)="onLugarChange($event)"
+      />
+    </label>
+
+    <div class="entrenamiento-filter__actions">
+      @if (isActive()) {
+        <app-button variant="ghost" icon="filter_alt_off" (click)="onLimpiar()">Limpiar</app-button>
+      }
+      <app-button
+        icon="picture_as_pdf"
+        [disabled]="!isActive() || exportingPdf() || filteredRows().length === 0"
+        (click)="onExportPdf()"
+      >
+        {{ exportingPdf() ? 'Generando PDF…' : 'Descargar lista de chequeo' }}
+      </app-button>
+    </div>
+  </div>
+
+  @if (isActive()) {
+    <p class="entrenamiento-filter__count">
+      {{ filteredRows().length }}
+      {{ filteredRows().length === 1 ? 'publicador asignado' : 'publicadores asignados' }} a este filtro.
+    </p>
+  }
+</div>

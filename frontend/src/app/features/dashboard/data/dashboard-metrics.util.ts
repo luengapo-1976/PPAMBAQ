@@ -6,6 +6,7 @@ export interface DashboardFilters {
   codigoDepartamento: string | null;
   codigoMunicipio: string | null;
   codigoCircuito: string | null;
+  codigoCongregacion: number | null;
   fechaSolicitudDesde: string | null;
   fechaSolicitudHasta: string | null;
 }
@@ -14,6 +15,7 @@ export const EMPTY_DASHBOARD_FILTERS: DashboardFilters = {
   codigoDepartamento: null,
   codigoMunicipio: null,
   codigoCircuito: null,
+  codigoCongregacion: null,
   fechaSolicitudDesde: null,
   fechaSolicitudHasta: null,
 };
@@ -29,10 +31,13 @@ export function applyDashboardFilters(rows: Publicador[], filters: DashboardFilt
     if (filters.codigoCircuito && row.codigo_circuito !== filters.codigoCircuito) {
       return false;
     }
-    if (filters.fechaSolicitudDesde && row.fecha_solicitud < filters.fechaSolicitudDesde) {
+    if (filters.codigoCongregacion != null && row.codigo_congregacion !== filters.codigoCongregacion) {
       return false;
     }
-    if (filters.fechaSolicitudHasta && row.fecha_solicitud > filters.fechaSolicitudHasta) {
+    if (filters.fechaSolicitudDesde && (!row.fecha_solicitud || row.fecha_solicitud < filters.fechaSolicitudDesde)) {
+      return false;
+    }
+    if (filters.fechaSolicitudHasta && (!row.fecha_solicitud || row.fecha_solicitud > filters.fechaSolicitudHasta)) {
       return false;
     }
     return true;
@@ -60,7 +65,7 @@ export function computeKpis(rows: Publicador[]): DashboardKpis {
     if (row.estado === 'CUMPLE REQUISITOS') {
       aprobados++;
     }
-    if (row.entrenamiento_requerido !== 'Ninguno') {
+    if (row.entrenamiento_requerido !== 'Entrenamiento completado') {
       pendientesEntrenamiento++;
     }
     if (row.fecha_solicitud?.startsWith(currentMonthPrefix)) {
@@ -192,7 +197,7 @@ export interface RecentActivityItem {
 
 export function recentActivity(rows: Publicador[], limit = 8): RecentActivityItem[] {
   return [...rows]
-    .filter((row) => !!(row.fecha_modificacion || row.fecha_registro))
+    .filter((row) => !!(row.fecha_modificacion || row.fecha_registro) && row.estado in ESTADO_CONFIG)
     .map((row) => {
       const fecha = row.fecha_modificacion ?? row.fecha_registro ?? '';
       const accion: 'Registrado' | 'Modificado' = row.fecha_modificacion ? 'Modificado' : 'Registrado';

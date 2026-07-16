@@ -30,6 +30,16 @@
   </label>
 
   <label class="dashboard-filters__field">
+    <span>Congregación</span>
+    <app-search-select
+      [options]="congregacionOptions()"
+      placeholder="Todas"
+      [ngModel]="selectedCongregacionValue()"
+      (ngModelChange)="onCongregacionChange($event)"
+    />
+  </label>
+
+  <label class="dashboard-filters__field">
     <span>Fecha solicitud desde</span>
     <input
       type="date"

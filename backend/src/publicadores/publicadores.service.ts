@@ -2,7 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { PublicadoresRepository } from './publicadores.repository';
 import { CreatePublicadorDto } from './dto/create-publicador.dto';
 import { UpdatePublicadorDto } from './dto/update-publicador.dto';
-import { CURRENT_USER_LOGIN, todayIsoDate } from '../common/audit/audit.util';
+import { MensajeRelacionadoCon } from './dto/notificar-entrenamiento.dto';
+import { AsignarLugarEntrenamientoDto } from './dto/asignar-lugar-entrenamiento.dto';
+import { todayIsoDate } from '../common/audit/audit.util';
 
 interface CongregacionEmbed {
   nombre_congregacion: string;
@@ -34,55 +36,57 @@ export class PublicadoresService {
     return (rows as unknown as PublicadorRow[]).map(flatten);
   }
 
-  async create(dto: CreatePublicadorDto) {
+  async create(dto: CreatePublicadorDto, usuarioLogin: string) {
     const login = await this.buildUniqueLogin(dto.primer_nombre, dto.primer_apellido);
     const row = await this.publicadoresRepository.create({
       ...dto,
       login,
-      usuario_registra: CURRENT_USER_LOGIN,
+      usuario_registra: usuarioLogin,
       fecha_registro: todayIsoDate(),
     });
     return flatten(row as unknown as PublicadorRow);
   }
 
-  async update(id: string, dto: UpdatePublicadorDto) {
+  async update(id: string, dto: UpdatePublicadorDto, usuarioLogin: string) {
     const row = await this.publicadoresRepository.update(id, {
       ...dto,
-      usuario_modifica: CURRENT_USER_LOGIN,
+      usuario_modifica: usuarioLogin,
       fecha_modificacion: todayIsoDate(),
     });
     return flatten(row as unknown as PublicadorRow);
   }
 
-  async notificarEntrenamiento(ids: string[]) {
-    const rows = await this.publicadoresRepository.findEstadoByIds(ids);
+  async notificarEntrenamiento(ids: string[], mensajeRelacionadoCon: MensajeRelacionadoCon, usuarioLogin: string) {
+    if (mensajeRelacionadoCon === 'otro') {
+      return { actualizados: 0 };
+    }
+
     const today = todayIsoDate();
+    const esPrimero = mensajeRelacionadoCon === 'Primer entrenamiento';
 
-    const idsRegistrado = rows.filter((r) => r.estado === 'REGISTRADO').map((r) => r.id);
-    const idsNotificadoPrimero = rows
-      .filter((r) => r.estado === 'NOTIFICADO PRIMER ENTRENAMIENTO')
-      .map((r) => r.id);
-
-    await this.publicadoresRepository.bulkUpdateByIds(idsRegistrado, 'REGISTRADO', {
-      estado: 'NOTIFICADO PRIMER ENTRENAMIENTO',
-      mensaje_primer_entrenamiento: today,
-      entrenamiento_requerido: 'Segundo entrenamiento',
-      usuario_modifica: CURRENT_USER_LOGIN,
+    await this.publicadoresRepository.bulkUpdateByIds(ids, {
+      estado: esPrimero ? 'NOTIFICADO PRIMER ENTRENAMIENTO' : 'NOTIFICADO SEGUNDO ENTRENAMIENTO',
+      entrenamiento_requerido: mensajeRelacionadoCon,
+      ...(esPrimero ? { mensaje_primer_entrenamiento: today } : { mensaje_segundo_entrenamiento: today }),
+      usuario_modifica: usuarioLogin,
       fecha_modificacion: today,
     });
 
-    await this.publicadoresRepository.bulkUpdateByIds(
-      idsNotificadoPrimero,
-      'NOTIFICADO PRIMER ENTRENAMIENTO',
-      {
-        estado: 'NOTIFICADO SEGUNDO ENTRENAMIENTO',
-        mensaje_segundo_entrenamiento: today,
-        usuario_modifica: CURRENT_USER_LOGIN,
-        fecha_modificacion: today,
-      },
-    );
+    return { actualizados: ids.length };
+  }
 
-    return { actualizados: idsRegistrado.length + idsNotificadoPrimero.length };
+  async asignarLugarEntrenamiento(dto: AsignarLugarEntrenamientoDto, usuarioLogin: string) {
+    const esPrimero = dto.tipoEntrenamiento === 'Primer entrenamiento';
+
+    await this.publicadoresRepository.bulkUpdateByIds(dto.ids, {
+      ...(esPrimero
+        ? { fecha_primera_capacitacion: dto.fecha, lugar_primera_capacitacion: dto.codigoPunto }
+        : { fecha_segunda_capacitacion: dto.fecha, lugar_segunda_capacitacion: dto.codigoPunto }),
+      usuario_modifica: usuarioLogin,
+      fecha_modificacion: todayIsoDate(),
+    });
+
+    return { actualizados: dto.ids.length };
   }
 
   /** login = primer_nombre + primer_apellido en minúsculas; si ya existe en

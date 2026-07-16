@@ -195,15 +195,20 @@ export type Database = {
           estado_civil: string | null
           fecha_aprobacion: string | null
           fecha_bautismo: string | null
+          fecha_cumple_requisitos: string | null
           fecha_modificacion: string | null
           fecha_nacimiento: string | null
           fecha_primer_entrenamiento: string | null
+          fecha_primera_capacitacion: string | null
           fecha_registro: string | null
+          fecha_segunda_capacitacion: string | null
           fecha_segundo_entrenamiento: string | null
           fecha_solicitud: string | null
           id: string
           login: string | null
           lugar_primer_entrenamiento: string | null
+          lugar_primera_capacitacion: number | null
+          lugar_segunda_capacitacion: number | null
           lugar_segundo_entrenamiento: string | null
           mensaje_primer_entrenamiento: string | null
           mensaje_segundo_entrenamiento: string | null
@@ -232,15 +237,20 @@ export type Database = {
           estado_civil?: string | null
           fecha_aprobacion?: string | null
           fecha_bautismo?: string | null
+          fecha_cumple_requisitos?: string | null
           fecha_modificacion?: string | null
           fecha_nacimiento?: string | null
           fecha_primer_entrenamiento?: string | null
+          fecha_primera_capacitacion?: string | null
           fecha_registro?: string | null
+          fecha_segunda_capacitacion?: string | null
           fecha_segundo_entrenamiento?: string | null
           fecha_solicitud?: string | null
           id?: string
           login?: string | null
           lugar_primer_entrenamiento?: string | null
+          lugar_primera_capacitacion?: number | null
+          lugar_segunda_capacitacion?: number | null
           lugar_segundo_entrenamiento?: string | null
           mensaje_primer_entrenamiento?: string | null
           mensaje_segundo_entrenamiento?: string | null
@@ -269,15 +279,20 @@ export type Database = {
           estado_civil?: string | null
           fecha_aprobacion?: string | null
           fecha_bautismo?: string | null
+          fecha_cumple_requisitos?: string | null
           fecha_modificacion?: string | null
           fecha_nacimiento?: string | null
           fecha_primer_entrenamiento?: string | null
+          fecha_primera_capacitacion?: string | null
           fecha_registro?: string | null
+          fecha_segunda_capacitacion?: string | null
           fecha_segundo_entrenamiento?: string | null
           fecha_solicitud?: string | null
           id?: string
           login?: string | null
           lugar_primer_entrenamiento?: string | null
+          lugar_primera_capacitacion?: number | null
+          lugar_segunda_capacitacion?: number | null
           lugar_segundo_entrenamiento?: string | null
           mensaje_primer_entrenamiento?: string | null
           mensaje_segundo_entrenamiento?: string | null
@@ -317,6 +332,45 @@ export type Database = {
             referencedColumns: ["codigo_municipio"]
           },
         ]
+      }
+      puntos: {
+        Row: {
+          codigo_punto: number
+          direccion: string | null
+          encargado: string | null
+          estado: string
+          fecha_modificacion: string | null
+          fecha_registro: string | null
+          movil: string | null
+          nombre_punto: string
+          usuario_modifica: string | null
+          usuario_registra: string | null
+        }
+        Insert: {
+          codigo_punto: number
+          direccion?: string | null
+          encargado?: string | null
+          estado?: string
+          fecha_modificacion?: string | null
+          fecha_registro?: string | null
+          movil?: string | null
+          nombre_punto: string
+          usuario_modifica?: string | null
+          usuario_registra?: string | null
+        }
+        Update: {
+          codigo_punto?: number
+          direccion?: string | null
+          encargado?: string | null
+          estado?: string
+          fecha_modificacion?: string | null
+          fecha_registro?: string | null
+          movil?: string | null
+          nombre_punto?: string
+          usuario_modifica?: string | null
+          usuario_registra?: string | null
+        }
+        Relationships: []
       }
       usuarios: {
         Row: {

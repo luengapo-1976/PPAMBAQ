@@ -9,7 +9,12 @@
   align-items: center;
   justify-content: center;
   background: rgba(27, 28, 28, 0.44);
-  backdrop-filter: blur(2px);
+  /** Sin backdrop-filter a propósito: crea un "containing block" para los
+   * descendientes position:fixed (p. ej. la lista de SearchSelect), lo que los
+   * desplaza exactamente el ancho del sidebar respecto al viewport real y los
+   * corta o desalinea. Verificado: el desfase medía siempre igual al ancho
+   * actual del sidebar (240px expandido / 72px colapsado). No reintroducir sin
+   * antes migrar la lista desplegable a un overlay fuera del árbol del diálogo. */
   padding: var(--ppam-space-md);
   transition: left var(--ppam-motion-base);
 }
@@ -33,6 +38,7 @@
 .dialog-scrim--right {
   justify-content: flex-end;
   padding: 0;
+  padding-right: var(--dialog-right-offset, 0px);
   align-items: stretch;
   animation: dialog-scrim-fade-in 200ms ease-out;
 }
@@ -76,22 +82,18 @@
 @keyframes dialog-scrim-fade-in {
   from {
     background: rgba(27, 28, 28, 0);
-    backdrop-filter: blur(0);
   }
   to {
     background: rgba(27, 28, 28, 0.44);
-    backdrop-filter: blur(2px);
   }
 }
 
 @keyframes dialog-scrim-fade-out {
   from {
     background: rgba(27, 28, 28, 0.44);
-    backdrop-filter: blur(2px);
   }
   to {
     background: rgba(27, 28, 28, 0);
-    backdrop-filter: blur(0);
   }
 }
 

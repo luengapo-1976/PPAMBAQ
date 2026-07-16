@@ -7,7 +7,7 @@ import { SearchSelect, SearchSelectOption } from '../../../../shared/ui/search-s
 import { SnackbarService } from '../../../../shared/ui/snackbar/snackbar.service';
 import { MensajesService } from '../../../mensajes/data/mensajes.service';
 import { Mensaje } from '../../../mensajes/data/models';
-import { Publicador } from '../../data/models';
+import { MENSAJE_RELACIONADO_CON_OPTIONS, MensajeRelacionadoCon, Publicador } from '../../data/models';
 import { PublicadoresService } from '../../data/publicadores.service';
 import { nombreCompleto } from '../../data/publicador.utils';
 import { buildWhatsAppLink, substitutePlaceholders } from '../../data/mensaje-placeholder.util';
@@ -32,6 +32,8 @@ export class EnviarMensajePanel {
   readonly open = input(false);
   readonly selectedPublicadorIds = input<string[]>([]);
   readonly publicadores = input<Publicador[]>([]);
+  /** Separación desde el borde derecho, para dejar espacio a la barra de acciones cuando se abre desde ahí. */
+  readonly rightOffset = input('0px');
   readonly closed = output<void>();
   readonly sent = output<void>();
 
@@ -43,9 +45,18 @@ export class EnviarMensajePanel {
 
   protected readonly tipoControl = new FormControl<string | null>(null);
   protected readonly mensajeControl = new FormControl<string | null>(null);
+  protected readonly mensajeRelacionadoControl = new FormControl<MensajeRelacionadoCon | null>(null);
+
+  protected readonly mensajeRelacionadoOptions: SearchSelectOption[] = MENSAJE_RELACIONADO_CON_OPTIONS.map((v) => ({
+    value: v,
+    label: v === 'otro' ? 'Otro' : v,
+  }));
 
   private readonly selectedTipo = toSignal(this.tipoControl.valueChanges, { initialValue: null });
   private readonly selectedMensajeId = toSignal(this.mensajeControl.valueChanges, { initialValue: null });
+  private readonly selectedMensajeRelacionado = toSignal(this.mensajeRelacionadoControl.valueChanges, {
+    initialValue: null,
+  });
 
   protected readonly tipoOptions = computed<SearchSelectOption[]>(() => {
     const tipos = [...new Set(this.mensajes().map((m) => m.tipo))].sort();
@@ -76,7 +87,11 @@ export class EnviarMensajePanel {
   protected readonly recipientsWithoutMovil = computed(() => this.selectedPublicadores().filter((p) => !p.movil));
 
   protected readonly canSend = computed(
-    () => !!this.selectedTipo() && !!this.selectedMensajeId() && this.mensajeText().trim().length > 0,
+    () =>
+      !!this.selectedTipo() &&
+      !!this.selectedMensajeId() &&
+      !!this.selectedMensajeRelacionado() &&
+      this.mensajeText().trim().length > 0,
   );
 
   constructor() {
@@ -85,6 +100,7 @@ export class EnviarMensajePanel {
         this.loadMensajes();
         this.tipoControl.reset(null, { emitEvent: false });
         this.mensajeControl.reset(null, { emitEvent: false });
+        this.mensajeRelacionadoControl.reset(null, { emitEvent: false });
         this.mensajeText.set('');
         this.recipientLinks.set(null);
       }
@@ -154,19 +170,25 @@ export class EnviarMensajePanel {
     }
 
     this.sending.set(true);
-    this.publicadoresService.notificarEntrenamiento(links.map((l) => l.publicador.id)).subscribe({
-      next: () => {
-        this.sending.set(false);
-        this.tipoControl.reset(null);
-        this.mensajeControl.reset(null);
-        this.mensajeText.set('');
-        this.sent.emit();
-      },
-      error: () => {
-        this.sending.set(false);
-        this.snackbar.error('Los enlaces se generaron, pero no se pudo actualizar el estado de las solicitudes.');
-      },
-    });
+    this.publicadoresService
+      .notificarEntrenamiento(
+        links.map((l) => l.publicador.id),
+        this.selectedMensajeRelacionado()!,
+      )
+      .subscribe({
+        next: () => {
+          this.sending.set(false);
+          this.tipoControl.reset(null);
+          this.mensajeControl.reset(null);
+          this.mensajeRelacionadoControl.reset(null);
+          this.mensajeText.set('');
+          this.sent.emit();
+        },
+        error: () => {
+          this.sending.set(false);
+          this.snackbar.error('Los enlaces se generaron, pero no se pudo actualizar el estado de las solicitudes.');
+        },
+      });
   }
 
   protected markOpened(publicadorId: string): void {

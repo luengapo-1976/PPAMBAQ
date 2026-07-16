@@ -11,13 +11,30 @@
     (subOptionCumpleChange)="subOptionCumple.set($event)"
   />
 
+  @if (entrenamientoFilterVisible()) {
+    <app-entrenamiento-filter
+      [allPublicadores]="publicadores()"
+      [filteredRows]="gridRows()"
+      [puntos]="puntos()"
+      [filtro]="entrenamientoFiltro()"
+      (filtroChange)="entrenamientoFiltro.set($event)"
+      (closed)="entrenamientoFilterVisible.set(false)"
+    />
+  } @else {
+    <div class="solicitudes-page__checklist-toggle">
+      <app-button variant="secondary" icon="fact_check" (click)="onToggleEntrenamientoFilter()">
+        Lista de chequeo
+      </app-button>
+    </div>
+  }
+
   <section class="solicitudes-page__grid">
     <app-publicadores-table
-      [rows]="filteredPublicadores()"
+      [rows]="gridRows()"
       [cumpleRequisitosActive]="activeCards().has('cumple')"
       (newRecord)="onNewRecord()"
       (editRecord)="onEditRecord($event)"
-      (sendMessage)="onSendMessage($event)"
+      (viewActions)="onViewActions($event)"
     />
   </section>
 </div>
@@ -30,14 +47,33 @@
   [municipios]="municipios()"
   [congregaciones]="congregaciones()"
   [existingPublicadores]="publicadores()"
+  [puntos]="puntos()"
   (closed)="onDialogClosed()"
   (saved)="onSaved()"
 />
 
+<app-asignar-lugar-panel
+  [open]="activeAccion() === 'asignar-lugar'"
+  [selectedPublicadorIds]="accionesSelectedIds()"
+  [rightOffset]="accionesBarWidth()"
+  (closed)="onAccionPanelClosed()"
+  (saved)="onSaved()"
+/>
+
 <app-enviar-mensaje-panel
-  [open]="sendMessagePanelOpen()"
-  [selectedPublicadorIds]="sendMessageSelectedIds()"
+  [open]="activeAccion() === 'enviar-mensaje'"
+  [selectedPublicadorIds]="accionesSelectedIds()"
   [publicadores]="publicadores()"
-  (closed)="onSendMessagePanelClosed()"
+  [rightOffset]="accionesBarWidth()"
+  (closed)="onAccionPanelClosed()"
   (sent)="onSaved()"
+/>
+
+<app-acciones-bar
+  [open]="accionesBarOpen()"
+  [collapsed]="accionesBarCollapsed()"
+  (collapsedChange)="accionesBarCollapsed.set($event)"
+  (closed)="onAccionesBarClosed()"
+  (selectAsignarLugar)="activeAccion.set('asignar-lugar')"
+  (selectEnviarMensaje)="activeAccion.set('enviar-mensaje')"
 />

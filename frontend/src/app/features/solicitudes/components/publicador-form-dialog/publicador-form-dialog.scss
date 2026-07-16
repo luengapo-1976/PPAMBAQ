@@ -5,6 +5,10 @@
   gap: var(--ppam-space-md) var(--ppam-space-lg);
 }
 
+.s73-file-input {
+  display: none;
+}
+
 ::ng-deep .form-field--wide {
   grid-column: 1 / -1;
 }
@@ -93,4 +97,13 @@
   justify-content: flex-end;
   gap: var(--ppam-space-sm);
   flex-wrap: wrap;
+}
+
+.duplicate-warning {
+  margin: var(--ppam-space-sm) 0 0;
+  padding: var(--ppam-space-sm);
+  border-radius: var(--ppam-radius-control);
+  background: color-mix(in srgb, var(--ppam-error) 12%, white);
+  color: var(--ppam-error);
+  font-size: var(--ppam-small-size);
 }

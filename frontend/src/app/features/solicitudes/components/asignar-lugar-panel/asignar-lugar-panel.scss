@@ -1,0 +1,51 @@
+.asignar-lugar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ppam-space-md);
+}
+
+.asignar-lugar__count {
+  color: var(--ppam-on-surface-variant);
+}
+
+.asignar-lugar__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.asignar-lugar__label {
+  font-size: var(--ppam-small-size);
+  font-weight: 600;
+  color: var(--ppam-on-surface-variant);
+}
+
+.asignar-lugar__detalle {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--ppam-space-sm);
+  border-radius: var(--ppam-radius-control);
+  background: var(--ppam-surface-container);
+  color: var(--ppam-on-surface);
+  font-size: var(--ppam-body-size);
+}
+
+.ppam-input {
+  width: 100%;
+  height: 44px;
+  padding-inline: var(--ppam-space-sm);
+  border-radius: var(--ppam-radius-control);
+  border: 1px solid var(--ppam-border-quiet);
+  background: var(--ppam-surface-container-lowest);
+  color: var(--ppam-on-surface);
+  font-family: inherit;
+  font-size: var(--ppam-body-size);
+  box-sizing: border-box;
+}
+
+.ppam-input:focus-visible {
+  outline: 2px solid var(--ppam-primary-container);
+  outline-offset: 1px;
+  border-color: var(--ppam-primary-container);
+}

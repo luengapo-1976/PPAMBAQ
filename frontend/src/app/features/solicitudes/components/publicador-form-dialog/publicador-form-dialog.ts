@@ -1,5 +1,5 @@
 import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { Dialog } from '../../../../shared/ui/dialog/dialog';
 import { Button } from '../../../../shared/ui/button/button';
@@ -23,6 +23,7 @@ import {
   PrivilegioSer,
   Publicador,
   PublicadorPayload,
+  PublicadorUpdatePayload,
   Sexo,
 } from '../../data/models';
 import {
@@ -34,7 +35,9 @@ import {
   toTitleCase,
   yearsSince,
 } from '../../data/publicador.utils';
-import { DuplicateCandidate, findDuplicateCandidates } from '../../data/duplicate-check';
+import { DuplicateCandidate, DuplicateReason, findDuplicateCandidates } from '../../data/duplicate-check';
+import { parseS73Pdf, S73ImportValues } from '../../data/s73-import.util';
+import { Punto } from '../../../configuracion/data/models';
 
 const ESTADO_CIVIL_OPTIONS: SelectOption[] = ['Casado', 'Soltero', 'Divorciado', 'Separado', 'Viudo'].map(
   (value) => ({ value, label: value }),
@@ -83,11 +86,13 @@ export class PublicadorFormDialog {
   readonly municipios = input.required<Municipio[]>();
   readonly congregaciones = input.required<Congregacion[]>();
   readonly existingPublicadores = input<Publicador[]>([]);
+  readonly puntos = input<Punto[]>([]);
 
   readonly closed = output<void>();
   readonly saved = output<void>();
 
   protected readonly saving = signal(false);
+  protected readonly importingS73 = signal(false);
 
   protected readonly estadoCivilOptions = ESTADO_CIVIL_OPTIONS;
   protected readonly privilegioMinOptions = PRIVILEGIO_MIN_OPTIONS;
@@ -111,6 +116,13 @@ export class PublicadorFormDialog {
   protected readonly duplicateCandidates = signal<DuplicateCandidate[]>([]);
   protected readonly selectedCandidateId = signal<string | null>(null);
 
+  protected readonly duplicateReasons = computed<Set<DuplicateReason>>(
+    () => new Set(this.duplicateCandidates().flatMap((c) => c.reasons)),
+  );
+  protected readonly duplicateHasMovilOrCorreo = computed(
+    () => this.duplicateReasons().has('movil') || this.duplicateReasons().has('correo'),
+  );
+
   protected readonly form = this.fb.group({
     primer_apellido: ['', [Validators.required, Validators.maxLength(20)]],
     segundo_apellido: ['', [Validators.maxLength(20)]],
@@ -133,8 +145,9 @@ export class PublicadorFormDialog {
     participo_antes: ['', Validators.required],
     fecha_solicitud: ['', Validators.required],
     estado: [{ value: 'REGISTRADO', disabled: true }, Validators.required],
-    entrenamiento_requerido: [{ value: 'Ninguno', disabled: true }, Validators.required],
+    entrenamiento_requerido: [{ value: 'Primer entrenamiento', disabled: true }, Validators.required],
     fecha_aprobacion: [''],
+    fecha_cumple_requisitos: [''],
   });
 
   private readonly selectedDepartamento = toSignal(this.form.controls.codigo_departamento.valueChanges, {
@@ -178,6 +191,28 @@ export class PublicadorFormDialog {
 
   protected readonly edadDisplay = computed(() => yearsSince(this.fechaNacimiento()));
   protected readonly aniosBautismoDisplay = computed(() => yearsSince(this.fechaBautismo()));
+
+  /** Datos de "Asignar lugar de entrenamiento": solo se muestran en edición y
+   * únicamente si esa capacitación ya tiene fecha o lugar asignado. */
+  protected readonly showPrimeraCapacitacion = computed(
+    () =>
+      this.mode() === 'edit' &&
+      (!!this.record()?.fecha_primera_capacitacion || !!this.record()?.lugar_primera_capacitacion),
+  );
+  protected readonly showSegundaCapacitacion = computed(
+    () =>
+      this.mode() === 'edit' &&
+      (!!this.record()?.fecha_segunda_capacitacion || !!this.record()?.lugar_segunda_capacitacion),
+  );
+
+  protected readonly primeraCapacitacionPunto = computed(() => {
+    const codigo = this.record()?.lugar_primera_capacitacion;
+    return codigo == null ? null : (this.puntos().find((p) => p.codigo_punto === codigo) ?? null);
+  });
+  protected readonly segundaCapacitacionPunto = computed(() => {
+    const codigo = this.record()?.lugar_segunda_capacitacion;
+    return codigo == null ? null : (this.puntos().find((p) => p.codigo_punto === codigo) ?? null);
+  });
 
   protected readonly showNombreConyuge = computed(
     () => this.selectedSexo() === 'F' && NOMBRE_CONYUGE_ESTADOS_CIVILES.includes(this.selectedEstadoCivil() ?? ''),
@@ -233,26 +268,33 @@ export class PublicadorFormDialog {
       if (this.isPatchingForm || this.mode() !== 'edit') {
         return;
       }
-      if (value === 'Ninguno') {
+      if (value === 'Entrenamiento completado') {
+        const today = todayIsoDate();
         this.form.controls.estado.setValue('CUMPLE REQUISITOS');
+        this.form.controls.fecha_cumple_requisitos.setValue(today);
+        if (!this.form.controls.fecha_aprobacion.value) {
+          this.form.controls.fecha_aprobacion.setValue(today);
+        }
       }
     });
 
     effect(() => {
-      const required = this.showNombreConyuge();
+      const visible = this.showNombreConyuge();
+      const required = visible && this.mode() !== 'edit';
       const control = this.form.controls.nombre_conyuge;
       control.setValidators(required ? [Validators.required, Validators.maxLength(100)] : [Validators.maxLength(100)]);
-      if (!required && control.value) {
+      if (!visible && control.value) {
         control.setValue('', { emitEvent: false });
       }
       control.updateValueAndValidity({ emitEvent: false });
     });
 
     effect(() => {
-      const required = this.showNombreConyuge();
+      const visible = this.showNombreConyuge();
+      const required = visible && this.mode() !== 'edit';
       const control = this.form.controls.apellido_casada;
       control.setValidators(required ? [Validators.required, Validators.maxLength(20)] : [Validators.maxLength(20)]);
-      if (!required && control.value) {
+      if (!visible && control.value) {
         control.setValue('', { emitEvent: false });
       }
       control.updateValueAndValidity({ emitEvent: false });
@@ -263,6 +305,10 @@ export class PublicadorFormDialog {
         this.form.controls.fecha_aprobacion.setValue(todayIsoDate());
       }
     });
+
+    effect(() => {
+      this.configureValidatorsForMode();
+    });
   }
 
   protected onBlurCapitalize(
@@ -272,6 +318,7 @@ export class PublicadorFormDialog {
       | 'primer_nombre'
       | 'segundo_nombre'
       | 'apellido_casada'
+      | 'nombre_conyuge'
       | 'direccion',
   ): void {
     const control = this.form.controls[controlName];
@@ -297,7 +344,7 @@ export class PublicadorFormDialog {
     this.matchedExistingId.set(null);
     if (this.mode() === 'create') {
       this.form.controls.estado.setValue('REGISTRADO');
-      this.form.controls.entrenamiento_requerido.setValue('Ninguno');
+      this.form.controls.entrenamiento_requerido.setValue('Primer entrenamiento');
     }
   }
 
@@ -308,41 +355,75 @@ export class PublicadorFormDialog {
     }
 
     const raw = this.form.getRawValue();
-    const payload: PublicadorPayload = {
-      primer_apellido: raw.primer_apellido!,
-      segundo_apellido: raw.segundo_apellido || null,
-      primer_nombre: raw.primer_nombre!,
-      segundo_nombre: raw.segundo_nombre || null,
-      direccion: raw.direccion!,
-      codigo_departamento: raw.codigo_departamento!,
-      codigo_municipio: raw.codigo_municipio!,
-      correo_electronico: raw.correo_electronico!,
-      movil: raw.movil!,
-      codigo_congregacion: Number(raw.codigo_congregacion),
-      fecha_nacimiento: raw.fecha_nacimiento!,
-      sexo: raw.sexo as Sexo,
-      fecha_bautismo: raw.fecha_bautismo!,
-      estado_civil: raw.estado_civil as EstadoCivil,
-      nombre_conyuge: raw.nombre_conyuge || null,
-      apellido_casada: raw.apellido_casada || null,
-      privilegio_min: raw.privilegio_min as PrivilegioMin,
-      privilegio_ser: raw.privilegio_ser as PrivilegioSer,
-      participo_antes: raw.participo_antes as ParticipoAntes,
-      fecha_solicitud: raw.fecha_solicitud!,
-      estado: raw.estado as EstadoSolicitud,
-      entrenamiento_requerido: raw.entrenamiento_requerido as EntrenamientoRequerido,
-    };
+    const isEdit = this.mode() === 'edit';
+    /** En modo edición los campos pueden estar vacíos (validaciones relajadas), así
+     * que se guarda tal cual lo que hay en el formulario: vacío se persiste como null. */
+    const toNullable = (value: string | null | undefined): string | null =>
+      value && value.length > 0 ? value : null;
+
+    const payload: PublicadorUpdatePayload = isEdit
+      ? {
+          primer_apellido: toNullable(raw.primer_apellido),
+          segundo_apellido: toNullable(raw.segundo_apellido),
+          primer_nombre: toNullable(raw.primer_nombre),
+          segundo_nombre: toNullable(raw.segundo_nombre),
+          direccion: toNullable(raw.direccion),
+          codigo_departamento: toNullable(raw.codigo_departamento),
+          codigo_municipio: toNullable(raw.codigo_municipio),
+          correo_electronico: toNullable(raw.correo_electronico),
+          movil: toNullable(raw.movil),
+          codigo_congregacion: raw.codigo_congregacion ? Number(raw.codigo_congregacion) : null,
+          fecha_nacimiento: toNullable(raw.fecha_nacimiento),
+          sexo: toNullable(raw.sexo) as Sexo | null,
+          fecha_bautismo: toNullable(raw.fecha_bautismo),
+          estado_civil: toNullable(raw.estado_civil) as EstadoCivil | null,
+          nombre_conyuge: toNullable(raw.nombre_conyuge),
+          apellido_casada: toNullable(raw.apellido_casada),
+          privilegio_min: toNullable(raw.privilegio_min) as PrivilegioMin | null,
+          privilegio_ser: toNullable(raw.privilegio_ser) as PrivilegioSer | null,
+          participo_antes: toNullable(raw.participo_antes) as ParticipoAntes | null,
+          fecha_solicitud: toNullable(raw.fecha_solicitud),
+          estado: toNullable(raw.estado) as EstadoSolicitud | null,
+          entrenamiento_requerido: toNullable(raw.entrenamiento_requerido) as EntrenamientoRequerido | null,
+        }
+      : {
+          primer_apellido: raw.primer_apellido!,
+          segundo_apellido: raw.segundo_apellido || null,
+          primer_nombre: raw.primer_nombre!,
+          segundo_nombre: raw.segundo_nombre || null,
+          direccion: raw.direccion!,
+          codigo_departamento: raw.codigo_departamento!,
+          codigo_municipio: raw.codigo_municipio!,
+          correo_electronico: raw.correo_electronico!,
+          movil: raw.movil!,
+          codigo_congregacion: Number(raw.codigo_congregacion),
+          fecha_nacimiento: raw.fecha_nacimiento!,
+          sexo: raw.sexo as Sexo,
+          fecha_bautismo: raw.fecha_bautismo!,
+          estado_civil: raw.estado_civil as EstadoCivil,
+          nombre_conyuge: raw.nombre_conyuge || null,
+          apellido_casada: raw.apellido_casada || null,
+          privilegio_min: raw.privilegio_min as PrivilegioMin,
+          privilegio_ser: raw.privilegio_ser as PrivilegioSer,
+          participo_antes: raw.participo_antes as ParticipoAntes,
+          fecha_solicitud: raw.fecha_solicitud!,
+          estado: raw.estado as EstadoSolicitud,
+          entrenamiento_requerido: raw.entrenamiento_requerido as EntrenamientoRequerido,
+        };
 
     if (raw.estado === 'CUMPLE REQUISITOS') {
-      payload.fecha_aprobacion = raw.fecha_aprobacion || null;
+      payload.fecha_aprobacion = isEdit ? toNullable(raw.fecha_aprobacion) : raw.fecha_aprobacion || null;
+      payload.fecha_cumple_requisitos = isEdit
+        ? toNullable(raw.fecha_cumple_requisitos)
+        : raw.fecha_cumple_requisitos || null;
     }
 
-    const targetId = this.mode() === 'edit' ? this.record()!.id : this.matchedExistingId();
+    const targetId = isEdit ? this.record()!.id : this.matchedExistingId();
 
     this.saving.set(true);
     const request$ = targetId
       ? this.publicadoresService.update(targetId, payload)
-      : this.publicadoresService.create(payload);
+      : this.publicadoresService.create(payload as PublicadorPayload);
 
     request$.subscribe({
       next: () => {
@@ -360,7 +441,51 @@ export class PublicadorFormDialog {
     });
   }
 
+  protected async onImportS73(files: FileList | null): Promise<void> {
+    const file = files?.[0] ?? null;
+    if (!file) {
+      return;
+    }
+    if (!file.type.includes('pdf') && !file.name.toLowerCase().endsWith('.pdf')) {
+      this.snackbar.error('Selecciona un archivo PDF válido.');
+      return;
+    }
+    this.importingS73.set(true);
+    try {
+      const bytes = await file.arrayBuffer();
+      const { values, warnings } = await parseS73Pdf(bytes, this.departamentos(), this.municipios(), this.congregaciones());
+      this.applyImportedData(values);
+      if (warnings.length > 0) {
+        this.snackbar.show(`Importado. Revisa antes de guardar: ${warnings.join(' ')}`, 'info');
+      } else {
+        this.snackbar.success('Datos importados desde el PDF S-73. Revisa el formulario antes de guardar.');
+      }
+    } catch {
+      this.snackbar.error('No se pudo leer el archivo. Verifica que sea un formulario S-73 con campos rellenables.');
+    } finally {
+      this.importingS73.set(false);
+    }
+  }
+
+  private applyImportedData(values: S73ImportValues): void {
+    this.isPatchingForm = true;
+    if (values.codigo_departamento) {
+      this.form.controls.codigo_municipio.enable({ emitEvent: false });
+    }
+    this.form.patchValue(values);
+    this.isPatchingForm = false;
+    this.form.markAllAsTouched();
+    this.checkForDuplicates();
+  }
+
   protected onDismissDuplicate(): void {
+    const reasons = this.duplicateReasons();
+    if (reasons.has('movil')) {
+      this.form.controls.movil.setValue('');
+    }
+    if (reasons.has('correo')) {
+      this.form.controls.correo_electronico.setValue('');
+    }
     this.duplicateDialogOpen.set(false);
   }
 
@@ -413,12 +538,45 @@ export class PublicadorFormDialog {
     this.duplicateDialogOpen.set(true);
   }
 
+  /** En "Editar solicitud" se quita Validators.required de todos los campos (las demás
+   * validaciones de formato/longitud se mantienen), para permitir guardar sin poblar
+   * campos que ya se encuentren vacíos. En "Nueva solicitud" se conservan las
+   * validaciones originales sin cambios. */
+  private configureValidatorsForMode(): void {
+    const isEdit = this.mode() === 'edit';
+    const req = (validators: ValidatorFn[]): ValidatorFn[] => (isEdit ? validators : [Validators.required, ...validators]);
+
+    this.form.controls.primer_apellido.setValidators(req([Validators.maxLength(20)]));
+    this.form.controls.primer_nombre.setValidators(req([Validators.maxLength(20)]));
+    this.form.controls.direccion.setValidators(req([Validators.maxLength(100)]));
+    this.form.controls.codigo_departamento.setValidators(req([]));
+    this.form.controls.codigo_municipio.setValidators(req([]));
+    this.form.controls.correo_electronico.setValidators(
+      req([Validators.pattern(EMAIL_PATTERN), Validators.maxLength(100)]),
+    );
+    this.form.controls.movil.setValidators(req([Validators.pattern(MOVIL_PATTERN)]));
+    this.form.controls.codigo_congregacion.setValidators(req([]));
+    this.form.controls.fecha_nacimiento.setValidators(req([]));
+    this.form.controls.sexo.setValidators(req([]));
+    this.form.controls.fecha_bautismo.setValidators(req([]));
+    this.form.controls.estado_civil.setValidators(req([]));
+    this.form.controls.privilegio_min.setValidators(req([]));
+    this.form.controls.privilegio_ser.setValidators(req([]));
+    this.form.controls.participo_antes.setValidators(req([]));
+    this.form.controls.fecha_solicitud.setValidators(req([]));
+    this.form.controls.estado.setValidators(req([]));
+    this.form.controls.entrenamiento_requerido.setValidators(req([]));
+
+    for (const control of Object.values(this.form.controls)) {
+      control.updateValueAndValidity({ emitEvent: false });
+    }
+  }
+
   private applyCreateDefaults(): void {
     this.form.reset();
     this.form.controls.codigo_municipio.disable({ emitEvent: false });
     this.form.controls.estado.setValue('REGISTRADO');
-    this.form.controls.estado.disable();
-    this.form.controls.entrenamiento_requerido.setValue('Ninguno');
+    this.form.controls.entrenamiento_requerido.setValue('Primer entrenamiento');
     this.form.controls.entrenamiento_requerido.disable();
   }
 
@@ -426,7 +584,6 @@ export class PublicadorFormDialog {
     this.isPatchingForm = true;
     this.form.controls.codigo_municipio.enable({ emitEvent: false });
     if (opts.enableWorkflowFields) {
-      this.form.controls.estado.enable();
       this.form.controls.entrenamiento_requerido.enable();
     }
     this.form.patchValue({
@@ -453,6 +610,7 @@ export class PublicadorFormDialog {
       estado: record.estado,
       entrenamiento_requerido: record.entrenamiento_requerido,
       fecha_aprobacion: record.fecha_aprobacion ?? '',
+      fecha_cumple_requisitos: record.fecha_cumple_requisitos ?? '',
     });
     this.isPatchingForm = false;
   }

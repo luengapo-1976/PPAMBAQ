@@ -5,10 +5,12 @@ import { StatCard } from '../../shared/ui/stat-card/stat-card';
 import { ChartCanvas } from '../../shared/ui/chart-canvas/chart-canvas';
 import { DashboardFiltersComponent } from './components/dashboard-filters/dashboard-filters';
 import { RecentActivity } from './components/recent-activity/recent-activity';
+import { CircuitoSummaryTable } from './components/circuito-summary-table/circuito-summary-table';
 import { SnackbarService } from '../../shared/ui/snackbar/snackbar.service';
-import { DashboardService } from './data/dashboard.service';
+import { PublicadoresService } from '../solicitudes/data/publicadores.service';
+import { LookupsService } from '../solicitudes/data/lookups.service';
 import { cssVar } from '../../shared/utils/theme-colors.util';
-import { Departamento, Municipio, Publicador } from '../solicitudes/data/models';
+import { Congregacion, Departamento, Municipio, Publicador } from '../solicitudes/data/models';
 import { Circuito } from '../configuracion/data/models';
 import {
   DashboardFilters,
@@ -22,17 +24,19 @@ import {
   recentActivity,
   topCongregaciones,
 } from './data/dashboard-metrics.util';
+import { buildCircuitoSummary } from './data/circuito-summary.util';
 
 const EXTRA_WARNING = '#c77f1f';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [StatCard, ChartCanvas, DashboardFiltersComponent, RecentActivity],
+  imports: [StatCard, ChartCanvas, DashboardFiltersComponent, RecentActivity, CircuitoSummaryTable],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
 export class Dashboard {
-  private readonly dashboardService = inject(DashboardService);
+  private readonly publicadoresService = inject(PublicadoresService);
+  private readonly lookupsService = inject(LookupsService);
   private readonly snackbar = inject(SnackbarService);
 
   protected readonly loading = signal(true);
@@ -42,6 +46,7 @@ export class Dashboard {
   protected readonly departamentos = signal<Departamento[]>([]);
   protected readonly municipios = signal<Municipio[]>([]);
   protected readonly circuitos = signal<Circuito[]>([]);
+  protected readonly congregaciones = signal<Congregacion[]>([]);
 
   protected readonly filters = signal<DashboardFilters>(EMPTY_DASHBOARD_FILTERS);
 
@@ -52,6 +57,10 @@ export class Dashboard {
   protected readonly kpis = computed(() => computeKpis(this.filteredPublicadores()));
 
   protected readonly recentActivityItems = computed(() => recentActivity(this.filteredPublicadores(), 8));
+
+  protected readonly circuitoSummaryRows = computed(() =>
+    buildCircuitoSummary(this.filteredPublicadores(), this.circuitos(), this.congregaciones()),
+  );
 
   protected readonly estadoChartData = computed<ChartData<'doughnut'>>(() => {
     const slices = distributionByEstado(this.filteredPublicadores());
@@ -171,8 +180,8 @@ export class Dashboard {
 
   private loadData(): void {
     this.loading.set(true);
-    this.dashboardService
-      .listPublicadores()
+    this.publicadoresService
+      .list()
       .pipe(
         catchError(() => {
           this.snackbar.error('No se pudo cargar el listado de solicitudes.');
@@ -184,17 +193,21 @@ export class Dashboard {
         this.loading.set(false);
       });
 
-    this.dashboardService.listDepartamentos().subscribe({
+    this.lookupsService.getDepartamentos().subscribe({
       next: (data) => this.departamentos.set(data),
       error: () => this.snackbar.error('No se pudo cargar el catálogo de departamentos.'),
     });
-    this.dashboardService.listMunicipios().subscribe({
+    this.lookupsService.getMunicipios().subscribe({
       next: (data) => this.municipios.set(data),
       error: () => this.snackbar.error('No se pudo cargar el catálogo de municipios.'),
     });
-    this.dashboardService.listCircuitos().subscribe({
+    this.lookupsService.getCircuitos().subscribe({
       next: (data) => this.circuitos.set(data),
       error: () => this.snackbar.error('No se pudo cargar el catálogo de circuitos.'),
+    });
+    this.lookupsService.getCongregaciones().subscribe({
+      next: (data) => this.congregaciones.set(data),
+      error: () => this.snackbar.error('No se pudo cargar el catálogo de congregaciones.'),
     });
   }
 }

@@ -1,0 +1,111 @@
+:host {
+  display: block;
+}
+
+.entrenamiento-filter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ppam-space-md);
+  padding: var(--ppam-space-md);
+  background: var(--ppam-surface-container-lowest);
+  border: 1px solid var(--ppam-border-quiet);
+  border-radius: var(--ppam-radius-card);
+}
+
+.entrenamiento-filter__header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ppam-space-md);
+}
+
+.entrenamiento-filter__header-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.entrenamiento-filter__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: var(--ppam-radius-control);
+  background: transparent;
+  color: var(--ppam-on-surface-variant);
+  cursor: pointer;
+  transition: background-color var(--ppam-motion-fast);
+}
+
+.entrenamiento-filter__close:hover {
+  background: var(--ppam-surface-container);
+}
+
+.entrenamiento-filter__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: var(--ppam-radius-control);
+  background: color-mix(in srgb, var(--ppam-primary-container) 16%, white);
+  color: var(--ppam-primary-container);
+}
+
+.entrenamiento-filter__title {
+  font-size: var(--ppam-card-title-size);
+  font-weight: var(--ppam-card-title-weight);
+  line-height: var(--ppam-card-title-line);
+  color: var(--ppam-on-surface);
+  margin: 0;
+}
+
+.entrenamiento-filter__hint {
+  margin: 4px 0 0;
+  font-size: var(--ppam-small-size);
+  color: var(--ppam-on-surface-variant);
+}
+
+.entrenamiento-filter__fields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--ppam-space-md);
+}
+
+.entrenamiento-filter__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 220px;
+  font-size: var(--ppam-small-size);
+  font-weight: 600;
+  color: var(--ppam-on-surface-variant);
+}
+
+.entrenamiento-filter__actions {
+  display: flex;
+  gap: var(--ppam-space-sm);
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+
+.entrenamiento-filter__count {
+  margin: 0;
+  font-size: var(--ppam-small-size);
+  color: var(--ppam-on-surface-variant);
+}
+
+@media (max-width: 899px) {
+  .entrenamiento-filter__actions {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 599px) {
+  .entrenamiento-filter__field {
+    width: 100%;
+  }
+}

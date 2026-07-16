@@ -13,6 +13,9 @@ export class Dialog {
   readonly size = input<'md' | 'full'>('md');
   readonly position = input<'center' | 'right'>('center');
   readonly rightWidth = input('50vw');
+  /** Separación desde el borde derecho del viewport (p. ej. para dejar espacio a
+   * una barra de opciones anclada a la derecha). Solo aplica con position="right". */
+  readonly rightOffset = input('0px');
   readonly panelBackground = input<string | null>(null);
   readonly closed = output<void>();
 

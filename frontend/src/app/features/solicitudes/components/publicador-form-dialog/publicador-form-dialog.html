@@ -15,6 +15,26 @@
   <app-button dialogToolbar type="button" variant="ghost" icon="restart_alt" (click)="onClear()">
     Limpiar
   </app-button>
+  @if (mode() === 'create') {
+    <ng-container dialogToolbar>
+      <app-button
+        type="button"
+        variant="secondary"
+        icon="upload_file"
+        [disabled]="importingS73()"
+        (click)="s73FileInput.click()"
+      >
+        {{ importingS73() ? 'Importando…' : 'Importar S-73' }}
+      </app-button>
+      <input
+        #s73FileInput
+        type="file"
+        accept="application/pdf"
+        class="s73-file-input"
+        (change)="onImportS73($any($event.target).files); $any($event.target).value = null"
+      />
+    </ng-container>
+  }
 
   <form class="form-grid" [formGroup]="form" (ngSubmit)="onSave()">
     <app-form-field label="Primer apellido" [required]="true" [control]="form.controls.primer_apellido">
@@ -147,7 +167,13 @@
         [control]="form.controls.nombre_conyuge"
         class="form-field--wide"
       >
-        <input type="text" formControlName="nombre_conyuge" class="ppam-input" maxlength="100" />
+        <input
+          type="text"
+          formControlName="nombre_conyuge"
+          class="ppam-input"
+          maxlength="100"
+          (blur)="onBlurCapitalize('nombre_conyuge')"
+        />
       </app-form-field>
 
       <app-form-field label="Apellido de casada" [required]="true" [control]="form.controls.apellido_casada">
@@ -161,11 +187,11 @@
       </app-form-field>
     }
 
-    <app-form-field label="Privilegio Min." [required]="true" [control]="form.controls.privilegio_min">
+    <app-form-field label="Privilegio ministerial" [required]="true" [control]="form.controls.privilegio_min">
       <app-select formControlName="privilegio_min" [options]="privilegioMinOptions" placeholder="Seleccionar…" />
     </app-form-field>
 
-    <app-form-field label="Privilegio Ser." [required]="true" [control]="form.controls.privilegio_ser">
+    <app-form-field label="Privilegio de servicio" [required]="true" [control]="form.controls.privilegio_ser">
       <app-select formControlName="privilegio_ser" [options]="privilegioSerOptions" placeholder="Seleccionar…" />
     </app-form-field>
 
@@ -198,6 +224,54 @@
         placeholder="Seleccionar…"
       />
     </app-form-field>
+
+    @if (showPrimeraCapacitacion()) {
+      <app-form-field label="Fecha de primera capacitación">
+        <div class="ppam-input ppam-input--readonly">
+          {{ formatDateShort(record()?.fecha_primera_capacitacion) }}
+        </div>
+      </app-form-field>
+
+      <app-form-field label="Lugar de primera capacitación">
+        <div class="ppam-input ppam-input--readonly">{{ primeraCapacitacionPunto()?.nombre_punto || '—' }}</div>
+      </app-form-field>
+
+      <app-form-field label="Dirección de primera capacitación">
+        <div class="ppam-input ppam-input--readonly">{{ primeraCapacitacionPunto()?.direccion || '—' }}</div>
+      </app-form-field>
+
+      <app-form-field label="Encargado de primera capacitación">
+        <div class="ppam-input ppam-input--readonly">{{ primeraCapacitacionPunto()?.encargado || '—' }}</div>
+      </app-form-field>
+
+      <app-form-field label="Móvil de primera capacitación">
+        <div class="ppam-input ppam-input--readonly">{{ primeraCapacitacionPunto()?.movil || '—' }}</div>
+      </app-form-field>
+    }
+
+    @if (showSegundaCapacitacion()) {
+      <app-form-field label="Fecha de segunda capacitación">
+        <div class="ppam-input ppam-input--readonly">
+          {{ formatDateShort(record()?.fecha_segunda_capacitacion) }}
+        </div>
+      </app-form-field>
+
+      <app-form-field label="Lugar de segunda capacitación">
+        <div class="ppam-input ppam-input--readonly">{{ segundaCapacitacionPunto()?.nombre_punto || '—' }}</div>
+      </app-form-field>
+
+      <app-form-field label="Dirección de segunda capacitación">
+        <div class="ppam-input ppam-input--readonly">{{ segundaCapacitacionPunto()?.direccion || '—' }}</div>
+      </app-form-field>
+
+      <app-form-field label="Encargado de segunda capacitación">
+        <div class="ppam-input ppam-input--readonly">{{ segundaCapacitacionPunto()?.encargado || '—' }}</div>
+      </app-form-field>
+
+      <app-form-field label="Móvil de segunda capacitación">
+        <div class="ppam-input ppam-input--readonly">{{ segundaCapacitacionPunto()?.movil || '—' }}</div>
+      </app-form-field>
+    }
   </form>
 </app-dialog>
 
@@ -240,4 +314,7 @@
       Cargar datos de la persona seleccionada
     </app-button>
   </div>
+  @if (duplicateHasMovilOrCorreo()) {
+    <p class="duplicate-warning">No se puede registrar un móvil o correo electrónico más de una vez.</p>
+  }
 </app-dialog>

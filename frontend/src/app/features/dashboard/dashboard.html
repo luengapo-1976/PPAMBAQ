@@ -3,6 +3,7 @@
     [departamentos]="departamentos()"
     [municipios]="municipios()"
     [circuitos]="circuitos()"
+    [congregaciones]="congregaciones()"
     [filters]="filters()"
     (filtersChange)="onFiltersChange($event)"
   />
@@ -63,6 +64,10 @@
           <app-chart-canvas type="line" [data]="trendChartData()" [options]="lineOptions" />
         </div>
       </div>
+    </section>
+
+    <section class="dashboard-card">
+      <app-circuito-summary-table [rows]="circuitoSummaryRows()" />
     </section>
 
     <section class="dashboard-card">

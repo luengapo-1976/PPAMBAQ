@@ -88,30 +88,11 @@ export class PublicadoresRepository {
     return (data?.length ?? 0) > 0;
   }
 
-  async findEstadoByIds(ids: string[]) {
-    const { data, error } = await this.supabaseService
-      .getClient()
-      .from('publicadores')
-      .select('id, estado')
-      .in('id', ids);
-
-    if (error) {
-      throw new InternalServerErrorException('No se pudo consultar el estado de las solicitudes.');
-    }
-
-    return data;
-  }
-
-  async bulkUpdateByIds(ids: string[], estadoActual: string, payload: TablesUpdate<'publicadores'>) {
+  async bulkUpdateByIds(ids: string[], payload: TablesUpdate<'publicadores'>) {
     if (ids.length === 0) {
       return;
     }
-    const { error } = await this.supabaseService
-      .getClient()
-      .from('publicadores')
-      .update(payload)
-      .eq('estado', estadoActual)
-      .in('id', ids);
+    const { error } = await this.supabaseService.getClient().from('publicadores').update(payload).in('id', ids);
 
     if (error) {
       throw new InternalServerErrorException('No se pudo actualizar el estado de las solicitudes.');

@@ -1,0 +1,47 @@
+<app-dialog
+  [open]="open()"
+  title="Asignar lugar de entrenamiento"
+  position="right"
+  [rightOffset]="rightOffset()"
+  panelBackground="var(--ppam-surface)"
+  (closed)="onCancel()"
+>
+  <app-button dialogToolbar type="button" icon="save" [disabled]="!canSave() || saving()" (click)="onGuardar()">
+    Guardar
+  </app-button>
+  <app-button dialogToolbar type="button" variant="secondary" icon="close" (click)="onCancel()">
+    Cancelar
+  </app-button>
+
+  <div class="asignar-lugar">
+    <p class="asignar-lugar__count">
+      Destinatarios seleccionados: <strong>{{ selectedPublicadorIds().length }}</strong>
+    </p>
+
+    <label class="asignar-lugar__field">
+      <span class="asignar-lugar__label">Lugar de entrenamiento</span>
+      <app-search-select [formControl]="puntoControl" [options]="puntoOptions()" placeholder="Buscar punto…" />
+    </label>
+
+    @if (selectedPunto(); as punto) {
+      <div class="asignar-lugar__field">
+        <span class="asignar-lugar__label">Detalle del punto</span>
+        <div class="asignar-lugar__detalle">
+          <span>Dirección: {{ punto.direccion || '—' }}</span>
+          <span>Encargado: {{ punto.encargado || '—' }}</span>
+          <span>Móvil: {{ punto.movil || '—' }}</span>
+        </div>
+      </div>
+    }
+
+    <label class="asignar-lugar__field">
+      <span class="asignar-lugar__label">Tipo de entrenamiento</span>
+      <app-select [formControl]="tipoControl" [options]="tipoEntrenamientoOptions" placeholder="Seleccionar…" />
+    </label>
+
+    <label class="asignar-lugar__field">
+      <span class="asignar-lugar__label">{{ fechaLabel() }}</span>
+      <input type="date" class="ppam-input" [formControl]="fechaControl" />
+    </label>
+  </div>
+</app-dialog>

@@ -1,14 +1,19 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, of, tap } from 'rxjs';
 import { EstadoSummary } from './components/estado-summary/estado-summary';
 import { PublicadoresTable } from './components/publicadores-table/publicadores-table';
 import { PublicadorFormDialog } from './components/publicador-form-dialog/publicador-form-dialog';
 import { EnviarMensajePanel } from './components/enviar-mensaje-panel/enviar-mensaje-panel';
+import { AccionesBar } from './components/acciones-bar/acciones-bar';
+import { AsignarLugarPanel } from './components/asignar-lugar-panel/asignar-lugar-panel';
+import { EntrenamientoFilter } from './components/entrenamiento-filter/entrenamiento-filter';
+import { Button } from '../../shared/ui/button/button';
 import { SnackbarService } from '../../shared/ui/snackbar/snackbar.service';
 import { PublicadoresService } from './data/publicadores.service';
 import { LookupsService } from './data/lookups.service';
 import { Congregacion, Departamento, Municipio, Publicador } from './data/models';
+import { Punto } from '../configuracion/data/models';
 import {
   CardKey,
   CumpleSubOption,
@@ -18,10 +23,20 @@ import {
   Pendiente1SubOption,
   Pendiente2SubOption,
 } from './data/estado-summary.util';
+import { EMPTY_ENTRENAMIENTO_FILTRO, EntrenamientoFiltro, applyEntrenamientoFiltro } from './data/entrenamiento-filter.util';
 
 @Component({
   selector: 'app-solicitudes',
-  imports: [EstadoSummary, PublicadoresTable, PublicadorFormDialog, EnviarMensajePanel],
+  imports: [
+    EstadoSummary,
+    PublicadoresTable,
+    PublicadorFormDialog,
+    EnviarMensajePanel,
+    AccionesBar,
+    AsignarLugarPanel,
+    EntrenamientoFilter,
+    Button,
+  ],
   templateUrl: './solicitudes.html',
   styleUrl: './solicitudes.scss',
 })
@@ -65,6 +80,15 @@ export class Solicitudes {
     ),
     { initialValue: [] },
   );
+  protected readonly puntos = toSignal(
+    this.lookupsService.getPuntos().pipe(
+      catchError(() => {
+        this.snackbar.error('No se pudo cargar el catálogo de puntos.');
+        return of<Punto[]>([]);
+      }),
+    ),
+    { initialValue: [] },
+  );
 
   protected readonly activeCards = signal<ReadonlySet<CardKey>>(new Set());
   protected readonly subOptionPendiente1 = signal<Pendiente1SubOption>('todos');
@@ -91,19 +115,51 @@ export class Solicitudes {
     );
   });
 
+  protected readonly entrenamientoFiltro = signal<EntrenamientoFiltro>(EMPTY_ENTRENAMIENTO_FILTRO);
+  /** Solo uno de los dos puede estar visible a la vez: esta sección y el filtro
+   * de fecha de aprobación (dentro de la tarjeta "Cumple requisitos") son excluyentes. */
+  protected readonly entrenamientoFilterVisible = signal(false);
+
+  protected readonly gridRows = computed(() =>
+    applyEntrenamientoFiltro(this.filteredPublicadores(), this.entrenamientoFiltro()),
+  );
+
   protected readonly dialogOpen = signal(false);
   protected readonly dialogMode = signal<'create' | 'edit'>('create');
   protected readonly editingRecord = signal<Publicador | null>(null);
 
-  protected readonly sendMessagePanelOpen = signal(false);
-  protected readonly sendMessageSelectedIds = signal<string[]>([]);
+  protected readonly accionesBarOpen = signal(false);
+  protected readonly accionesBarCollapsed = signal(false);
+  protected readonly accionesSelectedIds = signal<string[]>([]);
+  protected readonly activeAccion = signal<'asignar-lugar' | 'enviar-mensaje' | null>(null);
+
+  /** Ancho actual de la barra de acciones; los paneles abiertos desde ella se
+   * insertan a su izquierda usando este mismo valor como rightOffset. */
+  protected readonly accionesBarWidth = computed(() => (this.accionesBarCollapsed() ? '72px' : '360px'));
 
   constructor() {
     this.loadPublicadores();
+    effect(() => {
+      if (!this.entrenamientoFilterVisible()) {
+        this.entrenamientoFiltro.set(EMPTY_ENTRENAMIENTO_FILTRO);
+      }
+    });
   }
 
   protected toggleCard(card: CardKey): void {
-    this.activeCards.update((prev) => (prev.has(card) ? new Set() : new Set([card])));
+    const next = this.activeCards().has(card) ? new Set<CardKey>() : new Set<CardKey>([card]);
+    this.activeCards.set(next);
+    if (next.has('cumple')) {
+      this.entrenamientoFilterVisible.set(false);
+    }
+  }
+
+  protected onToggleEntrenamientoFilter(): void {
+    const next = !this.entrenamientoFilterVisible();
+    this.entrenamientoFilterVisible.set(next);
+    if (next && this.activeCards().has('cumple')) {
+      this.activeCards.set(new Set());
+    }
   }
 
   protected onNewRecord(): void {
@@ -126,16 +182,25 @@ export class Solicitudes {
     this.loadPublicadores();
   }
 
-  protected onSendMessage(selectedIds: string[]): void {
+  protected onViewActions(selectedIds: string[]): void {
     if (selectedIds.length === 0) {
       return;
     }
-    this.sendMessageSelectedIds.set(selectedIds);
-    this.sendMessagePanelOpen.set(true);
+    this.accionesSelectedIds.set(selectedIds);
+    this.activeAccion.set(null);
+    this.accionesBarOpen.set(true);
   }
 
-  protected onSendMessagePanelClosed(): void {
-    this.sendMessagePanelOpen.set(false);
+  /** Cierra la barra: oculta tanto la barra como el formulario que esté abierto a su izquierda. */
+  protected onAccionesBarClosed(): void {
+    this.accionesBarOpen.set(false);
+    this.activeAccion.set(null);
+    this.accionesBarCollapsed.set(false);
+  }
+
+  /** Cierra solo el formulario activo; la barra de acciones permanece abierta. */
+  protected onAccionPanelClosed(): void {
+    this.activeAccion.set(null);
   }
 
   private loadPublicadores(): void {

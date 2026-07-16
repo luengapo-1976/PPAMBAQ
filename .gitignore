@@ -16,3 +16,6 @@ coverage/
 ~$*
 .DS_Store
 Thumbs.db
+
+# Muestras con datos personales reales (no deben subirse a un repo público)
+frontend/src/assests/adjuntos/S-73_S Amparo Maida Editado.pdf

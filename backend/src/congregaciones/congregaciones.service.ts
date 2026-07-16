@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CongregacionesRepository } from './congregaciones.repository';
 import { CreateCongregacionDto } from './dto/create-congregacion.dto';
 import { UpdateCongregacionDto } from './dto/update-congregacion.dto';
-import { CURRENT_USER_LOGIN, todayIsoDate } from '../common/audit/audit.util';
+import { todayIsoDate } from '../common/audit/audit.util';
 
 @Injectable()
 export class CongregacionesService {
@@ -12,18 +12,18 @@ export class CongregacionesService {
     return this.congregacionesRepository.findAll();
   }
 
-  create(dto: CreateCongregacionDto) {
+  create(dto: CreateCongregacionDto, usuarioLogin: string) {
     return this.congregacionesRepository.create({
       ...dto,
-      usuario_registra: CURRENT_USER_LOGIN,
+      usuario_registra: usuarioLogin,
       fecha_registro: todayIsoDate(),
     });
   }
 
-  update(codigo: number, dto: UpdateCongregacionDto) {
+  update(codigo: number, dto: UpdateCongregacionDto, usuarioLogin: string) {
     return this.congregacionesRepository.update(codigo, {
       ...dto,
-      usuario_modifica: CURRENT_USER_LOGIN,
+      usuario_modifica: usuarioLogin,
       fecha_modificacion: todayIsoDate(),
     });
   }

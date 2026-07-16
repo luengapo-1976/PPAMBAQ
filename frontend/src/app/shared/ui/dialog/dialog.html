@@ -3,6 +3,7 @@
     class="dialog-scrim"
     [class.dialog-scrim--right]="position() === 'right'"
     [class.dialog-scrim--closing]="closing()"
+    [style.--dialog-right-offset]="rightOffset()"
     (click)="onScrimClick()"
   >
     <div

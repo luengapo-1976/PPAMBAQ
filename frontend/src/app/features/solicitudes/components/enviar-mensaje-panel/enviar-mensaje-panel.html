@@ -2,6 +2,7 @@
   [open]="open()"
   title="Enviar mensaje"
   position="right"
+  [rightOffset]="rightOffset()"
   panelBackground="var(--ppam-surface)"
   (closed)="onClose()"
 >
@@ -24,6 +25,15 @@
     <label class="enviar-mensaje__field">
       <span class="enviar-mensaje__label">Tipo de mensaje</span>
       <app-search-select [formControl]="tipoControl" [options]="tipoOptions()" placeholder="Buscar tipo…" />
+    </label>
+
+    <label class="enviar-mensaje__field">
+      <span class="enviar-mensaje__label">Mensaje relacionado con</span>
+      <app-search-select
+        [formControl]="mensajeRelacionadoControl"
+        [options]="mensajeRelacionadoOptions"
+        placeholder="Selecciona una opción…"
+      />
     </label>
 
     <label class="enviar-mensaje__field">

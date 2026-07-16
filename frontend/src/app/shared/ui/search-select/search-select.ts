@@ -1,4 +1,14 @@
-import { Component, DestroyRef, ElementRef, computed, forwardRef, inject, input, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  ElementRef,
+  ViewChild,
+  computed,
+  forwardRef,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 export interface SearchSelectOption {
@@ -10,7 +20,12 @@ interface DropdownPosition {
   top: number;
   left: number;
   width: number;
+  maxHeight: number;
 }
+
+const DROPDOWN_DEFAULT_MAX_HEIGHT = 320;
+const DROPDOWN_MIN_HEIGHT = 120;
+const DROPDOWN_VIEWPORT_MARGIN = 8;
 
 @Component({
   selector: 'app-search-select',
@@ -26,6 +41,10 @@ interface DropdownPosition {
 })
 export class SearchSelect implements ControlValueAccessor {
   private readonly host = inject(ElementRef<HTMLElement>);
+  /** Referencia a la lista desplegable, para distinguir su propio scroll interno
+   * (que NO debe cerrarla) del scroll de la página o de un contenedor ancestro
+   * (que sí debe cerrarla, porque desalinearía la lista de su campo anclado). */
+  @ViewChild('dropdownList') private readonly dropdownListRef?: ElementRef<HTMLElement>;
 
   readonly options = input.required<SearchSelectOption[]>();
   readonly placeholder = input('Buscar…');
@@ -38,6 +57,10 @@ export class SearchSelect implements ControlValueAccessor {
 
   protected readonly isOpen = signal(false);
   protected readonly query = signal('');
+  /** Distingue "recién abierto, sin escribir todavía" de "el usuario ya está escribiendo",
+   * para poder seguir mostrando el valor seleccionado en el input mientras la lista
+   * completa está abierta, en lugar de vaciarlo apenas se abre. */
+  protected readonly hasTyped = signal(false);
   protected readonly highlightedIndex = signal(0);
   protected readonly value = signal<string | null>(null);
   protected readonly isDisabled = signal(false);
@@ -47,11 +70,30 @@ export class SearchSelect implements ControlValueAccessor {
 
   private onChange: (value: string | null) => void = () => {};
   private onTouched: () => void = () => {};
-  private readonly onWindowScrollOrResize = () => this.close();
+  /** El listener de scroll se registra en fase de captura para detectar el
+   * scroll de cualquier contenedor ancestro (ver attachDismissListeners), pero
+   * eso también intercepta el scroll interno de la propia lista desplegable
+   * (el evento 'scroll' no burbujea, pero sí se captura al viajar hacia el
+   * destino). Hay que ignorarlo explícitamente o la lista se cierra apenas el
+   * usuario intenta desplazarla para ver más opciones. */
+  private readonly onWindowScrollOrResize = (event: Event) => {
+    const list = this.dropdownListRef?.nativeElement;
+    if (list && event.target instanceof Node && list.contains(event.target)) {
+      return;
+    }
+    this.close();
+  };
 
   constructor() {
     inject(DestroyRef).onDestroy(() => this.detachDismissListeners());
   }
+
+  protected readonly displayValue = computed(() => {
+    if (!this.isOpen()) {
+      return this.selectedLabel();
+    }
+    return this.hasTyped() ? this.query() : this.selectedLabel();
+  });
 
   protected readonly selectedLabel = computed(() => {
     const match = this.options().find((option) => option.value === this.value());
@@ -90,15 +132,17 @@ export class SearchSelect implements ControlValueAccessor {
   }
 
   protected onFocus(): void {
-    if (this.isFieldDisabled()) {
-      return;
-    }
-    this.query.set('');
-    this.open();
-    this.highlightedIndex.set(0);
+    this.activate();
+  }
+
+  /** Reabre la lista en un segundo clic aunque el input nunca haya perdido el foco
+   * tras una selección previa (el navegador no vuelve a disparar 'focus' en ese caso). */
+  protected onMouseDown(): void {
+    this.activate();
   }
 
   protected onInput(text: string): void {
+    this.hasTyped.set(true);
     this.query.set(text);
     this.open();
     this.highlightedIndex.set(0);
@@ -158,9 +202,33 @@ export class SearchSelect implements ControlValueAccessor {
     }
   }
 
+  private activate(): void {
+    if (this.isFieldDisabled() || this.isOpen()) {
+      return;
+    }
+    this.hasTyped.set(false);
+    this.query.set('');
+    this.open();
+    this.highlightedIndex.set(0);
+  }
+
   private open(): void {
     const rect = this.host.nativeElement.getBoundingClientRect();
-    this.dropdownPosition.set({ top: rect.bottom + 4, left: rect.left, width: rect.width });
+    /** Si el campo queda muy pegado al borde derecho (p. ej. junto a un panel
+     * angosto anclado a la derecha), se recorre la lista hacia la izquierda para
+     * que quede completa dentro del viewport y su scrollbar vertical sea visible. */
+    const viewportWidth = document.documentElement.clientWidth;
+    const left = Math.max(DROPDOWN_VIEWPORT_MARGIN, Math.min(rect.left, viewportWidth - rect.width - DROPDOWN_VIEWPORT_MARGIN));
+    const top = rect.bottom + 4;
+    /** Si no hay 320px libres hasta el borde inferior de la pantalla, se reduce la
+     * altura máxima de la lista para que quede completa dentro del viewport y su
+     * scroll interno (con la barra de desplazamiento) sea siempre alcanzable. */
+    const viewportHeight = document.documentElement.clientHeight;
+    const maxHeight = Math.max(
+      DROPDOWN_MIN_HEIGHT,
+      Math.min(DROPDOWN_DEFAULT_MAX_HEIGHT, viewportHeight - top - DROPDOWN_VIEWPORT_MARGIN),
+    );
+    this.dropdownPosition.set({ top, left, width: rect.width, maxHeight });
     this.isOpen.set(true);
     // Se difiere un tick para no capturar el scroll que a veces dispara el propio
     // navegador al enfocar el campo (lo cual cerraría el desplegable recién abierto).

@@ -9,3 +9,8 @@
   border-radius: var(--ppam-radius-card);
   padding: var(--ppam-space-md);
 }
+
+.solicitudes-page__checklist-toggle {
+  display: flex;
+  justify-content: flex-end;
+}

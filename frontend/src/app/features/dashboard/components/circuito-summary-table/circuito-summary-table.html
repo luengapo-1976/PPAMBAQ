@@ -1,0 +1,159 @@
+<div class="circuito-summary">
+  <div class="circuito-summary__toolbar">
+    <h2 class="dashboard-card__title">Resumen por circuito</h2>
+    <app-button
+      variant="secondary"
+      icon="picture_as_pdf"
+      [disabled]="exportingPdf() || rows().length === 0"
+      (click)="onExportPdf()"
+    >
+      {{ exportingPdf() ? 'Generando PDF…' : 'Descargar PDF' }}
+    </app-button>
+  </div>
+
+  <div class="circuito-summary__scroll">
+    <table class="ppam-table circuito-summary__table">
+      <thead>
+        <tr>
+          <th rowspan="2" class="circuito-summary__label-col">Circuito / Congregación / Publicador</th>
+          <th rowspan="2">Total</th>
+          <th colspan="3" class="circuito-summary__group-header">Entrenamiento requerido</th>
+          <th colspan="3" class="circuito-summary__group-header">Privilegio mínimo</th>
+          <th colspan="5" class="circuito-summary__group-header">Privilegio de servicio</th>
+          <th rowspan="2">Correo electrónico</th>
+          <th rowspan="2">Móvil</th>
+        </tr>
+        <tr>
+          <th>Primer entren.</th>
+          <th>Segundo entren.</th>
+          <th>Completado</th>
+          <th>Ninguno</th>
+          <th>Anciano</th>
+          <th>Siervo min.</th>
+          <th>Publicador</th>
+          <th>Precursor reg.</th>
+          <th>Precursor esp.</th>
+          <th>Misionero</th>
+          <th>Betel</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (circuito of rows(); track circuito.codigoCircuito) {
+          <tr class="circuito-summary__row circuito-summary__row--circuito">
+            <td class="circuito-summary__label-col">
+              <button
+                type="button"
+                class="circuito-summary__toggle"
+                [attr.aria-label]="(isCircuitoExpanded(circuito.codigoCircuito) ? 'Contraer' : 'Expandir') + ' ' + circuito.nombreCircuito"
+                [attr.aria-expanded]="isCircuitoExpanded(circuito.codigoCircuito)"
+                (click)="toggleCircuito(circuito.codigoCircuito)"
+              >
+                <span class="material-symbols-outlined" aria-hidden="true">
+                  {{ isCircuitoExpanded(circuito.codigoCircuito) ? 'expand_more' : 'chevron_right' }}
+                </span>
+                <span class="material-symbols-outlined" aria-hidden="true">account_tree</span>
+                {{ circuito.nombreCircuito }}
+              </button>
+            </td>
+            <td>{{ circuito.total }}</td>
+            <td>{{ circuito.primerEntrenamiento }}</td>
+            <td>{{ circuito.segundoEntrenamiento }}</td>
+            <td>{{ circuito.entrenamientoCompletado }}</td>
+            <td>{{ circuito.privilegioMinNinguno }}</td>
+            <td>{{ circuito.privilegioMinAnciano }}</td>
+            <td>{{ circuito.privilegioMinSiervo }}</td>
+            <td>{{ circuito.privilegioSerPublicador }}</td>
+            <td>{{ circuito.privilegioSerPrecursorRegular }}</td>
+            <td>{{ circuito.privilegioSerPrecursorEspecial }}</td>
+            <td>{{ circuito.privilegioSerMisionero }}</td>
+            <td>{{ circuito.privilegioSerBetel }}</td>
+            <td>—</td>
+            <td>—</td>
+          </tr>
+
+          @if (isCircuitoExpanded(circuito.codigoCircuito)) {
+            @for (congregacion of circuito.congregaciones; track congregacion.codigoCongregacion) {
+              <tr class="circuito-summary__row circuito-summary__row--congregacion">
+                <td class="circuito-summary__label-col">
+                  <button
+                    type="button"
+                    class="circuito-summary__toggle circuito-summary__toggle--nested"
+                    [attr.aria-label]="(isCongregacionExpanded(congregacion.codigoCongregacion) ? 'Contraer' : 'Expandir') + ' ' + congregacion.nombreCongregacion"
+                    [attr.aria-expanded]="isCongregacionExpanded(congregacion.codigoCongregacion)"
+                    (click)="toggleCongregacion(congregacion.codigoCongregacion)"
+                  >
+                    <span class="material-symbols-outlined" aria-hidden="true">
+                      {{ isCongregacionExpanded(congregacion.codigoCongregacion) ? 'expand_more' : 'chevron_right' }}
+                    </span>
+                    <span class="material-symbols-outlined" aria-hidden="true">house</span>
+                    {{ congregacion.nombreCongregacion }}
+                  </button>
+                </td>
+                <td>{{ congregacion.total }}</td>
+                <td>{{ congregacion.primerEntrenamiento }}</td>
+                <td>{{ congregacion.segundoEntrenamiento }}</td>
+                <td>{{ congregacion.entrenamientoCompletado }}</td>
+                <td>{{ congregacion.privilegioMinNinguno }}</td>
+                <td>{{ congregacion.privilegioMinAnciano }}</td>
+                <td>{{ congregacion.privilegioMinSiervo }}</td>
+                <td>{{ congregacion.privilegioSerPublicador }}</td>
+                <td>{{ congregacion.privilegioSerPrecursorRegular }}</td>
+                <td>{{ congregacion.privilegioSerPrecursorEspecial }}</td>
+                <td>{{ congregacion.privilegioSerMisionero }}</td>
+                <td>{{ congregacion.privilegioSerBetel }}</td>
+                <td>—</td>
+                <td>—</td>
+              </tr>
+
+              @if (isCongregacionExpanded(congregacion.codigoCongregacion)) {
+                @for (publicador of congregacion.publicadores; track publicador.id) {
+                  <tr class="circuito-summary__row circuito-summary__row--publicador">
+                    <td class="circuito-summary__label-col">
+                      <span class="circuito-summary__publicador-name">
+                        <span class="material-symbols-outlined" aria-hidden="true">person</span>
+                        {{ publicador.nombre }}
+                      </span>
+                    </td>
+                    <td colspan="12" class="circuito-summary__publicador-spacer"></td>
+                    <td>{{ publicador.correo }}</td>
+                    <td>{{ publicador.movil }}</td>
+                  </tr>
+                } @empty {
+                  <tr class="circuito-summary__row circuito-summary__row--empty">
+                    <td class="circuito-summary__label-col">Sin publicadores.</td>
+                    <td colspan="14"></td>
+                  </tr>
+                }
+              }
+            }
+          }
+        } @empty {
+          <tr>
+            <td class="ppam-table__empty" colspan="15">No hay datos para el filtro actual.</td>
+          </tr>
+        }
+      </tbody>
+      @if (rows().length > 0) {
+        <tfoot>
+          <tr class="circuito-summary__row circuito-summary__row--total">
+            <td class="circuito-summary__label-col">Total general</td>
+            <td>{{ totals().total }}</td>
+            <td>{{ totals().primerEntrenamiento }}</td>
+            <td>{{ totals().segundoEntrenamiento }}</td>
+            <td>{{ totals().entrenamientoCompletado }}</td>
+            <td>{{ totals().privilegioMinNinguno }}</td>
+            <td>{{ totals().privilegioMinAnciano }}</td>
+            <td>{{ totals().privilegioMinSiervo }}</td>
+            <td>{{ totals().privilegioSerPublicador }}</td>
+            <td>{{ totals().privilegioSerPrecursorRegular }}</td>
+            <td>{{ totals().privilegioSerPrecursorEspecial }}</td>
+            <td>{{ totals().privilegioSerMisionero }}</td>
+            <td>{{ totals().privilegioSerBetel }}</td>
+            <td>—</td>
+            <td>—</td>
+          </tr>
+        </tfoot>
+      }
+    </table>
+  </div>
+</div>
