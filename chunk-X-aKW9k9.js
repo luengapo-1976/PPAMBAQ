@@ -1,0 +1,1 @@
+var o=["Administrador","Coordinador"],i=["Activo","Inactivo"],n=["Punto PPAM","Punto de entrenamiento"];export{i,n,o};
