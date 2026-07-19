@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsString, Matches, MaxLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, Matches, MaxLength } from 'class-validator';
 
 export class CreateCircuitoDto {
   @IsString()
@@ -6,17 +6,16 @@ export class CreateCircuitoDto {
   @MaxLength(10)
   codigo_circuito!: string;
 
-  @IsOptional()
   @IsString()
+  @IsNotEmpty()
   @MaxLength(100)
-  nombre_viajante?: string | null;
+  nombre_viajante!: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @Matches(/^\d{1,10}$/, { message: 'movil debe contener solo números (máx. 10 dígitos)' })
-  movil?: string | null;
+  movil!: string;
 
-  @IsOptional()
   @IsEmail()
   @MaxLength(100)
-  correo_electronico?: string | null;
+  correo_electronico!: string;
 }

@@ -3,6 +3,7 @@ import { ConfigTable, ConfigTableColumn } from '../../../shared/ui/config-table/
 import { DepartamentoFormDialog } from './components/departamento-form-dialog/departamento-form-dialog';
 import { SnackbarService } from '../../../shared/ui/snackbar/snackbar.service';
 import { ReferenceDataService } from '../data/reference-data.service';
+import { LookupsService } from '../../solicitudes/data/lookups.service';
 import { Departamento } from '../data/models';
 
 const COLUMNS: ConfigTableColumn<Departamento>[] = [
@@ -18,6 +19,7 @@ const COLUMNS: ConfigTableColumn<Departamento>[] = [
 })
 export class Departamentos {
   private readonly referenceDataService = inject(ReferenceDataService);
+  private readonly lookupsService = inject(LookupsService);
   private readonly snackbar = inject(SnackbarService);
 
   protected readonly columns = COLUMNS;
@@ -52,6 +54,7 @@ export class Departamentos {
 
   protected onSaved(): void {
     this.loadDepartamentos();
+    this.lookupsService.refreshDepartamentos();
   }
 
   private loadDepartamentos(): void {

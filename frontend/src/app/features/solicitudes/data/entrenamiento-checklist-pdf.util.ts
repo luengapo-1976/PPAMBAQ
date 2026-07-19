@@ -1,6 +1,6 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { Publicador } from './models';
+import { Departamento, Municipio, Publicador } from './models';
 import { Punto } from '../../configuracion/data/models';
 import { TipoEntrenamientoFiltro, fechaCampo, lugarCampo } from './entrenamiento-filter.util';
 import { formatDateShort, nombreCompleto } from './publicador.utils';
@@ -8,32 +8,49 @@ import { formatDateShort, nombreCompleto } from './publicador.utils';
 const PRIMARY_RGB: [number, number, number] = [74, 109, 167];
 const PAGE_MARGIN = 32;
 
+interface GrupoEntrenamiento {
+  fecha: string;
+  codigoPunto: number;
+  publicadores: Publicador[];
+}
+
 export async function exportEntrenamientoChecklistToPdf(
   rows: Publicador[],
   tipo: TipoEntrenamientoFiltro,
   puntos: Punto[],
+  departamentos: Departamento[],
+  municipios: Municipio[],
 ): Promise<void> {
   const campoFecha = fechaCampo(tipo);
   const campoLugar = lugarCampo(tipo);
   const puntosPorCodigo = new Map(puntos.map((p) => [p.codigo_punto, p]));
+  const departamentosPorCodigo = new Map(departamentos.map((d) => [d.codigo_departamento, d]));
+  const municipiosPorCodigo = new Map(municipios.map((m) => [m.codigo_municipio, m]));
 
-  const grupos = new Map<number, Publicador[]>();
+  const grupos = new Map<string, GrupoEntrenamiento>();
   for (const row of rows) {
-    const codigo = row[campoLugar];
-    if (codigo == null) {
+    const fecha = row[campoFecha];
+    const codigoPunto = row[campoLugar];
+    if (!fecha || codigoPunto == null) {
       continue;
     }
-    const grupo = grupos.get(codigo);
+    const key = `${fecha}|${codigoPunto}`;
+    const grupo = grupos.get(key);
     if (grupo) {
-      grupo.push(row);
+      grupo.publicadores.push(row);
     } else {
-      grupos.set(codigo, [row]);
+      grupos.set(key, { fecha, codigoPunto, publicadores: [row] });
     }
   }
 
-  const gruposOrdenados = [...grupos.entries()].sort(([codigoA], [codigoB]) => {
-    const nombreA = puntosPorCodigo.get(codigoA)?.nombre_punto ?? '';
-    const nombreB = puntosPorCodigo.get(codigoB)?.nombre_punto ?? '';
+  /** El rompimiento del listado sigue el orden de la cabecera: primero por fecha
+   * de entrenamiento y, dentro de una misma fecha, por lugar. */
+  const gruposOrdenados = [...grupos.values()].sort((a, b) => {
+    if (a.fecha !== b.fecha) {
+      return a.fecha.localeCompare(b.fecha);
+    }
+    const nombreA = puntosPorCodigo.get(a.codigoPunto)?.nombre_punto ?? '';
+    const nombreB = puntosPorCodigo.get(b.codigoPunto)?.nombre_punto ?? '';
     return nombreA.localeCompare(nombreB);
   });
 
@@ -54,11 +71,16 @@ export async function exportEntrenamientoChecklistToPdf(
 
   let cursorY = 78;
 
-  for (const [codigoPunto, publicadoresPunto] of gruposOrdenados) {
-    const punto = puntosPorCodigo.get(codigoPunto);
-    const nombrePunto = punto?.nombre_punto ?? `Punto ${codigoPunto}`;
+  for (const grupo of gruposOrdenados) {
+    const punto = puntosPorCodigo.get(grupo.codigoPunto);
+    const nombrePunto = punto?.nombre_punto ?? `Punto ${grupo.codigoPunto}`;
+    const nombreMunicipio = punto ? municipiosPorCodigo.get(punto.codigo_municipio)?.nombre_municipio : undefined;
+    const nombreDepartamento = punto
+      ? departamentosPorCodigo.get(punto.codigo_departamento)?.nombre_departamento
+      : undefined;
+    const direccion = [punto?.direccion, nombreMunicipio, nombreDepartamento].filter(Boolean).join(', ') || '—';
 
-    if (cursorY > pageHeight - 140) {
+    if (cursorY > pageHeight - 170) {
       doc.addPage();
       cursorY = 32;
     }
@@ -66,31 +88,35 @@ export async function exportEntrenamientoChecklistToPdf(
     doc.setTextColor(37, 37, 37);
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
-    doc.text(nombrePunto, PAGE_MARGIN, cursorY);
+    doc.text(`Fecha de entrenamiento: ${formatDateShort(grupo.fecha)}`, PAGE_MARGIN, cursorY);
     cursorY += 16;
 
     doc.setFontSize(9);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(90, 90, 90);
-    doc.text(`Dirección: ${punto?.direccion || '—'}`, PAGE_MARGIN, cursorY);
+    doc.text(`Lugar: ${nombrePunto}`, PAGE_MARGIN, cursorY);
     cursorY += 13;
-    doc.text(`Encargado: ${punto?.encargado || '—'}    Móvil: ${punto?.movil || '—'}`, PAGE_MARGIN, cursorY);
-    cursorY += 6;
+    doc.text(`Dirección: ${direccion}`, PAGE_MARGIN, cursorY);
+    cursorY += 13;
+    doc.text(`Encargado del entrenamiento: ${punto?.encargado || '—'} - Móvil: ${punto?.movil || '—'}`, PAGE_MARGIN, cursorY);
+    cursorY += 13;
 
-    const publicadoresOrdenados = [...publicadoresPunto].sort((a, b) =>
+    // Una línea de espacio antes de la tabla.
+    cursorY += 13;
+
+    const publicadoresOrdenados = [...grupo.publicadores].sort((a, b) =>
       nombreCompleto(a).localeCompare(nombreCompleto(b)),
     );
 
     autoTable(doc, {
-      startY: cursorY + 10,
-      head: [['#', 'Nombre', 'Móvil', 'Congregación', 'Circuito', 'Fecha', 'Asistió']],
+      startY: cursorY,
+      head: [['#', 'Nombre', 'Móvil', 'Congregación', 'Circuito', 'Asistió']],
       body: publicadoresOrdenados.map((p, index) => [
         index + 1,
         nombreCompleto(p),
         p.movil,
         p.nombre_congregacion ?? '—',
         p.codigo_circuito ?? '—',
-        formatDateShort(p[campoFecha]),
         '',
       ]),
       styles: {
@@ -104,8 +130,7 @@ export async function exportEntrenamientoChecklistToPdf(
       headStyles: { fillColor: PRIMARY_RGB, textColor: [255, 255, 255], fontStyle: 'bold' },
       columnStyles: {
         0: { cellWidth: 24, halign: 'center' },
-        5: { cellWidth: 64, halign: 'center' },
-        6: { cellWidth: 50, halign: 'center' },
+        5: { cellWidth: 50, halign: 'center' },
       },
       margin: { left: PAGE_MARGIN, right: PAGE_MARGIN },
     });

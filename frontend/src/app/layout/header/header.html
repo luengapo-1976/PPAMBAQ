@@ -14,6 +14,36 @@
   </div>
 
   <div class="header__end">
-    <app-avatar [name]="userName()" [size]="40" />
+    <div class="header__account">
+      <button
+        type="button"
+        class="header__avatar-trigger"
+        [attr.aria-expanded]="menuOpen()"
+        aria-haspopup="menu"
+        aria-label="Abrir menú de cuenta"
+        (click)="toggleMenu()"
+      >
+        <app-avatar [name]="userName()" [size]="40" />
+      </button>
+
+      @if (menuOpen()) {
+        <ul class="header__menu" role="menu">
+          <li role="none">
+            <button type="button" role="menuitem" class="header__menu-item" (click)="onChangePassword()">
+              <span class="material-symbols-outlined" aria-hidden="true">lock_reset</span>
+              <span>Cambiar contraseña</span>
+            </button>
+          </li>
+          <li role="none">
+            <button type="button" role="menuitem" class="header__menu-item" (click)="onLogout()">
+              <span class="material-symbols-outlined" aria-hidden="true">logout</span>
+              <span>Cerrar sesión</span>
+            </button>
+          </li>
+        </ul>
+      }
+    </div>
   </div>
 </header>
+
+<app-change-password-dialog [open]="changePasswordOpen()" (closed)="changePasswordOpen.set(false)" />

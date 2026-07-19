@@ -4,6 +4,7 @@ import { ConfigTable, ConfigTableColumn } from '../../../shared/ui/config-table/
 import { MunicipioFormDialog } from './components/municipio-form-dialog/municipio-form-dialog';
 import { SnackbarService } from '../../../shared/ui/snackbar/snackbar.service';
 import { ReferenceDataService } from '../data/reference-data.service';
+import { LookupsService } from '../../solicitudes/data/lookups.service';
 import { Departamento, Municipio } from '../data/models';
 
 @Component({
@@ -14,6 +15,7 @@ import { Departamento, Municipio } from '../data/models';
 })
 export class Municipios {
   private readonly referenceDataService = inject(ReferenceDataService);
+  private readonly lookupsService = inject(LookupsService);
   private readonly snackbar = inject(SnackbarService);
 
   protected readonly municipios = signal<Municipio[]>([]);
@@ -61,6 +63,7 @@ export class Municipios {
 
   protected onSaved(): void {
     this.loadAll();
+    this.lookupsService.refreshMunicipios();
   }
 
   private loadAll(): void {

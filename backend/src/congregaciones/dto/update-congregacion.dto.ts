@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, MaxLength } from 'class-validator';
 
 export class UpdateCongregacionDto {
   @IsString()
@@ -16,13 +16,12 @@ export class UpdateCongregacionDto {
   @MaxLength(6)
   codigo_municipio!: string;
 
-  @IsOptional()
   @IsString()
+  @IsNotEmpty()
   @MaxLength(10)
-  codigo_circuito?: string | null;
+  codigo_circuito!: string;
 
-  @IsOptional()
   @IsEmail()
   @MaxLength(100)
-  correo_congregacion?: string | null;
+  correo_congregacion!: string;
 }

@@ -3,6 +3,7 @@ import { ConfigTable, ConfigTableColumn } from '../../../shared/ui/config-table/
 import { CircuitoFormDialog } from './components/circuito-form-dialog/circuito-form-dialog';
 import { SnackbarService } from '../../../shared/ui/snackbar/snackbar.service';
 import { ReferenceDataService } from '../data/reference-data.service';
+import { LookupsService } from '../../solicitudes/data/lookups.service';
 import { Circuito } from '../data/models';
 import { formatDateShort } from '../../../shared/utils/format.util';
 
@@ -25,6 +26,7 @@ const COLUMNS: ConfigTableColumn<Circuito>[] = [
 })
 export class Circuitos {
   private readonly referenceDataService = inject(ReferenceDataService);
+  private readonly lookupsService = inject(LookupsService);
   private readonly snackbar = inject(SnackbarService);
 
   protected readonly columns = COLUMNS;
@@ -59,6 +61,7 @@ export class Circuitos {
 
   protected onSaved(): void {
     this.loadCircuitos();
+    this.lookupsService.refreshCircuitos();
   }
 
   private loadCircuitos(): void {

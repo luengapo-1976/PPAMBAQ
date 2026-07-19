@@ -4,6 +4,7 @@ import { ConfigTable, ConfigTableColumn } from '../../../shared/ui/config-table/
 import { CongregacionFormDialog } from './components/congregacion-form-dialog/congregacion-form-dialog';
 import { SnackbarService } from '../../../shared/ui/snackbar/snackbar.service';
 import { ReferenceDataService } from '../data/reference-data.service';
+import { LookupsService } from '../../solicitudes/data/lookups.service';
 import { Circuito, Congregacion, Departamento, Municipio } from '../data/models';
 import { formatDateShort } from '../../../shared/utils/format.util';
 
@@ -15,6 +16,7 @@ import { formatDateShort } from '../../../shared/utils/format.util';
 })
 export class Congregaciones {
   private readonly referenceDataService = inject(ReferenceDataService);
+  private readonly lookupsService = inject(LookupsService);
   private readonly snackbar = inject(SnackbarService);
 
   protected readonly congregaciones = signal<Congregacion[]>([]);
@@ -78,6 +80,7 @@ export class Congregaciones {
 
   protected onSaved(): void {
     this.loadAll();
+    this.lookupsService.refreshCongregaciones();
   }
 
   private loadAll(): void {

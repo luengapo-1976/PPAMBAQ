@@ -18,6 +18,7 @@
   <table class="ppam-table">
     <thead>
       <tr>
+        <th>Acciones</th>
         @for (column of columns(); track column.key) {
           <th>
             <button type="button" class="ppam-table__sort-btn" (click)="onSort(column.key)">
@@ -30,25 +31,25 @@
             </button>
           </th>
         }
-        <th>Acciones</th>
       </tr>
     </thead>
     <tbody>
       @for (row of sortedRows(); track rowId()(row)) {
         <tr>
-          @for (column of columns(); track column.key) {
-            <td>{{ column.value(row) }}</td>
-          }
           <td>
             <button
               type="button"
               class="ppam-table__edit-btn"
               aria-label="Editar registro"
+              title="Editar registro"
               (click)="editRecord.emit(row)"
             >
               <span class="material-symbols-outlined" aria-hidden="true">edit</span>
             </button>
           </td>
+          @for (column of columns(); track column.key) {
+            <td>{{ column.value(row) }}</td>
+          }
         </tr>
       } @empty {
         <tr>

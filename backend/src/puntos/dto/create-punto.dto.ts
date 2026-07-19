@@ -1,6 +1,7 @@
 import { IsIn, IsInt, IsNotEmpty, IsOptional, IsString, Matches, MaxLength } from 'class-validator';
 
 const ESTADO_VALUES = ['Activo', 'Inactivo'] as const;
+const TIPO_PUNTO_VALUES = ['Punto PPAM', 'Punto de entrenamiento'] as const;
 
 export class CreatePuntoDto {
   @IsInt()
@@ -11,19 +12,32 @@ export class CreatePuntoDto {
   @MaxLength(100)
   nombre_punto!: string;
 
-  @IsOptional()
-  @IsString()
-  @MaxLength(100)
-  direccion?: string | null;
+  @IsIn(TIPO_PUNTO_VALUES)
+  tipo_punto!: (typeof TIPO_PUNTO_VALUES)[number];
 
-  @IsOptional()
   @IsString()
+  @IsNotEmpty()
   @MaxLength(100)
-  encargado?: string | null;
+  direccion!: string;
 
-  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(6)
+  codigo_departamento!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(6)
+  codigo_municipio!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(100)
+  encargado!: string;
+
+  @IsNotEmpty()
   @Matches(/^\d{1,10}$/, { message: 'movil debe contener solo números (máx. 10 dígitos)' })
-  movil?: string | null;
+  movil!: string;
 
   @IsOptional()
   @IsIn(ESTADO_VALUES)

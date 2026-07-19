@@ -6,8 +6,10 @@ import { PasswordService } from '../common/security/password.service';
 import { MailService } from '../common/mail/mail.service';
 import { LoginDto } from './dto/login.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 const INVALID_CREDENTIALS_MESSAGE = 'Usuario o contraseña incorrectos.';
+const INVALID_CURRENT_PASSWORD_MESSAGE = 'La contraseña actual no es correcta.';
 const FORGOT_PASSWORD_GENERIC_MESSAGE =
   'Si el correo está registrado, en unos minutos recibirás un mensaje con una contraseña temporal.';
 const TEMP_PASSWORD_CHARSET = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
@@ -79,5 +81,22 @@ export class AuthService {
     }
 
     return { message: FORGOT_PASSWORD_GENERIC_MESSAGE };
+  }
+
+  async changePassword(login: string, dto: ChangePasswordDto): Promise<{ message: string }> {
+    const usuario = await this.usuariosRepository.findByLogin(login);
+    if (!usuario) {
+      throw new UnauthorizedException(INVALID_CREDENTIALS_MESSAGE);
+    }
+
+    const passwordMatches = await this.passwordService.compare(dto.currentPassword, usuario.password_hash);
+    if (!passwordMatches) {
+      throw new UnauthorizedException(INVALID_CURRENT_PASSWORD_MESSAGE);
+    }
+
+    const passwordHash = await this.passwordService.hash(dto.newPassword);
+    await this.usuariosRepository.updatePasswordHash(login, passwordHash);
+
+    return { message: 'Contraseña actualizada correctamente.' };
   }
 }

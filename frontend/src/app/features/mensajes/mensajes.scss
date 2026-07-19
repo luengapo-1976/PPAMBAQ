@@ -4,6 +4,11 @@
   gap: var(--ppam-space-lg);
 }
 
+.mensajes-page__toolbar {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .mensajes-page__grid {
   background: var(--ppam-surface-container-lowest);
   border-radius: var(--ppam-radius-card);

@@ -18,6 +18,7 @@
       [sidebarExpanded]="!sidebarCollapsed()"
       [userName]="userName()"
       (toggleSidebar)="onToggleSidebar()"
+      (logout)="onLogout()"
     />
     <main class="shell__main">
       <router-outlet />

@@ -52,6 +52,7 @@
   <table class="ppam-table">
     <thead>
       <tr>
+        <th>Acciones</th>
         <th class="ppam-table__checkbox-col">
           <input
             type="checkbox"
@@ -74,12 +75,22 @@
             </button>
           </th>
         }
-        <th>Acciones</th>
       </tr>
     </thead>
     <tbody>
       @for (row of sortedRows(); track row.id) {
         <tr>
+          <td>
+            <button
+              type="button"
+              class="ppam-table__edit-btn"
+              [attr.aria-label]="'Editar ' + nombreCompleto(row)"
+              title="Editar registro"
+              (click)="editRecord.emit(row)"
+            >
+              <span class="material-symbols-outlined" aria-hidden="true">edit</span>
+            </button>
+          </td>
           <td>
             <input
               type="checkbox"
@@ -101,16 +112,6 @@
           <td>{{ row.entrenamiento_requerido }}</td>
           <td>
             <app-badge [tone]="estadoConfig[row.estado].tone">{{ row.estado }}</app-badge>
-          </td>
-          <td>
-            <button
-              type="button"
-              class="ppam-table__edit-btn"
-              [attr.aria-label]="'Editar ' + nombreCompleto(row)"
-              (click)="editRecord.emit(row)"
-            >
-              <span class="material-symbols-outlined" aria-hidden="true">edit</span>
-            </button>
           </td>
         </tr>
       } @empty {

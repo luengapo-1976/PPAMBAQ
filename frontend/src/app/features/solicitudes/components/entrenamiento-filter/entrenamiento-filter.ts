@@ -2,7 +2,7 @@ import { Component, computed, inject, input, output, signal } from '@angular/cor
 import { FormsModule } from '@angular/forms';
 import { Select, SelectOption } from '../../../../shared/ui/select/select';
 import { Button } from '../../../../shared/ui/button/button';
-import { Publicador } from '../../data/models';
+import { Departamento, Municipio, Publicador } from '../../data/models';
 import { Punto } from '../../../configuracion/data/models';
 import {
   EMPTY_ENTRENAMIENTO_FILTRO,
@@ -37,6 +37,8 @@ export class EntrenamientoFilter {
   /** Resultado ya filtrado (tipo + fecha + lugar) que se muestra en la grilla y se exporta a PDF. */
   readonly filteredRows = input.required<Publicador[]>();
   readonly puntos = input.required<Punto[]>();
+  readonly departamentos = input.required<Departamento[]>();
+  readonly municipios = input.required<Municipio[]>();
   readonly filtro = input.required<EntrenamientoFiltro>();
 
   readonly filtroChange = output<EntrenamientoFiltro>();
@@ -103,7 +105,7 @@ export class EntrenamientoFilter {
     }
     this.exportingPdf.set(true);
     try {
-      await exportEntrenamientoChecklistToPdf(rows, tipo, this.puntos());
+      await exportEntrenamientoChecklistToPdf(rows, tipo, this.puntos(), this.departamentos(), this.municipios());
     } catch {
       this.snackbar.error('No se pudo generar el PDF de la lista de chequeo.');
     } finally {

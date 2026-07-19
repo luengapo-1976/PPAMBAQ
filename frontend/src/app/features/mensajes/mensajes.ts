@@ -1,13 +1,14 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { MensajeForm } from './components/mensaje-form/mensaje-form';
 import { MensajesTable } from './components/mensajes-table/mensajes-table';
+import { Button } from '../../shared/ui/button/button';
 import { SnackbarService } from '../../shared/ui/snackbar/snackbar.service';
 import { MensajesService } from './data/mensajes.service';
 import { Mensaje } from './data/models';
 
 @Component({
   selector: 'app-mensajes',
-  imports: [MensajeForm, MensajesTable],
+  imports: [MensajeForm, MensajesTable, Button],
   templateUrl: './mensajes.html',
   styleUrl: './mensajes.scss',
 })
@@ -18,21 +19,33 @@ export class Mensajes {
   protected readonly mensajes = signal<Mensaje[]>([]);
   protected readonly editingRecord = signal<Mensaje | null>(null);
 
+  protected readonly dialogOpen = signal(false);
+  protected readonly dialogMode = signal<'create' | 'edit'>('create');
+
   protected readonly tipos = computed(() => [...new Set(this.mensajes().map((m) => m.tipo))].sort());
 
   constructor() {
     this.loadMensajes();
   }
 
-  protected onEditRecord(record: Mensaje): void {
-    this.editingRecord.set(record);
+  protected onNewRecord(): void {
+    this.dialogMode.set('create');
+    this.editingRecord.set(null);
+    this.dialogOpen.set(true);
   }
 
-  protected onCancelEdit(): void {
-    this.editingRecord.set(null);
+  protected onEditRecord(record: Mensaje): void {
+    this.dialogMode.set('edit');
+    this.editingRecord.set(record);
+    this.dialogOpen.set(true);
+  }
+
+  protected onDialogClosed(): void {
+    this.dialogOpen.set(false);
   }
 
   protected onSaved(): void {
+    this.dialogOpen.set(false);
     this.editingRecord.set(null);
     this.loadMensajes();
   }

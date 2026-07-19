@@ -335,6 +335,8 @@ export type Database = {
       }
       puntos: {
         Row: {
+          codigo_departamento: string
+          codigo_municipio: string
           codigo_punto: number
           direccion: string | null
           encargado: string | null
@@ -343,10 +345,13 @@ export type Database = {
           fecha_registro: string | null
           movil: string | null
           nombre_punto: string
+          tipo_punto: string
           usuario_modifica: string | null
           usuario_registra: string | null
         }
         Insert: {
+          codigo_departamento: string
+          codigo_municipio: string
           codigo_punto: number
           direccion?: string | null
           encargado?: string | null
@@ -355,10 +360,13 @@ export type Database = {
           fecha_registro?: string | null
           movil?: string | null
           nombre_punto: string
+          tipo_punto: string
           usuario_modifica?: string | null
           usuario_registra?: string | null
         }
         Update: {
+          codigo_departamento?: string
+          codigo_municipio?: string
           codigo_punto?: number
           direccion?: string | null
           encargado?: string | null
@@ -367,10 +375,26 @@ export type Database = {
           fecha_registro?: string | null
           movil?: string | null
           nombre_punto?: string
+          tipo_punto?: string
           usuario_modifica?: string | null
           usuario_registra?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "puntos_codigo_departamento_fkey"
+            columns: ["codigo_departamento"]
+            isOneToOne: false
+            referencedRelation: "departamentos"
+            referencedColumns: ["codigo_departamento"]
+          },
+          {
+            foreignKeyName: "puntos_codigo_municipio_fkey"
+            columns: ["codigo_municipio"]
+            isOneToOne: false
+            referencedRelation: "municipios"
+            referencedColumns: ["codigo_municipio"]
+          },
+        ]
       }
       usuarios: {
         Row: {

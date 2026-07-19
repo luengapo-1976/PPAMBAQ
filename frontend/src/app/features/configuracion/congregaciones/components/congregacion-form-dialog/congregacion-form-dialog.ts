@@ -44,8 +44,8 @@ export class CongregacionFormDialog {
     nombre_congregacion: ['', [Validators.required, Validators.maxLength(100)]],
     codigo_departamento: ['', Validators.required],
     codigo_municipio: [{ value: '', disabled: true }, Validators.required],
-    codigo_circuito: [''],
-    correo_congregacion: ['', [Validators.pattern(EMAIL_PATTERN), Validators.maxLength(100)]],
+    codigo_circuito: ['', Validators.required],
+    correo_congregacion: ['', [Validators.required, Validators.pattern(EMAIL_PATTERN), Validators.maxLength(100)]],
   });
 
   private readonly selectedDepartamento = toSignal(this.form.controls.codigo_departamento.valueChanges, {
@@ -137,16 +137,16 @@ export class CongregacionFormDialog {
             nombre_congregacion: raw.nombre_congregacion!,
             codigo_departamento: raw.codigo_departamento!,
             codigo_municipio: raw.codigo_municipio!,
-            codigo_circuito: raw.codigo_circuito || null,
-            correo_congregacion: raw.correo_congregacion || null,
+            codigo_circuito: raw.codigo_circuito!,
+            correo_congregacion: raw.correo_congregacion!,
           })
         : this.referenceDataService.createCongregacion({
             codigo_congregacion: raw.codigo_congregacion!,
             nombre_congregacion: raw.nombre_congregacion!,
             codigo_departamento: raw.codigo_departamento!,
             codigo_municipio: raw.codigo_municipio!,
-            codigo_circuito: raw.codigo_circuito || null,
-            correo_congregacion: raw.correo_congregacion || null,
+            codigo_circuito: raw.codigo_circuito!,
+            correo_congregacion: raw.correo_congregacion!,
           });
 
     request$.subscribe({

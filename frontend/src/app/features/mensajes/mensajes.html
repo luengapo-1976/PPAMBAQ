@@ -1,12 +1,18 @@
 <div class="mensajes-page">
-  <app-mensaje-form
-    [tipos]="tipos()"
-    [editingRecord]="editingRecord()"
-    (saved)="onSaved()"
-    (cancelEdit)="onCancelEdit()"
-  />
+  <div class="mensajes-page__toolbar">
+    <app-button icon="add" (click)="onNewRecord()">Nuevo mensaje</app-button>
+  </div>
 
   <section class="mensajes-page__grid">
     <app-mensajes-table [rows]="mensajes()" (editRecord)="onEditRecord($event)" />
   </section>
 </div>
+
+<app-mensaje-form
+  [open]="dialogOpen()"
+  [mode]="dialogMode()"
+  [tipos]="tipos()"
+  [record]="editingRecord()"
+  (closed)="onDialogClosed()"
+  (saved)="onSaved()"
+/>

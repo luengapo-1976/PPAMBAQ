@@ -2,16 +2,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--ppam-space-md);
-  padding: var(--ppam-space-lg);
-  background: var(--ppam-surface-container-lowest);
-  border: 1px solid var(--ppam-border-quiet);
-  border-radius: var(--ppam-radius-card);
-}
-
-.mensaje-form__toolbar {
-  display: flex;
-  gap: var(--ppam-space-sm);
-  flex-wrap: wrap;
 }
 
 .mensaje-form__row {
@@ -114,4 +104,92 @@
 .mensaje-form__textarea:focus-visible {
   outline: 2px solid var(--ppam-primary-container);
   outline-offset: -2px;
+}
+
+.mensaje-form__mention-menu {
+  position: fixed;
+  z-index: 200;
+  width: 300px;
+  max-height: 260px;
+  overflow-y: auto;
+  margin: 0;
+  padding: var(--ppam-space-xs);
+  list-style: none;
+  background: var(--ppam-surface-container-lowest);
+  border: 1px solid var(--ppam-border-quiet);
+  border-radius: var(--ppam-radius-control);
+  box-shadow: var(--ppam-elevation-2);
+}
+
+.mensaje-form__mention-option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  width: 100%;
+  padding: var(--ppam-space-xs) var(--ppam-space-sm);
+  border: 0;
+  border-radius: var(--ppam-radius-sm);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.mensaje-form__mention-option:hover,
+.mensaje-form__mention-option--active {
+  background: var(--ppam-surface-container);
+}
+
+.mensaje-form__mention-token {
+  font-size: var(--ppam-small-size);
+  font-weight: 600;
+  color: var(--ppam-primary-container);
+}
+
+.mensaje-form__mention-desc {
+  font-size: var(--ppam-small-size);
+  color: var(--ppam-on-surface-variant);
+}
+
+.mensaje-help {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ppam-space-md);
+  color: var(--ppam-on-surface);
+}
+
+.mensaje-help code {
+  padding: 1px 4px;
+  border-radius: var(--ppam-radius-sm);
+  background: var(--ppam-surface-container);
+  font-size: 0.9em;
+}
+
+.mensaje-help h3 {
+  font-size: var(--ppam-h3-size);
+  font-weight: var(--ppam-h3-weight);
+}
+
+.mensaje-help__rules {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ppam-space-xs);
+  padding-left: var(--ppam-space-lg);
+}
+
+.mensaje-help__fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ppam-space-xs);
+  list-style: none;
+  padding: 0;
+}
+
+.mensaje-help__fields li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--ppam-space-xs);
+  padding: var(--ppam-space-xs) 0;
+  border-bottom: 1px solid var(--ppam-border-quiet);
 }

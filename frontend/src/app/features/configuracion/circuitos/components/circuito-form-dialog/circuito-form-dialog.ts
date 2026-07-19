@@ -33,9 +33,9 @@ export class CircuitoFormDialog {
 
   protected readonly form = this.fb.group({
     codigo_circuito: ['', [Validators.required, Validators.maxLength(10)]],
-    nombre_viajante: ['', [Validators.maxLength(100)]],
-    movil: ['', [Validators.pattern(MOVIL_PATTERN)]],
-    correo_electronico: ['', [Validators.pattern(EMAIL_PATTERN), Validators.maxLength(100)]],
+    nombre_viajante: ['', [Validators.required, Validators.maxLength(100)]],
+    movil: ['', [Validators.required, Validators.pattern(MOVIL_PATTERN)]],
+    correo_electronico: ['', [Validators.required, Validators.pattern(EMAIL_PATTERN), Validators.maxLength(100)]],
   });
 
   constructor() {
@@ -79,15 +79,15 @@ export class CircuitoFormDialog {
     const request$ =
       this.mode() === 'edit'
         ? this.referenceDataService.updateCircuito(this.record()!.codigo_circuito, {
-            nombre_viajante: raw.nombre_viajante || null,
-            movil: raw.movil || null,
-            correo_electronico: raw.correo_electronico || null,
+            nombre_viajante: raw.nombre_viajante!,
+            movil: raw.movil!,
+            correo_electronico: raw.correo_electronico!,
           })
         : this.referenceDataService.createCircuito({
             codigo_circuito: raw.codigo_circuito!,
-            nombre_viajante: raw.nombre_viajante || null,
-            movil: raw.movil || null,
-            correo_electronico: raw.correo_electronico || null,
+            nombre_viajante: raw.nombre_viajante!,
+            movil: raw.movil!,
+            correo_electronico: raw.correo_electronico!,
           });
 
     request$.subscribe({

@@ -25,15 +25,35 @@
       <input type="text" formControlName="nombre_punto" class="ppam-input" maxlength="100" />
     </app-form-field>
 
-    <app-form-field label="Dirección" [control]="form.controls.direccion" class="form-field--wide">
+    <app-form-field label="Tipo de punto" [required]="true" [control]="form.controls.tipo_punto">
+      <app-select formControlName="tipo_punto" [options]="tipoPuntoOptions" placeholder="Seleccionar…" />
+    </app-form-field>
+
+    <app-form-field label="Dirección" [required]="true" [control]="form.controls.direccion" class="form-field--wide">
       <input type="text" formControlName="direccion" class="ppam-input" maxlength="100" />
     </app-form-field>
 
-    <app-form-field label="Encargado" [control]="form.controls.encargado">
+    <app-form-field label="Departamento" [required]="true" [control]="form.controls.codigo_departamento">
+      <app-search-select
+        formControlName="codigo_departamento"
+        [options]="departamentoOptions()"
+        placeholder="Buscar departamento…"
+      />
+    </app-form-field>
+
+    <app-form-field label="Municipio" [required]="true" [control]="form.controls.codigo_municipio">
+      <app-search-select
+        formControlName="codigo_municipio"
+        [options]="municipioOptions()"
+        placeholder="Buscar municipio…"
+      />
+    </app-form-field>
+
+    <app-form-field label="Encargado" [required]="true" [control]="form.controls.encargado">
       <input type="text" formControlName="encargado" class="ppam-input" maxlength="100" />
     </app-form-field>
 
-    <app-form-field label="Móvil" [control]="form.controls.movil">
+    <app-form-field label="Móvil" [required]="true" [control]="form.controls.movil">
       <input type="tel" formControlName="movil" class="ppam-input" maxlength="10" inputmode="numeric" />
     </app-form-field>
 

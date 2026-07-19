@@ -2,26 +2,27 @@
   <table class="ppam-table">
     <thead>
       <tr>
+        <th>Acciones</th>
         <th>Tipo</th>
         <th>Mensaje</th>
-        <th>Acciones</th>
       </tr>
     </thead>
     <tbody>
       @for (row of rows(); track row.id) {
         <tr>
-          <td class="ppam-table__tipo">{{ row.tipo }}</td>
-          <td class="ppam-table__mensaje">{{ row.mensaje }}</td>
           <td>
             <button
               type="button"
               class="ppam-table__edit-btn"
               [attr.aria-label]="'Editar mensaje de tipo ' + row.tipo"
+              title="Editar registro"
               (click)="editRecord.emit(row)"
             >
               <span class="material-symbols-outlined" aria-hidden="true">edit</span>
             </button>
           </td>
+          <td class="ppam-table__tipo">{{ row.tipo }}</td>
+          <td class="ppam-table__mensaje">{{ row.mensaje }}</td>
         </tr>
       } @empty {
         <tr>

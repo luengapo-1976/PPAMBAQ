@@ -46,7 +46,7 @@
       />
     </app-form-field>
 
-    <app-form-field label="Circuito" [control]="form.controls.codigo_circuito">
+    <app-form-field label="Circuito" [required]="true" [control]="form.controls.codigo_circuito">
       <app-search-select
         formControlName="codigo_circuito"
         [options]="circuitoOptions()"
@@ -54,7 +54,7 @@
       />
     </app-form-field>
 
-    <app-form-field label="Correo de la congregación" [control]="form.controls.correo_congregacion">
+    <app-form-field label="Correo de la congregación" [required]="true" [control]="form.controls.correo_congregacion">
       <input type="email" formControlName="correo_congregacion" class="ppam-input" maxlength="100" />
     </app-form-field>
   </form>

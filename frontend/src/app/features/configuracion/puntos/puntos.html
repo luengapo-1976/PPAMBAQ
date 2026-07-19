@@ -1,7 +1,7 @@
 <div class="config-page">
   <app-config-table
     [rows]="puntos()"
-    [columns]="columns"
+    [columns]="columns()"
     [rowId]="rowId"
     searchPlaceholder="Buscar por código, nombre, dirección, encargado o móvil…"
     newRecordLabel="Nuevo registro"
@@ -16,6 +16,8 @@
   [mode]="dialogMode()"
   [record]="editingRecord()"
   [puntos]="puntos()"
+  [departamentos]="departamentos()"
+  [municipios]="municipios()"
   (closed)="onDialogClosed()"
   (saved)="onSaved()"
 />

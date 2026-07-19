@@ -11,6 +11,7 @@ import { MENSAJE_RELACIONADO_CON_OPTIONS, MensajeRelacionadoCon, Publicador } fr
 import { PublicadoresService } from '../../data/publicadores.service';
 import { nombreCompleto } from '../../data/publicador.utils';
 import { buildWhatsAppLink, substitutePlaceholders } from '../../data/mensaje-placeholder.util';
+import { Punto } from '../../../configuracion/data/models';
 
 interface RecipientLink {
   publicador: Publicador;
@@ -32,6 +33,7 @@ export class EnviarMensajePanel {
   readonly open = input(false);
   readonly selectedPublicadorIds = input<string[]>([]);
   readonly publicadores = input<Publicador[]>([]);
+  readonly puntos = input<Punto[]>([]);
   /** Separación desde el borde derecho, para dejar espacio a la barra de acciones cuando se abre desde ahí. */
   readonly rightOffset = input('0px');
   readonly closed = output<void>();
@@ -141,7 +143,7 @@ export class EnviarMensajePanel {
     const links: RecipientLink[] = recipients
       .filter((p) => !!p.movil)
       .map((p) => {
-        let final = substitutePlaceholders(this.mensajeText(), p);
+        let final = substitutePlaceholders(this.mensajeText(), p, this.puntos());
         if (adjuntoUrl) {
           final += `\n\n📎 Archivo adjunto: ${adjuntoUrl}`;
         }

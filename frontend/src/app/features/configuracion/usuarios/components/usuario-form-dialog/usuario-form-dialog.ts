@@ -42,8 +42,8 @@ export class UsuarioFormDialog {
     login: ['', [Validators.required, Validators.maxLength(20)]],
     rol: ['', Validators.required],
     password: ['', [Validators.minLength(6), Validators.maxLength(100)]],
-    correo: ['', [Validators.pattern(EMAIL_PATTERN), Validators.maxLength(100)]],
-    movil: ['', [Validators.pattern(/^\d{1,10}$/)]],
+    correo: ['', [Validators.required, Validators.pattern(EMAIL_PATTERN), Validators.maxLength(100)]],
+    movil: ['', [Validators.required, Validators.pattern(/^\d{1,10}$/)]],
   });
 
   constructor() {
@@ -89,15 +89,15 @@ export class UsuarioFormDialog {
         ? this.referenceDataService.updateUsuario(this.record()!.login, {
             rol: raw.rol as 'Administrador' | 'Coordinador',
             password: raw.password || undefined,
-            correo: raw.correo || null,
-            movil: raw.movil || null,
+            correo: raw.correo!,
+            movil: raw.movil!,
           })
         : this.referenceDataService.createUsuario({
             login: raw.login!,
             rol: raw.rol as 'Administrador' | 'Coordinador',
             password: raw.password!,
-            correo: raw.correo || null,
-            movil: raw.movil || null,
+            correo: raw.correo!,
+            movil: raw.movil!,
           });
 
     request$.subscribe({
