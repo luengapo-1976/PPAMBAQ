@@ -1,54 +1,125 @@
-import { Component, effect, input, output, signal } from '@angular/core';
+import { Component, inject, input, output, signal } from '@angular/core';
 import { Button } from '../../../../shared/ui/button/button';
-
-const CLOSE_ANIMATION_MS = 220;
+import { Dialog } from '../../../../shared/ui/dialog/dialog';
+import { Publicador } from '../../data/models';
+import { exportPublicadoresToCsv, exportPublicadoresToExcel } from '../../data/export.util';
+import { PublicadoresService } from '../../data/publicadores.service';
+import { SnackbarService } from '../../../../shared/ui/snackbar/snackbar.service';
 
 @Component({
   selector: 'app-acciones-bar',
-  imports: [Button],
+  imports: [Button, Dialog],
   templateUrl: './acciones-bar.html',
   styleUrl: './acciones-bar.scss',
 })
 export class AccionesBar {
-  readonly open = input(false);
-  readonly collapsed = input(false);
+  private readonly snackbar = inject(SnackbarService);
+  private readonly publicadoresService = inject(PublicadoresService);
 
-  readonly closed = output<void>();
+  readonly collapsed = input(false);
+  /** Cantidad de registros actualmente seleccionados en la grilla; las acciones
+   * de esta barra solo se habilitan cuando hay al menos un registro seleccionado. */
+  readonly selectedCount = input(0);
+  /** Ids de los registros actualmente seleccionados en la grilla. */
+  readonly selectedIds = input<ReadonlySet<string>>(new Set());
+  /** Filas actualmente mostradas en la grilla (ya filtradas/ordenadas), usadas para exportar. */
+  readonly displayedRows = input<Publicador[]>([]);
+
   readonly collapsedChange = output<boolean>();
   readonly selectAsignarLugar = output<void>();
   readonly selectEnviarMensaje = output<void>();
+  /** Se emite cuando se actualizan registros (p. ej. existe_bd_anterior), para que
+   * la página recargue el listado y refleje el cambio en la grilla. */
+  readonly updated = output<void>();
+
+  protected readonly exportingExcel = signal(false);
+  protected readonly confirmExisteBdAnteriorOpen = signal(false);
+  protected readonly markingExisteBdAnterior = signal(false);
+  protected readonly pendingMarkIds = signal<string[]>([]);
 
   protected onToggleCollapsed(): void {
     this.collapsedChange.emit(!this.collapsed());
   }
 
-  /** Se mantiene en el DOM un instante más allá de `open()` para poder
-   * reproducir la animación de salida antes de desmontar la barra. */
-  protected readonly visible = signal(false);
-  protected readonly closing = signal(false);
+  protected onSelectAsignarLugar(): void {
+    this.collapse();
+    this.selectAsignarLugar.emit();
+  }
 
-  private wasOpen = false;
-  private closeTimer: ReturnType<typeof setTimeout> | null = null;
+  protected onSelectEnviarMensaje(): void {
+    this.collapse();
+    this.selectEnviarMensaje.emit();
+  }
 
-  constructor() {
-    effect(() => {
-      const isOpen = this.open();
-      if (isOpen) {
-        if (this.closeTimer) {
-          clearTimeout(this.closeTimer);
-          this.closeTimer = null;
-        }
-        this.closing.set(false);
-        this.visible.set(true);
-      } else if (this.wasOpen) {
-        this.closing.set(true);
-        this.closeTimer = setTimeout(() => {
-          this.visible.set(false);
-          this.closing.set(false);
-          this.closeTimer = null;
-        }, CLOSE_ANIMATION_MS);
+  protected async onExportExcel(): Promise<void> {
+    this.collapse();
+    const rows = this.displayedRows();
+    if (rows.length === 0) {
+      this.snackbar.show('No hay registros para exportar con el filtro actual.', 'info');
+      return;
+    }
+    this.exportingExcel.set(true);
+    try {
+      await exportPublicadoresToExcel(rows);
+      this.snackbar.success('Exportación de datos exitosa.');
+      const ids = [...this.selectedIds()];
+      if (ids.length > 0) {
+        this.pendingMarkIds.set(ids);
+        this.confirmExisteBdAnteriorOpen.set(true);
       }
-      this.wasOpen = isOpen;
+    } catch {
+      this.snackbar.error('No se pudo generar el archivo de Excel.');
+    } finally {
+      this.exportingExcel.set(false);
+    }
+  }
+
+  protected onExportCsv(): void {
+    this.collapse();
+    const rows = this.displayedRows();
+    if (rows.length === 0) {
+      this.snackbar.show('No hay registros para exportar con el filtro actual.', 'info');
+      return;
+    }
+    try {
+      exportPublicadoresToCsv(rows);
+    } catch {
+      this.snackbar.error('No se pudo generar el archivo CSV.');
+    }
+  }
+
+  protected onCancelMarkExisteBdAnterior(): void {
+    this.confirmExisteBdAnteriorOpen.set(false);
+    this.pendingMarkIds.set([]);
+  }
+
+  protected onConfirmMarkExisteBdAnterior(): void {
+    const ids = this.pendingMarkIds();
+    if (ids.length === 0 || this.markingExisteBdAnterior()) {
+      return;
+    }
+    this.markingExisteBdAnterior.set(true);
+    this.publicadoresService.marcarExisteBdAnterior(ids).subscribe({
+      next: ({ actualizados }) => {
+        this.markingExisteBdAnterior.set(false);
+        this.confirmExisteBdAnteriorOpen.set(false);
+        this.pendingMarkIds.set([]);
+        this.snackbar.success(
+          `Se actualizaron ${actualizados} registro(s): ya existen en la base de datos anterior.`,
+        );
+        this.updated.emit();
+      },
+      error: () => {
+        this.markingExisteBdAnterior.set(false);
+        this.snackbar.error('No se pudo actualizar los registros seleccionados.');
+      },
     });
+  }
+
+  /** Contrae la barra automáticamente al usar cualquiera de sus acciones. */
+  private collapse(): void {
+    if (!this.collapsed()) {
+      this.collapsedChange.emit(true);
+    }
   }
 }

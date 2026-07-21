@@ -193,6 +193,7 @@ export type Database = {
           entrenamiento_requerido: string | null
           estado: string | null
           estado_civil: string | null
+          existe_bd_anterior: string | null
           fecha_aprobacion: string | null
           fecha_bautismo: string | null
           fecha_cumple_requisitos: string | null
@@ -235,6 +236,7 @@ export type Database = {
           entrenamiento_requerido?: string | null
           estado?: string | null
           estado_civil?: string | null
+          existe_bd_anterior?: string | null
           fecha_aprobacion?: string | null
           fecha_bautismo?: string | null
           fecha_cumple_requisitos?: string | null
@@ -277,6 +279,7 @@ export type Database = {
           entrenamiento_requerido?: string | null
           estado?: string | null
           estado_civil?: string | null
+          existe_bd_anterior?: string | null
           fecha_aprobacion?: string | null
           fecha_bautismo?: string | null
           fecha_cumple_requisitos?: string | null

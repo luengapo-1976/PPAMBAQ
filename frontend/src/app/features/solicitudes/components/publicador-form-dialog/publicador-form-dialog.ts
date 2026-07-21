@@ -17,6 +17,7 @@ import {
   EstadoCivil,
   ESTADOS_SOLICITUD,
   EstadoSolicitud,
+  ExisteBdAnterior,
   Municipio,
   ParticipoAntes,
   PrivilegioMin,
@@ -57,6 +58,10 @@ const PARTICIPO_ANTES_OPTIONS: SelectOption[] = [
   { value: 'SI', label: 'Sí' },
   { value: 'NO', label: 'No' },
 ];
+const EXISTE_BD_ANTERIOR_OPTIONS: SelectOption[] = [
+  { value: 'SI', label: 'Sí' },
+  { value: 'NO', label: 'No' },
+];
 const SEXO_OPTIONS: SelectOption[] = [
   { value: 'F', label: 'Femenino' },
   { value: 'M', label: 'Masculino' },
@@ -87,6 +92,8 @@ export class PublicadorFormDialog {
   readonly congregaciones = input.required<Congregacion[]>();
   readonly existingPublicadores = input<Publicador[]>([]);
   readonly puntos = input<Punto[]>([]);
+  /** Separación desde el borde derecho, para dejar espacio a la barra de acciones. */
+  readonly rightOffset = input('0px');
 
   readonly closed = output<void>();
   readonly saved = output<void>();
@@ -98,6 +105,7 @@ export class PublicadorFormDialog {
   protected readonly privilegioMinOptions = PRIVILEGIO_MIN_OPTIONS;
   protected readonly privilegioSerOptions = PRIVILEGIO_SER_OPTIONS;
   protected readonly participoAntesOptions = PARTICIPO_ANTES_OPTIONS;
+  protected readonly existeBdAnteriorOptions = EXISTE_BD_ANTERIOR_OPTIONS;
   protected readonly sexoOptions = SEXO_OPTIONS;
   protected readonly estadoOptions = ESTADO_OPTIONS;
   protected readonly entrenamientoRequeridoOptions = ENTRENAMIENTO_REQUERIDO_OPTIONS;
@@ -148,6 +156,7 @@ export class PublicadorFormDialog {
     entrenamiento_requerido: [{ value: 'Primer entrenamiento', disabled: true }, Validators.required],
     fecha_aprobacion: [''],
     fecha_cumple_requisitos: [''],
+    existe_bd_anterior: [{ value: 'NO', disabled: true }, Validators.required],
   });
 
   private readonly selectedDepartamento = toSignal(this.form.controls.codigo_departamento.valueChanges, {
@@ -345,6 +354,7 @@ export class PublicadorFormDialog {
     if (this.mode() === 'create') {
       this.form.controls.estado.setValue('REGISTRADO');
       this.form.controls.entrenamiento_requerido.setValue('Primer entrenamiento');
+      this.form.controls.existe_bd_anterior.setValue('NO');
     }
   }
 
@@ -385,6 +395,7 @@ export class PublicadorFormDialog {
           fecha_solicitud: toNullable(raw.fecha_solicitud),
           estado: toNullable(raw.estado) as EstadoSolicitud | null,
           entrenamiento_requerido: toNullable(raw.entrenamiento_requerido) as EntrenamientoRequerido | null,
+          existe_bd_anterior: toNullable(raw.existe_bd_anterior) as ExisteBdAnterior | null,
         }
       : {
           primer_apellido: raw.primer_apellido!,
@@ -409,6 +420,7 @@ export class PublicadorFormDialog {
           fecha_solicitud: raw.fecha_solicitud!,
           estado: raw.estado as EstadoSolicitud,
           entrenamiento_requerido: raw.entrenamiento_requerido as EntrenamientoRequerido,
+          existe_bd_anterior: raw.existe_bd_anterior as ExisteBdAnterior,
         };
 
     if (raw.estado === 'CUMPLE REQUISITOS') {
@@ -566,6 +578,7 @@ export class PublicadorFormDialog {
     this.form.controls.fecha_solicitud.setValidators(req([]));
     this.form.controls.estado.setValidators(req([]));
     this.form.controls.entrenamiento_requerido.setValidators(req([]));
+    this.form.controls.existe_bd_anterior.setValidators(req([]));
 
     for (const control of Object.values(this.form.controls)) {
       control.updateValueAndValidity({ emitEvent: false });
@@ -578,6 +591,8 @@ export class PublicadorFormDialog {
     this.form.controls.estado.setValue('REGISTRADO');
     this.form.controls.entrenamiento_requerido.setValue('Primer entrenamiento');
     this.form.controls.entrenamiento_requerido.disable();
+    this.form.controls.existe_bd_anterior.setValue('NO');
+    this.form.controls.existe_bd_anterior.disable();
   }
 
   private populateForm(record: Publicador, opts: { enableWorkflowFields: boolean }): void {
@@ -585,6 +600,7 @@ export class PublicadorFormDialog {
     this.form.controls.codigo_municipio.enable({ emitEvent: false });
     if (opts.enableWorkflowFields) {
       this.form.controls.entrenamiento_requerido.enable();
+      this.form.controls.existe_bd_anterior.enable();
     }
     this.form.patchValue({
       primer_apellido: record.primer_apellido,
@@ -611,6 +627,7 @@ export class PublicadorFormDialog {
       entrenamiento_requerido: record.entrenamiento_requerido,
       fecha_aprobacion: record.fecha_aprobacion ?? '',
       fecha_cumple_requisitos: record.fecha_cumple_requisitos ?? '',
+      existe_bd_anterior: record.existe_bd_anterior ?? 'NO',
     });
     this.isPatchingForm = false;
   }

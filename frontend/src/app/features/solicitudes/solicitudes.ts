@@ -128,10 +128,14 @@ export class Solicitudes {
   protected readonly dialogMode = signal<'create' | 'edit'>('create');
   protected readonly editingRecord = signal<Publicador | null>(null);
 
-  protected readonly accionesBarOpen = signal(false);
-  protected readonly accionesBarCollapsed = signal(false);
+  protected readonly accionesBarCollapsed = signal(true);
   protected readonly accionesSelectedIds = signal<string[]>([]);
   protected readonly activeAccion = signal<'asignar-lugar' | 'enviar-mensaje' | null>(null);
+
+  /** Selección viva de la grilla, compartida entre la tabla y la barra de acciones. */
+  protected readonly selectedIds = signal<ReadonlySet<string>>(new Set());
+  /** Filas actualmente mostradas en la grilla (tras filtros/orden), usadas al exportar. */
+  protected readonly displayedRows = signal<Publicador[]>([]);
 
   /** Ancho actual de la barra de acciones; los paneles abiertos desde ella se
    * insertan a su izquierda usando este mismo valor como rightOffset. */
@@ -182,23 +186,17 @@ export class Solicitudes {
     this.loadPublicadores();
   }
 
-  protected onViewActions(selectedIds: string[]): void {
-    if (selectedIds.length === 0) {
-      return;
-    }
-    this.accionesSelectedIds.set(selectedIds);
-    this.activeAccion.set(null);
-    this.accionesBarOpen.set(true);
+  protected onSelectAsignarLugar(): void {
+    this.accionesSelectedIds.set([...this.selectedIds()]);
+    this.activeAccion.set('asignar-lugar');
   }
 
-  /** Cierra la barra: oculta tanto la barra como el formulario que esté abierto a su izquierda. */
-  protected onAccionesBarClosed(): void {
-    this.accionesBarOpen.set(false);
-    this.activeAccion.set(null);
-    this.accionesBarCollapsed.set(false);
+  protected onSelectEnviarMensaje(): void {
+    this.accionesSelectedIds.set([...this.selectedIds()]);
+    this.activeAccion.set('enviar-mensaje');
   }
 
-  /** Cierra solo el formulario activo; la barra de acciones permanece abierta. */
+  /** Cierra solo el formulario activo; la barra de acciones permanece siempre visible. */
   protected onAccionPanelClosed(): void {
     this.activeAccion.set(null);
   }

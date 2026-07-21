@@ -21,6 +21,7 @@ const PRIVILEGIO_SER_VALUES = [
   'Miembro de la familia Betel',
 ] as const;
 const PARTICIPO_ANTES_VALUES = ['SI', 'NO'] as const;
+const EXISTE_BD_ANTERIOR_VALUES = ['SI', 'NO'] as const;
 export const ESTADO_VALUES = [
   'REGISTRADO',
   'NOTIFICADO PRIMER ENTRENAMIENTO',
@@ -128,4 +129,8 @@ export class CreatePublicadorDto {
   @IsOptional()
   @IsDateString()
   fecha_cumple_requisitos?: string | null;
+
+  @IsOptional()
+  @IsIn(EXISTE_BD_ANTERIOR_VALUES)
+  existe_bd_anterior?: (typeof EXISTE_BD_ANTERIOR_VALUES)[number];
 }

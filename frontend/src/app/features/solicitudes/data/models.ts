@@ -27,6 +27,7 @@ export type PrivilegioSer =
   | 'Misionero que sirve en el campo'
   | 'Miembro de la familia Betel';
 export type ParticipoAntes = 'SI' | 'NO';
+export type ExisteBdAnterior = 'SI' | 'NO';
 export type EstadoSolicitud =
   | 'REGISTRADO'
   | 'NOTIFICADO PRIMER ENTRENAMIENTO'
@@ -93,6 +94,7 @@ export interface Publicador {
   fecha_registro: string | null;
   usuario_modifica: string | null;
   fecha_modificacion: string | null;
+  existe_bd_anterior: ExisteBdAnterior;
 }
 
 export type PublicadorPayload = Omit<

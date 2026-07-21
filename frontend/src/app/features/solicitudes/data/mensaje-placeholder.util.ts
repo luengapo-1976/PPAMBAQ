@@ -84,13 +84,18 @@ export function buildPlaceholderContext(publicador: Publicador, puntos: Punto[] 
   };
 }
 
+/** Marcadores de énfasis de WhatsApp (negrita/cursiva/tachado) que los botones
+ * del editor anteponen al texto seleccionado. No cuentan como "contenido" al
+ * determinar el inicio de línea: "*<primer_nombre>*" debe seguir capitalizando. */
+const LEADING_NON_CONTENT = /^[\s*_~`]+/;
+
 /** true si, mirando hacia atrás desde `offset` hasta el último salto de línea
- * (o el inicio del texto), solo hay espacios en blanco — es decir, el match
- * es el primer contenido no vacío de su línea. */
+ * (o el inicio del texto), solo hay espacios en blanco y/o marcadores de estilo
+ * — es decir, el match es el primer contenido real de su línea. */
 function isStartOfLine(text: string, offset: number): boolean {
   const before = text.slice(0, offset);
   const linePrefix = before.slice(before.lastIndexOf('\n') + 1);
-  return linePrefix.trim().length === 0;
+  return linePrefix.replace(LEADING_NON_CONTENT, '').length === 0;
 }
 
 function formatNameWithHermano(value: string, sexo: Sexo, startOfLine: boolean): string {

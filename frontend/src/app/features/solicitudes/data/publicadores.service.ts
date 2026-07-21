@@ -42,4 +42,8 @@ export class PublicadoresService {
       codigoPunto,
     });
   }
+
+  marcarExisteBdAnterior(ids: string[]): Observable<{ actualizados: number }> {
+    return this.api.patch<{ actualizados: number }>('publicadores/marcar-existe-bd-anterior', { ids });
+  }
 }

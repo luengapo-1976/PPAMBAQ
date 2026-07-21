@@ -1,3 +1,25 @@
+<div class="table-selection-bar">
+  <span class="table-selection-bar__count">
+    {{ selectedIds().size }} {{ selectedIds().size === 1 ? 'registro seleccionado' : 'registros seleccionados' }}
+  </span>
+  <app-button
+    variant="secondary"
+    icon="remove_done"
+    [disabled]="selectedIds().size === 0"
+    (click)="onDeselectAll()"
+  >
+    Desmarcar todos
+  </app-button>
+  <app-button
+    variant="secondary"
+    [icon]="onlySelectedFilter() ? 'filter_alt_off' : 'filter_alt'"
+    [disabled]="selectedIds().size === 0 && !onlySelectedFilter()"
+    (click)="onToggleOnlySelected()"
+  >
+    {{ onlySelectedFilter() ? 'Ver todos los registros' : 'Filtrar seleccionados' }}
+  </app-button>
+</div>
+
 @if (cumpleRequisitosActive()) {
   <div class="table-date-filters">
     <label class="table-date-filters__field">
@@ -35,15 +57,16 @@
       aria-label="Buscar solicitudes"
     />
   </div>
+  <label class="table-toolbar__filter">
+    <span>¿Existe registro en BD anterior'?</span>
+    <app-select
+      [options]="existeBdAnteriorFilterOptions"
+      [ngModel]="existeBdAnteriorFilter()"
+      (ngModelChange)="existeBdAnteriorFilter.set($event)"
+    />
+  </label>
   <span class="table-toolbar__count">{{ sortedRows().length }} {{ sortedRows().length === 1 ? 'registro' : 'registros' }}</span>
   <div class="table-toolbar__actions">
-    <app-button variant="secondary" icon="table_view" [disabled]="exportingExcel()" (click)="onExportExcel()">
-      {{ exportingExcel() ? 'Exportando…' : 'Exportar filas' }}
-    </app-button>
-    <app-button variant="secondary" icon="download" (click)="onExportCsv()">Exportar csv</app-button>
-    <app-button icon="tune" [disabled]="selectedIds().size === 0" (click)="onViewActions()">
-      Ver acciones
-    </app-button>
     <app-button icon="add" (click)="newRecord.emit()">Nuevo registro</app-button>
   </div>
 </div>
@@ -113,6 +136,8 @@
           <td>
             <app-badge [tone]="estadoConfig[row.estado].tone">{{ row.estado }}</app-badge>
           </td>
+          <td>{{ formatDateShort(row.fecha_registro) }}</td>
+          <td>{{ formatDateShort(row.fecha_modificacion) }}</td>
         </tr>
       } @empty {
         <tr>

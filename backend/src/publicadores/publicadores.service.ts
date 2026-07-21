@@ -37,10 +37,11 @@ export class PublicadoresService {
   }
 
   async create(dto: CreatePublicadorDto, usuarioLogin: string) {
-    const login = await this.buildUniqueLogin(dto.primer_nombre, dto.primer_apellido);
+    const login = await this.buildUniqueLogin(dto.primer_nombre, dto.primer_apellido, dto.segundo_apellido);
     const row = await this.publicadoresRepository.create({
       ...dto,
       login,
+      existe_bd_anterior: 'NO',
       usuario_registra: usuarioLogin,
       fecha_registro: todayIsoDate(),
     });
@@ -89,15 +90,48 @@ export class PublicadoresService {
     return { actualizados: dto.ids.length };
   }
 
-  /** login = primer_nombre + primer_apellido en minúsculas; si ya existe en
-   * publicadores.login, se le agrega un sufijo aleatorio de 2 dígitos (10-99). */
-  private async buildUniqueLogin(primerNombre: string, primerApellido: string): Promise<string> {
+  async marcarExisteBdAnterior(ids: string[], usuarioLogin: string) {
+    await this.publicadoresRepository.bulkUpdateByIds(ids, {
+      existe_bd_anterior: 'SI',
+      usuario_modifica: usuarioLogin,
+      fecha_modificacion: todayIsoDate(),
+    });
+
+    return { actualizados: ids.length };
+  }
+
+  /** login = primer_nombre + primer_apellido en minúsculas. Si ya existe en
+   * publicadores.login:
+   *  1. Si hay segundo_apellido, se le agrega su primera letra y se vuelve a validar.
+   *  2. Si esa combinación también existe (o no había segundo_apellido), se le agrega
+   *     un sufijo aleatorio de 2 dígitos (10-99), reintentando con un sufijo nuevo
+   *     cada vez que la combinación resultante ya exista, hasta obtener una libre. */
+  private async buildUniqueLogin(
+    primerNombre: string,
+    primerApellido: string,
+    segundoApellido?: string | null,
+  ): Promise<string> {
     const base = `${primerNombre}${primerApellido}`.toLowerCase().trim();
-    const alreadyExists = await this.publicadoresRepository.existsByLogin(base);
-    if (!alreadyExists) {
+    if (!(await this.publicadoresRepository.existsByLogin(base))) {
       return base;
     }
-    const suffix = Math.floor(Math.random() * 90) + 10;
-    return `${base}${suffix}`;
+
+    let candidateBase = base;
+    const segundo = segundoApellido?.trim();
+    if (segundo) {
+      const conInicialSegundoApellido = `${base}${segundo.charAt(0).toLowerCase()}`;
+      if (!(await this.publicadoresRepository.existsByLogin(conInicialSegundoApellido))) {
+        return conInicialSegundoApellido;
+      }
+      candidateBase = conInicialSegundoApellido;
+    }
+
+    for (;;) {
+      const suffix = Math.floor(Math.random() * 90) + 10;
+      const candidate = `${candidateBase}${suffix}`;
+      if (!(await this.publicadoresRepository.existsByLogin(candidate))) {
+        return candidate;
+      }
+    }
   }
 }

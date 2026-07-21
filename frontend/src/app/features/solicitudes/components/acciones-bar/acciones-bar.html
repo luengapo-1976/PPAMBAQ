@@ -1,6 +1,5 @@
-@if (visible()) {
-  <div class="acciones-bar" [class.acciones-bar--collapsed]="collapsed()" [class.acciones-bar--closing]="closing()">
-    <header class="acciones-bar__header">
+<div class="acciones-bar" [class.acciones-bar--collapsed]="collapsed()">
+  <header class="acciones-bar__header">
       <button
         type="button"
         class="acciones-bar__toggle"
@@ -13,17 +12,15 @@
       @if (!collapsed()) {
         <h2 class="acciones-bar__title">Acciones</h2>
       }
-      <button type="button" class="acciones-bar__close" aria-label="Cerrar" (click)="closed.emit()">
-        <span class="material-symbols-outlined" aria-hidden="true">close</span>
-      </button>
     </header>
 
     <div class="acciones-bar__options">
       <app-button
         class="acciones-bar__option"
         icon="school"
+        [disabled]="selectedCount() === 0"
         [attr.title]="collapsed() ? 'Asignar lugar de entrenamiento' : null"
-        (click)="selectAsignarLugar.emit()"
+        (click)="onSelectAsignarLugar()"
       >
         @if (!collapsed()) {
           Asignar lugar de entrenamiento
@@ -33,8 +30,9 @@
       <app-button
         class="acciones-bar__option"
         variant="whatsapp"
+        [disabled]="selectedCount() === 0"
         [attr.title]="collapsed() ? 'Enviar mensaje' : null"
-        (click)="selectEnviarMensaje.emit()"
+        (click)="onSelectEnviarMensaje()"
       >
         <svg class="acciones-bar__whatsapp-icon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
           <path
@@ -45,6 +43,50 @@
           Enviar mensaje
         }
       </app-button>
+
+      <app-button
+        class="acciones-bar__option"
+        variant="excel"
+        icon="table_view"
+        [disabled]="selectedCount() === 0 || exportingExcel()"
+        [attr.title]="collapsed() ? 'Exportar filas' : null"
+        (click)="onExportExcel()"
+      >
+        @if (!collapsed()) {
+          {{ exportingExcel() ? 'Exportando…' : 'Exportar filas' }}
+        }
+      </app-button>
+
+      <app-button
+        class="acciones-bar__option"
+        variant="excel"
+        icon="download"
+        [disabled]="selectedCount() === 0"
+        [attr.title]="collapsed() ? 'Exportar csv' : null"
+        (click)="onExportCsv()"
+      >
+        @if (!collapsed()) {
+          Exportar csv
+        }
+      </app-button>
     </div>
+</div>
+
+<app-dialog
+  [open]="confirmExisteBdAnteriorOpen()"
+  title="Exportación exitosa"
+  (closed)="onCancelMarkExisteBdAnterior()"
+>
+  <p class="acciones-bar__confirm-text">
+    La exportación de datos fue exitosa. ¿Desea actualizar los {{ pendingMarkIds().length }} registro(s)
+    seleccionado(s) indicando que ya se encuentran en la base de datos anterior?
+  </p>
+  <div class="acciones-bar__confirm-actions">
+    <app-button variant="secondary" [disabled]="markingExisteBdAnterior()" (click)="onCancelMarkExisteBdAnterior()">
+      No
+    </app-button>
+    <app-button [disabled]="markingExisteBdAnterior()" (click)="onConfirmMarkExisteBdAnterior()">
+      {{ markingExisteBdAnterior() ? 'Actualizando…' : 'Sí, actualizar' }}
+    </app-button>
   </div>
-}
+</app-dialog>

@@ -61,6 +61,15 @@
   background: #1ebe5b;
 }
 
+.ppam-button--excel {
+  background: #217346;
+  color: #ffffff;
+}
+
+.ppam-button--excel:hover:not(:disabled) {
+  background: #1a5c38;
+}
+
 .ppam-button .material-symbols-outlined {
   color: currentColor;
 }

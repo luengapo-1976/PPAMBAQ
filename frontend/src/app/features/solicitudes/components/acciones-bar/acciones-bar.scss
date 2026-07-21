@@ -1,6 +1,8 @@
 .acciones-bar {
   position: fixed;
-  top: 0;
+  /* Empieza debajo del header para no tapar el avatar de iniciales del
+   * usuario, que vive en la esquina superior derecha sin z-index propio. */
+  top: var(--ppam-header-height);
   right: 0;
   bottom: 0;
   width: 360px;
@@ -9,34 +11,11 @@
   flex-direction: column;
   background: var(--ppam-surface-container-lowest);
   box-shadow: var(--ppam-elevation-2);
-  animation: acciones-bar-slide-in 240ms cubic-bezier(0.16, 1, 0.3, 1);
   transition: width var(--ppam-motion-base);
 }
 
 .acciones-bar--collapsed {
   width: 72px;
-}
-
-.acciones-bar--closing {
-  animation: acciones-bar-slide-out 220ms cubic-bezier(0.4, 0, 1, 1) forwards;
-}
-
-@keyframes acciones-bar-slide-in {
-  from {
-    transform: translateX(100%);
-  }
-  to {
-    transform: translateX(0);
-  }
-}
-
-@keyframes acciones-bar-slide-out {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(100%);
-  }
 }
 
 .acciones-bar__header {
@@ -66,8 +45,7 @@
   white-space: nowrap;
 }
 
-.acciones-bar__toggle,
-.acciones-bar__close {
+.acciones-bar__toggle {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -81,8 +59,7 @@
   cursor: pointer;
 }
 
-.acciones-bar__toggle:hover,
-.acciones-bar__close:hover {
+.acciones-bar__toggle:hover {
   background: var(--ppam-surface-container);
 }
 
@@ -125,4 +102,16 @@
   .acciones-bar {
     width: 100%;
   }
+}
+
+.acciones-bar__confirm-text {
+  color: var(--ppam-on-surface-variant);
+  margin: 0 0 var(--ppam-space-lg);
+}
+
+.acciones-bar__confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--ppam-space-sm);
+  flex-wrap: wrap;
 }

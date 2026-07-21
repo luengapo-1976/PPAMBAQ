@@ -2,6 +2,20 @@
   display: block;
 }
 
+.table-selection-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ppam-space-md);
+  margin-bottom: var(--ppam-space-md);
+}
+
+.table-selection-bar__count {
+  color: var(--ppam-on-surface-variant);
+  font-size: var(--ppam-small-size);
+  font-weight: 600;
+}
+
 .table-date-filters {
   display: flex;
   flex-wrap: wrap;
@@ -81,6 +95,20 @@
   font-size: var(--ppam-body-size);
   color: var(--ppam-on-surface);
   background: transparent;
+}
+
+.table-toolbar__filter {
+  display: flex;
+  align-items: center;
+  gap: var(--ppam-space-sm);
+  font-size: var(--ppam-small-size);
+  font-weight: 600;
+  color: var(--ppam-on-surface-variant);
+  white-space: nowrap;
+}
+
+.table-toolbar__filter app-select {
+  min-width: 140px;
 }
 
 .table-toolbar__count {

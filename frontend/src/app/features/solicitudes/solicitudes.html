@@ -1,4 +1,4 @@
-<div class="solicitudes-page">
+<div class="solicitudes-page" [style.paddingRight]="accionesBarWidth()">
   <app-estado-summary
     [publicadores]="publicadores()"
     [activeCards]="activeCards()"
@@ -34,9 +34,11 @@
     <app-publicadores-table
       [rows]="gridRows()"
       [cumpleRequisitosActive]="activeCards().has('cumple')"
+      [selectedIds]="selectedIds()"
+      (selectedIdsChange)="selectedIds.set($event)"
+      (rowsChange)="displayedRows.set($event)"
       (newRecord)="onNewRecord()"
       (editRecord)="onEditRecord($event)"
-      (viewActions)="onViewActions($event)"
     />
   </section>
 </div>
@@ -50,6 +52,7 @@
   [congregaciones]="congregaciones()"
   [existingPublicadores]="publicadores()"
   [puntos]="puntos()"
+  [rightOffset]="accionesBarWidth()"
   (closed)="onDialogClosed()"
   (saved)="onSaved()"
 />
@@ -73,10 +76,12 @@
 />
 
 <app-acciones-bar
-  [open]="accionesBarOpen()"
   [collapsed]="accionesBarCollapsed()"
+  [selectedCount]="selectedIds().size"
+  [selectedIds]="selectedIds()"
+  [displayedRows]="displayedRows()"
   (collapsedChange)="accionesBarCollapsed.set($event)"
-  (closed)="onAccionesBarClosed()"
-  (selectAsignarLugar)="activeAccion.set('asignar-lugar')"
-  (selectEnviarMensaje)="activeAccion.set('enviar-mensaje')"
+  (selectAsignarLugar)="onSelectAsignarLugar()"
+  (selectEnviarMensaje)="onSelectEnviarMensaje()"
+  (updated)="onSaved()"
 />

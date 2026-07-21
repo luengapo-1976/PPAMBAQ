@@ -3,6 +3,7 @@
   [title]="dialogTitle()"
   position="right"
   rightWidth="70vw"
+  [rightOffset]="rightOffset()"
   panelBackground="var(--ppam-surface)"
   (closed)="onCancel()"
 >
@@ -205,6 +206,14 @@
 
     <app-form-field label="Estado" [required]="true" [control]="form.controls.estado">
       <app-select formControlName="estado" [options]="estadoOptions" placeholder="Seleccionar…" />
+    </app-form-field>
+
+    <app-form-field
+      label="¿Existe registro en BD anterior'?"
+      [required]="true"
+      [control]="form.controls.existe_bd_anterior"
+    >
+      <app-select formControlName="existe_bd_anterior" [options]="existeBdAnteriorOptions" placeholder="Seleccionar…" />
     </app-form-field>
 
     @if (showFechaAprobacion()) {

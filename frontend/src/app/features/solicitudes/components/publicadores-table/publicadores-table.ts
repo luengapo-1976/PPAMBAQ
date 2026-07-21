@@ -1,12 +1,17 @@
-import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
+import { Component, computed, effect, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Button } from '../../../../shared/ui/button/button';
 import { Badge } from '../../../../shared/ui/badge/badge';
-import { Publicador } from '../../data/models';
+import { Select, SelectOption } from '../../../../shared/ui/select/select';
+import { ExisteBdAnterior, Publicador } from '../../data/models';
 import { ESTADO_CONFIG } from '../../data/estado.config';
 import { formatDateShort, nombreCompleto } from '../../data/publicador.utils';
-import { exportPublicadoresToCsv, exportPublicadoresToExcel } from '../../data/export.util';
-import { SnackbarService } from '../../../../shared/ui/snackbar/snackbar.service';
+
+const EXISTE_BD_ANTERIOR_FILTER_OPTIONS: SelectOption[] = [
+  { value: 'TODOS', label: 'Todos' },
+  { value: 'SI', label: 'Sí' },
+  { value: 'NO', label: 'No' },
+];
 
 type SortKey =
   | 'fecha_solicitud'
@@ -19,7 +24,9 @@ type SortKey =
   | 'nombre_congregacion'
   | 'codigo_circuito'
   | 'entrenamiento_requerido'
-  | 'estado';
+  | 'estado'
+  | 'fecha_registro'
+  | 'fecha_modificacion';
 
 interface ColumnDef {
   key: SortKey;
@@ -38,6 +45,8 @@ const COLUMNS: ColumnDef[] = [
   { key: 'codigo_circuito', label: 'Circuito' },
   { key: 'entrenamiento_requerido', label: 'Entrenamiento requerido' },
   { key: 'estado', label: 'Estado' },
+  { key: 'fecha_registro', label: 'Fecha de registro' },
+  { key: 'fecha_modificacion', label: 'Fecha de modificación' },
 ];
 
 function extract(row: Publicador, key: SortKey): string | number {
@@ -57,30 +66,36 @@ function extract(row: Publicador, key: SortKey): string | number {
 
 @Component({
   selector: 'app-publicadores-table',
-  imports: [FormsModule, Button, Badge],
+  imports: [FormsModule, Button, Badge, Select],
   templateUrl: './publicadores-table.html',
   styleUrl: './publicadores-table.scss',
 })
 export class PublicadoresTable {
-  private readonly snackbar = inject(SnackbarService);
-
   readonly rows = input.required<Publicador[]>();
   /** true cuando la tarjeta de resumen "Cumple requisitos" está activa como filtro. */
   readonly cumpleRequisitosActive = input(false);
+  /** Selección controlada por el componente padre, compartida con la barra de acciones. */
+  readonly selectedIds = input<ReadonlySet<string>>(new Set());
 
   readonly newRecord = output<void>();
   readonly editRecord = output<Publicador>();
-  readonly viewActions = output<string[]>();
+  readonly selectedIdsChange = output<ReadonlySet<string>>();
+  /** Emite las filas actualmente mostradas (filtradas/ordenadas) para que otros
+   * componentes (p. ej. la barra de acciones) puedan exportarlas. */
+  readonly rowsChange = output<Publicador[]>();
 
   protected readonly columns = COLUMNS;
   protected readonly estadoConfig = ESTADO_CONFIG;
   protected readonly formatDateShort = formatDateShort;
   protected readonly nombreCompleto = nombreCompleto;
+  protected readonly existeBdAnteriorFilterOptions = EXISTE_BD_ANTERIOR_FILTER_OPTIONS;
 
   protected readonly searchText = signal('');
   protected readonly sortKey = signal<SortKey>('fecha_solicitud');
   protected readonly sortDir = signal<'asc' | 'desc'>('desc');
-  protected readonly selectedIds = signal<ReadonlySet<string>>(new Set());
+  protected readonly existeBdAnteriorFilter = signal<'TODOS' | ExisteBdAnterior>('TODOS');
+  /** Cuando está activo, la grilla solo muestra los registros seleccionados. */
+  protected readonly onlySelectedFilter = signal(false);
 
   protected readonly fechaAprobacionDesde = signal('');
   protected readonly fechaAprobacionHasta = signal('');
@@ -97,6 +112,10 @@ export class PublicadoresTable {
         this.appliedFechaAprobacionDesde.set('');
         this.appliedFechaAprobacionHasta.set('');
       }
+    });
+
+    effect(() => {
+      this.rowsChange.emit(this.sortedRows());
     });
   }
 
@@ -139,6 +158,16 @@ export class PublicadoresTable {
       }
     }
 
+    const existeBdAnterior = this.existeBdAnteriorFilter();
+    if (existeBdAnterior !== 'TODOS') {
+      result = result.filter((row) => row.existe_bd_anterior === existeBdAnterior);
+    }
+
+    if (this.onlySelectedFilter()) {
+      const selected = this.selectedIds();
+      result = result.filter((row) => selected.has(row.id));
+    }
+
     return result;
   });
 
@@ -173,64 +202,33 @@ export class PublicadoresTable {
   }
 
   protected toggleRow(id: string, checked: boolean): void {
-    this.selectedIds.update((prev) => {
-      const next = new Set(prev);
+    const next = new Set(this.selectedIds());
+    if (checked) {
+      next.add(id);
+    } else {
+      next.delete(id);
+    }
+    this.selectedIdsChange.emit(next);
+  }
+
+  protected toggleAll(checked: boolean): void {
+    const visibleIds = this.sortedRows().map((row) => row.id);
+    const next = new Set(this.selectedIds());
+    for (const id of visibleIds) {
       if (checked) {
         next.add(id);
       } else {
         next.delete(id);
       }
-      return next;
-    });
+    }
+    this.selectedIdsChange.emit(next);
   }
 
-  protected toggleAll(checked: boolean): void {
-    const visibleIds = this.sortedRows().map((row) => row.id);
-    this.selectedIds.update((prev) => {
-      const next = new Set(prev);
-      for (const id of visibleIds) {
-        if (checked) {
-          next.add(id);
-        } else {
-          next.delete(id);
-        }
-      }
-      return next;
-    });
+  protected onDeselectAll(): void {
+    this.selectedIdsChange.emit(new Set());
   }
 
-  protected onViewActions(): void {
-    this.viewActions.emit([...this.selectedIds()]);
-  }
-
-  protected readonly exportingExcel = signal(false);
-
-  protected async onExportExcel(): Promise<void> {
-    const rows = this.sortedRows();
-    if (rows.length === 0) {
-      this.snackbar.show('No hay registros para exportar con el filtro actual.', 'info');
-      return;
-    }
-    this.exportingExcel.set(true);
-    try {
-      await exportPublicadoresToExcel(rows);
-    } catch {
-      this.snackbar.error('No se pudo generar el archivo de Excel.');
-    } finally {
-      this.exportingExcel.set(false);
-    }
-  }
-
-  protected onExportCsv(): void {
-    const rows = this.sortedRows();
-    if (rows.length === 0) {
-      this.snackbar.show('No hay registros para exportar con el filtro actual.', 'info');
-      return;
-    }
-    try {
-      exportPublicadoresToCsv(rows);
-    } catch {
-      this.snackbar.error('No se pudo generar el archivo CSV.');
-    }
+  protected onToggleOnlySelected(): void {
+    this.onlySelectedFilter.update((value) => !value);
   }
 }
