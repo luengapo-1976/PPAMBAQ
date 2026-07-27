@@ -4,6 +4,8 @@ import { CreatePublicadorDto } from './dto/create-publicador.dto';
 import { UpdatePublicadorDto } from './dto/update-publicador.dto';
 import { NotificarEntrenamientoDto } from './dto/notificar-entrenamiento.dto';
 import { AsignarLugarEntrenamientoDto } from './dto/asignar-lugar-entrenamiento.dto';
+import { QuitarLugarEntrenamientoDto } from './dto/quitar-lugar-entrenamiento.dto';
+import { ConfirmarAsistenciaDto } from './dto/confirmar-asistencia.dto';
 import { MarcarExisteBdAnteriorDto } from './dto/marcar-existe-bd-anterior.dto';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import type { AuthenticatedUser } from '../auth/strategies/jwt.strategy';
@@ -30,6 +32,21 @@ export class PublicadoresController {
   @Patch('asignar-lugar-entrenamiento')
   asignarLugarEntrenamiento(@Body() dto: AsignarLugarEntrenamientoDto, @CurrentUser() user: AuthenticatedUser) {
     return this.publicadoresService.asignarLugarEntrenamiento(dto, user.login);
+  }
+
+  @Patch('quitar-lugar-entrenamiento')
+  quitarLugarEntrenamiento(@Body() dto: QuitarLugarEntrenamientoDto, @CurrentUser() user: AuthenticatedUser) {
+    return this.publicadoresService.quitarLugarEntrenamiento(dto.ids, user.login);
+  }
+
+  @Patch('confirmar-asistencia')
+  confirmarAsistencia(@Body() dto: ConfirmarAsistenciaDto, @CurrentUser() user: AuthenticatedUser) {
+    return this.publicadoresService.confirmarAsistencia(dto.ids, dto.tipoEntrenamiento, user.login);
+  }
+
+  @Patch('revertir-asistencia')
+  revertirAsistencia(@Body() dto: ConfirmarAsistenciaDto, @CurrentUser() user: AuthenticatedUser) {
+    return this.publicadoresService.revertirAsistencia(dto.ids, dto.tipoEntrenamiento, user.login);
   }
 
   @Patch('marcar-existe-bd-anterior')

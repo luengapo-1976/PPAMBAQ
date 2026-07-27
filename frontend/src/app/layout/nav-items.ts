@@ -3,6 +3,7 @@ import { NavItem } from '../shared/models/nav-item.model';
 export const NAV_ITEMS: NavItem[] = [
   { label: 'Dashboard', icon: 'dashboard', route: '/dashboard' },
   { label: 'Gestión de solicitudes', icon: 'assignment', route: '/solicitudes' },
+  { label: 'Confirmar asistencia', icon: 'how_to_reg', route: '/confirmar-asistencia' },
   {
     label: 'Configuración',
     icon: 'settings',

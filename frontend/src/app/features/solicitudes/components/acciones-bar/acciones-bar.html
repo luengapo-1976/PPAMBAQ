@@ -69,6 +69,18 @@
           Exportar csv
         }
       </app-button>
+
+      <app-button
+        class="acciones-bar__option"
+        icon="location_off"
+        [disabled]="selectedCount() === 0"
+        [attr.title]="collapsed() ? 'Quitar lugar de entrenamiento' : null"
+        (click)="onSelectQuitarLugarEntrenamiento()"
+      >
+        @if (!collapsed()) {
+          Quitar lugar de entrenamiento
+        }
+      </app-button>
     </div>
 </div>
 
@@ -87,6 +99,32 @@
     </app-button>
     <app-button [disabled]="markingExisteBdAnterior()" (click)="onConfirmMarkExisteBdAnterior()">
       {{ markingExisteBdAnterior() ? 'Actualizando…' : 'Sí, actualizar' }}
+    </app-button>
+  </div>
+</app-dialog>
+
+<app-dialog
+  [open]="confirmQuitarLugarOpen()"
+  title="Quitar lugar de entrenamiento"
+  (closed)="onCancelQuitarLugarEntrenamiento()"
+>
+  <p class="acciones-bar__confirm-text">
+    Se actualizará(n) {{ selectedIds().size }} registro(s) seleccionado(s).
+  </p>
+  <p class="acciones-bar__confirm-warning">
+    <span class="material-symbols-outlined" aria-hidden="true">warning</span>
+    <span>Esta opción borrará el lugar y fechas asignados a la última capacitación requerida y no podrá deshacerse.</span>
+  </p>
+  <div class="acciones-bar__confirm-actions">
+    <app-button
+      variant="secondary"
+      [disabled]="removingLugarEntrenamiento()"
+      (click)="onCancelQuitarLugarEntrenamiento()"
+    >
+      Cancelar
+    </app-button>
+    <app-button [disabled]="removingLugarEntrenamiento()" (click)="onConfirmQuitarLugarEntrenamiento()">
+      {{ removingLugarEntrenamiento() ? 'Actualizando…' : 'Confirmar acción' }}
     </app-button>
   </div>
 </app-dialog>

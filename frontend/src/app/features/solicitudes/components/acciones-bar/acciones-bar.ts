@@ -37,6 +37,9 @@ export class AccionesBar {
   protected readonly markingExisteBdAnterior = signal(false);
   protected readonly pendingMarkIds = signal<string[]>([]);
 
+  protected readonly confirmQuitarLugarOpen = signal(false);
+  protected readonly removingLugarEntrenamiento = signal(false);
+
   protected onToggleCollapsed(): void {
     this.collapsedChange.emit(!this.collapsed());
   }
@@ -86,6 +89,38 @@ export class AccionesBar {
     } catch {
       this.snackbar.error('No se pudo generar el archivo CSV.');
     }
+  }
+
+  protected onSelectQuitarLugarEntrenamiento(): void {
+    this.collapse();
+    if (this.selectedCount() === 0) {
+      return;
+    }
+    this.confirmQuitarLugarOpen.set(true);
+  }
+
+  protected onCancelQuitarLugarEntrenamiento(): void {
+    this.confirmQuitarLugarOpen.set(false);
+  }
+
+  protected onConfirmQuitarLugarEntrenamiento(): void {
+    const ids = [...this.selectedIds()];
+    if (ids.length === 0 || this.removingLugarEntrenamiento()) {
+      return;
+    }
+    this.removingLugarEntrenamiento.set(true);
+    this.publicadoresService.quitarLugarEntrenamiento(ids).subscribe({
+      next: ({ actualizados }) => {
+        this.removingLugarEntrenamiento.set(false);
+        this.confirmQuitarLugarOpen.set(false);
+        this.snackbar.success(`Se actualizó el lugar de entrenamiento de ${actualizados} registro(s).`);
+        this.updated.emit();
+      },
+      error: () => {
+        this.removingLugarEntrenamiento.set(false);
+        this.snackbar.error('No se pudo quitar el lugar de entrenamiento de los registros seleccionados.');
+      },
+    });
   }
 
   protected onCancelMarkExisteBdAnterior(): void {

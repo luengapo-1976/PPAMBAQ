@@ -1,0 +1,220 @@
+:host {
+  display: block;
+}
+
+.asistencia-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ppam-space-lg);
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.asistencia-page__header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ppam-space-md);
+}
+
+.asistencia-page__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: var(--ppam-radius-control);
+  background: color-mix(in srgb, var(--ppam-primary-container) 16%, white);
+  color: var(--ppam-primary-container);
+}
+
+.asistencia-page__title {
+  font-size: var(--ppam-h1-mobile-size);
+  line-height: var(--ppam-h1-mobile-line);
+  font-weight: var(--ppam-h1-weight);
+  color: var(--ppam-on-surface);
+}
+
+.asistencia-page__hint {
+  margin: 4px 0 0;
+  font-size: var(--ppam-small-size);
+  color: var(--ppam-on-surface-variant);
+}
+
+.asistencia-page__filters {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ppam-space-md);
+  padding: var(--ppam-space-md);
+  background: var(--ppam-form-bg);
+  border-radius: var(--ppam-radius-card);
+}
+
+.asistencia-page__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: var(--ppam-small-size);
+  font-weight: 600;
+  color: var(--ppam-on-surface-variant);
+}
+
+.asistencia-page__count {
+  margin: 0;
+  font-size: var(--ppam-small-size);
+  color: var(--ppam-on-surface-variant);
+}
+
+.asistencia-page__empty-hint {
+  margin: 0;
+  padding: var(--ppam-space-lg);
+  text-align: center;
+  color: var(--ppam-on-surface-variant);
+  background: var(--ppam-surface-container-lowest);
+  border: 1px solid var(--ppam-border-quiet);
+  border-radius: var(--ppam-radius-card);
+}
+
+.asistencia-page__skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ppam-space-sm);
+}
+
+.skeleton-block {
+  border-radius: var(--ppam-radius-card);
+  background: linear-gradient(
+    100deg,
+    var(--ppam-surface-container) 30%,
+    var(--ppam-surface-container-high) 50%,
+    var(--ppam-surface-container) 70%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+}
+
+.skeleton-block--row {
+  height: 64px;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.asistencia-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ppam-space-sm);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.asistencia-list__item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ppam-space-sm);
+  padding: var(--ppam-space-md);
+  background: var(--ppam-surface-container-lowest);
+  border: 1px solid var(--ppam-border-quiet);
+  border-radius: var(--ppam-radius-card);
+}
+
+.asistencia-list__item--done {
+  border-color: var(--ppam-semantic-success);
+  background: color-mix(in srgb, var(--ppam-semantic-success) 6%, var(--ppam-surface-container-lowest));
+}
+
+.asistencia-list__info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.asistencia-list__name {
+  font-weight: 600;
+  color: var(--ppam-on-surface);
+  overflow-wrap: anywhere;
+}
+
+.asistencia-list__movil {
+  font-size: var(--ppam-small-size);
+  color: var(--ppam-on-surface-variant);
+}
+
+.asistencia-list__check {
+  display: flex;
+  align-items: center;
+  gap: var(--ppam-space-sm);
+  min-height: var(--ppam-touch-target-min);
+  font-size: var(--ppam-small-size);
+  font-weight: 600;
+  color: var(--ppam-on-surface);
+  cursor: pointer;
+}
+
+.asistencia-list__lock {
+  width: 16px;
+  height: 16px;
+  font-size: 16px;
+  color: var(--ppam-on-surface-variant);
+  vertical-align: text-bottom;
+}
+
+.asistencia-list__check .ppam-checkbox {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  cursor: pointer;
+  accent-color: var(--ppam-semantic-success);
+}
+
+.asistencia-list__empty {
+  padding: var(--ppam-space-lg);
+  text-align: center;
+  color: var(--ppam-on-surface-variant);
+}
+
+@media (min-width: 600px) {
+  .asistencia-page__filters {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .asistencia-page__field {
+    flex: 1;
+    min-width: 200px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .asistencia-page {
+    max-width: none;
+  }
+
+  .asistencia-page__title {
+    font-size: var(--ppam-h1-size);
+    line-height: var(--ppam-h1-line);
+  }
+
+  .asistencia-list__item {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .asistencia-list__info {
+    flex-direction: row;
+    align-items: baseline;
+    gap: var(--ppam-space-lg);
+  }
+
+  .asistencia-list__movil {
+    min-width: 140px;
+  }
+}

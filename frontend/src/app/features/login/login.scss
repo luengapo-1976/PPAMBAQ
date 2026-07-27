@@ -201,6 +201,30 @@ app-button.login__submit {
   gap: var(--ppam-space-md);
 }
 
+/* Acceso móvil: sin imagen de fondo, panel centrado y logo protagonista
+   (JW.org-like: mucho blanco, serenidad, sin foto de fondo en pantallas pequeñas). */
+.login--mobile {
+  background: var(--ppam-surface);
+}
+
+.login--mobile .login__panel {
+  justify-content: center;
+}
+
+.login--mobile .login__brand {
+  flex-direction: column;
+  margin-bottom: var(--ppam-space-xl);
+}
+
+.login--mobile .login__brand-logo {
+  width: 96px;
+  height: 96px;
+}
+
+.login--mobile .login__brand-text {
+  font-size: var(--ppam-h1-mobile-size);
+}
+
 @media (min-width: 900px) {
   .login__panel {
     position: absolute;

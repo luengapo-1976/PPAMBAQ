@@ -46,4 +46,28 @@ export class PublicadoresService {
   marcarExisteBdAnterior(ids: string[]): Observable<{ actualizados: number }> {
     return this.api.patch<{ actualizados: number }>('publicadores/marcar-existe-bd-anterior', { ids });
   }
+
+  quitarLugarEntrenamiento(ids: string[]): Observable<{ actualizados: number }> {
+    return this.api.patch<{ actualizados: number }>('publicadores/quitar-lugar-entrenamiento', { ids });
+  }
+
+  confirmarAsistencia(
+    ids: string[],
+    tipoEntrenamiento: 'Primer entrenamiento' | 'Segundo entrenamiento',
+  ): Observable<{ actualizados: number }> {
+    return this.api.patch<{ actualizados: number }>('publicadores/confirmar-asistencia', {
+      ids,
+      tipoEntrenamiento,
+    });
+  }
+
+  revertirAsistencia(
+    ids: string[],
+    tipoEntrenamiento: 'Primer entrenamiento' | 'Segundo entrenamiento',
+  ): Observable<{ actualizados: number }> {
+    return this.api.patch<{ actualizados: number }>('publicadores/revertir-asistencia', {
+      ids,
+      tipoEntrenamiento,
+    });
+  }
 }

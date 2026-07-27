@@ -109,6 +109,21 @@
   margin: 0 0 var(--ppam-space-lg);
 }
 
+.acciones-bar__confirm-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ppam-space-sm);
+  margin: 0 0 var(--ppam-space-lg);
+  padding: var(--ppam-space-sm) var(--ppam-space-md);
+  border-radius: var(--ppam-radius-control);
+  background: var(--ppam-semantic-warning-container);
+  color: var(--ppam-semantic-warning);
+}
+
+.acciones-bar__confirm-warning .material-symbols-outlined {
+  flex-shrink: 0;
+}
+
 .acciones-bar__confirm-actions {
   display: flex;
   justify-content: flex-end;

@@ -28,6 +28,13 @@ export const routes: Routes = [
         data: { title: 'Gestión de solicitudes' },
       },
       {
+        path: 'confirmar-asistencia',
+        loadComponent: () =>
+          import('./features/confirmar-asistencia/confirmar-asistencia').then((m) => m.ConfirmarAsistencia),
+        title: 'Confirmar asistencia · PPAM BAQ',
+        data: { title: 'Confirmar asistencia' },
+      },
+      {
         path: 'configuracion/circuitos',
         loadComponent: () => import('./features/configuracion/circuitos/circuitos').then((m) => m.Circuitos),
         title: 'Circuitos · PPAM BAQ',

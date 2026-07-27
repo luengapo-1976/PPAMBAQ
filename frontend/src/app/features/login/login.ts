@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, HostListener, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormField } from '../../shared/ui/form-field/form-field';
@@ -7,6 +7,10 @@ import { Dialog } from '../../shared/ui/dialog/dialog';
 import { AuthService } from '../../core/auth.service';
 import { ApiError } from '../../core/error.interceptor';
 import { EMAIL_PATTERN } from '../../shared/utils/format.util';
+
+/** Por debajo de este ancho se considera acceso móvil: se omite la imagen de fondo
+ * (evita su descarga) y el layout pasa a un diseño de una sola columna centrado. */
+const MOBILE_BREAKPOINT = 900;
 
 @Component({
   selector: 'app-login',
@@ -19,6 +23,17 @@ export class Login {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly activatedRoute = inject(ActivatedRoute);
+
+  protected readonly isMobileViewport = signal(this.isMobile());
+
+  @HostListener('window:resize')
+  protected onResize(): void {
+    this.isMobileViewport.set(this.isMobile());
+  }
+
+  private isMobile(): boolean {
+    return typeof window !== 'undefined' && window.innerWidth < MOBILE_BREAKPOINT;
+  }
 
   protected readonly submitting = signal(false);
   protected readonly errorMessage = signal<string | null>(null);

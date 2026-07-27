@@ -98,4 +98,58 @@ export class PublicadoresRepository {
       throw new InternalServerErrorException('No se pudo actualizar el estado de las solicitudes.');
     }
   }
+
+  async findFechaAprobacionByIds(ids: string[]): Promise<{ id: string; fecha_aprobacion: string | null }[]> {
+    if (ids.length === 0) {
+      return [];
+    }
+    const { data, error } = await this.supabaseService
+      .getClient()
+      .from('publicadores')
+      .select('id, fecha_aprobacion')
+      .in('id', ids);
+
+    if (error) {
+      throw new InternalServerErrorException('No se pudo consultar las solicitudes seleccionadas.');
+    }
+
+    return data ?? [];
+  }
+
+  async findUsuarioModificaByIds(ids: string[]): Promise<{ id: string; usuario_modifica: string | null }[]> {
+    if (ids.length === 0) {
+      return [];
+    }
+    const { data, error } = await this.supabaseService
+      .getClient()
+      .from('publicadores')
+      .select('id, usuario_modifica')
+      .in('id', ids);
+
+    if (error) {
+      throw new InternalServerErrorException('No se pudo consultar las solicitudes seleccionadas.');
+    }
+
+    return data ?? [];
+  }
+
+  async bulkUpdateByIdsAndEntrenamiento(
+    ids: string[],
+    entrenamientoRequerido: string,
+    payload: TablesUpdate<'publicadores'>,
+  ) {
+    if (ids.length === 0) {
+      return;
+    }
+    const { error } = await this.supabaseService
+      .getClient()
+      .from('publicadores')
+      .update(payload)
+      .in('id', ids)
+      .eq('entrenamiento_requerido', entrenamientoRequerido);
+
+    if (error) {
+      throw new InternalServerErrorException('No se pudo actualizar el lugar de entrenamiento de las solicitudes.');
+    }
+  }
 }

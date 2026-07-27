@@ -3,7 +3,7 @@ import { PublicadoresRepository } from './publicadores.repository';
 import { CreatePublicadorDto } from './dto/create-publicador.dto';
 import { UpdatePublicadorDto } from './dto/update-publicador.dto';
 import { MensajeRelacionadoCon } from './dto/notificar-entrenamiento.dto';
-import { AsignarLugarEntrenamientoDto } from './dto/asignar-lugar-entrenamiento.dto';
+import { AsignarLugarEntrenamientoDto, TipoEntrenamiento } from './dto/asignar-lugar-entrenamiento.dto';
 import { todayIsoDate } from '../common/audit/audit.util';
 
 interface CongregacionEmbed {
@@ -42,6 +42,8 @@ export class PublicadoresService {
       ...dto,
       login,
       existe_bd_anterior: 'NO',
+      asistio_primera_capacitacion: 'NO',
+      asistio_segunda_capacitacion: 'NO',
       usuario_registra: usuarioLogin,
       fecha_registro: todayIsoDate(),
     });
@@ -88,6 +90,90 @@ export class PublicadoresService {
     });
 
     return { actualizados: dto.ids.length };
+  }
+
+  async quitarLugarEntrenamiento(ids: string[], usuarioLogin: string) {
+    const audit = { usuario_modifica: usuarioLogin, fecha_modificacion: todayIsoDate() };
+
+    await this.publicadoresRepository.bulkUpdateByIdsAndEntrenamiento(ids, 'Primer entrenamiento', {
+      fecha_primera_capacitacion: null,
+      lugar_primera_capacitacion: null,
+      estado: 'REGISTRADO',
+      ...audit,
+    });
+
+    await this.publicadoresRepository.bulkUpdateByIdsAndEntrenamiento(ids, 'Segundo entrenamiento', {
+      fecha_segunda_capacitacion: null,
+      lugar_segunda_capacitacion: null,
+      estado: 'NOTIFICADO PRIMER ENTRENAMIENTO',
+      ...audit,
+    });
+
+    return { actualizados: ids.length };
+  }
+
+  async confirmarAsistencia(ids: string[], tipoEntrenamiento: TipoEntrenamiento, usuarioLogin: string) {
+    const today = todayIsoDate();
+    const audit = { usuario_modifica: usuarioLogin, fecha_modificacion: today };
+
+    if (tipoEntrenamiento === 'Primer entrenamiento') {
+      await this.publicadoresRepository.bulkUpdateByIds(ids, {
+        asistio_primera_capacitacion: 'SI',
+        entrenamiento_requerido: 'Segundo entrenamiento',
+        ...audit,
+      });
+      return { actualizados: ids.length };
+    }
+
+    // Al completar el segundo entrenamiento la solicitud "Cumple requisitos"; se replica la
+    // misma convención usada al editar manualmente entrenamiento_requerido a ese valor: se
+    // completa fecha_cumple_requisitos y, si aún no existía, también fecha_aprobacion.
+    const rows = await this.publicadoresRepository.findFechaAprobacionByIds(ids);
+    const idsSinAprobacion = rows.filter((row) => !row.fecha_aprobacion).map((row) => row.id);
+    const idsConAprobacion = rows.filter((row) => row.fecha_aprobacion).map((row) => row.id);
+
+    const base = {
+      asistio_segunda_capacitacion: 'SI',
+      entrenamiento_requerido: 'Entrenamiento completado',
+      estado: 'CUMPLE REQUISITOS',
+      fecha_cumple_requisitos: today,
+      ...audit,
+    };
+
+    await this.publicadoresRepository.bulkUpdateByIds(idsSinAprobacion, { ...base, fecha_aprobacion: today });
+    await this.publicadoresRepository.bulkUpdateByIds(idsConAprobacion, base);
+
+    return { actualizados: ids.length };
+  }
+
+  /** Solo puede desmarcar la asistencia el mismo usuario que la había confirmado
+   * (usuario_modifica actual del registro); los ids que no cumplan se ignoran. */
+  async revertirAsistencia(ids: string[], tipoEntrenamiento: TipoEntrenamiento, usuarioLogin: string) {
+    const rows = await this.publicadoresRepository.findUsuarioModificaByIds(ids);
+    const autorizados = rows.filter((row) => row.usuario_modifica === usuarioLogin).map((row) => row.id);
+
+    if (autorizados.length === 0) {
+      return { actualizados: 0 };
+    }
+
+    const audit = { usuario_modifica: usuarioLogin, fecha_modificacion: todayIsoDate() };
+
+    if (tipoEntrenamiento === 'Primer entrenamiento') {
+      await this.publicadoresRepository.bulkUpdateByIds(autorizados, {
+        asistio_primera_capacitacion: 'NO',
+        entrenamiento_requerido: 'Primer entrenamiento',
+        ...audit,
+      });
+    } else {
+      await this.publicadoresRepository.bulkUpdateByIds(autorizados, {
+        asistio_segunda_capacitacion: 'NO',
+        entrenamiento_requerido: 'Segundo entrenamiento',
+        estado: 'NOTIFICADO SEGUNDO ENTRENAMIENTO',
+        ...audit,
+      });
+    }
+
+    return { actualizados: autorizados.length };
   }
 
   async marcarExisteBdAnterior(ids: string[], usuarioLogin: string) {

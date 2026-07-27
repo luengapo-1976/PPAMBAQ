@@ -1,5 +1,7 @@
-<main class="login">
-  <img class="login__bg-image" src="images/Imagen_Login.png" alt="" aria-hidden="true" />
+<main class="login" [class.login--mobile]="isMobileViewport()">
+  @if (!isMobileViewport()) {
+    <img class="login__bg-image" src="images/Imagen_Login.png" alt="" aria-hidden="true" />
+  }
 
   <section class="login__panel">
     <div class="login__panel-inner">

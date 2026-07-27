@@ -185,6 +185,8 @@ export type Database = {
       publicadores: {
         Row: {
           apellido_casada: string | null
+          asistio_primera_capacitacion: string
+          asistio_segunda_capacitacion: string
           codigo_congregacion: number | null
           codigo_departamento: string | null
           codigo_municipio: string | null
@@ -228,6 +230,8 @@ export type Database = {
         }
         Insert: {
           apellido_casada?: string | null
+          asistio_primera_capacitacion?: string
+          asistio_segunda_capacitacion?: string
           codigo_congregacion?: number | null
           codigo_departamento?: string | null
           codigo_municipio?: string | null
@@ -271,6 +275,8 @@ export type Database = {
         }
         Update: {
           apellido_casada?: string | null
+          asistio_primera_capacitacion?: string
+          asistio_segunda_capacitacion?: string
           codigo_congregacion?: number | null
           codigo_departamento?: string | null
           codigo_municipio?: string | null

@@ -1,0 +1,96 @@
+<div class="asistencia-page">
+  <header class="asistencia-page__header">
+    <span class="asistencia-page__icon material-symbols-outlined" aria-hidden="true">how_to_reg</span>
+    <div>
+      <h1 class="asistencia-page__title">Confirmar asistencia</h1>
+      <p class="asistencia-page__hint">
+        Selecciona la fecha, el tipo y el lugar de entrenamiento para ver la lista de publicadores citados y marcar
+        quiénes asistieron.
+      </p>
+    </div>
+  </header>
+
+  <div class="asistencia-page__filters">
+    <label class="asistencia-page__field">
+      <span>Fecha</span>
+      <app-select
+        [options]="fechaOptions()"
+        placeholder="Selecciona una fecha"
+        [ngModel]="selectedFecha()"
+        (ngModelChange)="onFechaChange($event)"
+      />
+    </label>
+
+    <label class="asistencia-page__field">
+      <span>Tipo de entrenamiento</span>
+      <app-select
+        [options]="tipoOptions()"
+        placeholder="Selecciona un tipo"
+        [disabled]="!selectedFecha()"
+        [ngModel]="selectedTipo()"
+        (ngModelChange)="onTipoChange($event)"
+      />
+    </label>
+
+    <label class="asistencia-page__field">
+      <span>Lugar de entrenamiento</span>
+      <app-select
+        [options]="lugarOptions()"
+        placeholder="Selecciona un lugar"
+        [disabled]="!selectedTipo()"
+        [ngModel]="selectedLugarValue()"
+        (ngModelChange)="onLugarChange($event)"
+      />
+    </label>
+  </div>
+
+  @if (loading()) {
+    <div class="asistencia-page__skeleton">
+      @for (i of [1, 2, 3]; track i) {
+        <div class="skeleton-block skeleton-block--row"></div>
+      }
+    </div>
+  } @else if (!selectedFecha() || !selectedTipo() || selectedCodigoPunto() == null) {
+    <p class="asistencia-page__empty-hint">
+      Selecciona fecha, tipo y lugar de entrenamiento para ver la lista de asistencia.
+    </p>
+  } @else {
+    <p class="asistencia-page__count">
+      {{ asistieronCount() }} de {{ rows().length }}
+      {{ rows().length === 1 ? 'publicador asistió' : 'publicadores asistieron' }}.
+    </p>
+
+    <ul class="asistencia-list">
+      @for (row of rows(); track row.id) {
+        <li class="asistencia-list__item" [class.asistencia-list__item--done]="isAsistio(row)">
+          <div class="asistencia-list__info">
+            <span class="asistencia-list__name">{{ nombreCompleto(row) }}</span>
+            <span class="asistencia-list__movil">{{ row.movil }}</span>
+          </div>
+          <label class="asistencia-list__check">
+            <input
+              type="checkbox"
+              class="ppam-checkbox"
+              [checked]="isAsistio(row)"
+              [disabled]="isConfirming(row) || (isAsistio(row) && !canRevertir(row))"
+              (change)="onToggleAsistencia(row)"
+              [attr.aria-label]="'Marcar asistencia de ' + nombreCompleto(row)"
+            />
+            <span>
+              @if (isConfirming(row)) {
+                Guardando…
+              } @else if (isAsistio(row) && !canRevertir(row)) {
+                Asistió
+                <span class="asistencia-list__lock material-symbols-outlined" aria-hidden="true">lock</span>
+              } @else {
+                Asistió
+              }
+            </span>
+          </label>
+        </li>
+      } @empty {
+        <li class="asistencia-list__empty">No hay publicadores citados para este filtro.</li>
+      }
+    </ul>
+  }
+</div>

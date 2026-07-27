@@ -28,6 +28,7 @@ export type PrivilegioSer =
   | 'Miembro de la familia Betel';
 export type ParticipoAntes = 'SI' | 'NO';
 export type ExisteBdAnterior = 'SI' | 'NO';
+export type AsistioCapacitacion = 'SI' | 'NO';
 export type EstadoSolicitud =
   | 'REGISTRADO'
   | 'NOTIFICADO PRIMER ENTRENAMIENTO'
@@ -88,8 +89,10 @@ export interface Publicador {
   fecha_cumple_requisitos: string | null;
   fecha_primera_capacitacion: string | null;
   lugar_primera_capacitacion: number | null;
+  asistio_primera_capacitacion: AsistioCapacitacion;
   fecha_segunda_capacitacion: string | null;
   lugar_segunda_capacitacion: number | null;
+  asistio_segunda_capacitacion: AsistioCapacitacion;
   usuario_registra: string | null;
   fecha_registro: string | null;
   usuario_modifica: string | null;
@@ -111,8 +114,10 @@ export type PublicadorPayload = Omit<
   | 'fecha_cumple_requisitos'
   | 'fecha_primera_capacitacion'
   | 'lugar_primera_capacitacion'
+  | 'asistio_primera_capacitacion'
   | 'fecha_segunda_capacitacion'
   | 'lugar_segunda_capacitacion'
+  | 'asistio_segunda_capacitacion'
 > & {
   /** Solo se incluyen en el payload cuando Estado = "CUMPLE REQUISITOS". */
   fecha_aprobacion?: string | null;
