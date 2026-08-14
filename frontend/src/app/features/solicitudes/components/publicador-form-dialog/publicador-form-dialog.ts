@@ -355,6 +355,7 @@ export class PublicadorFormDialog {
       this.form.controls.estado.setValue('REGISTRADO');
       this.form.controls.entrenamiento_requerido.setValue('Primer entrenamiento');
       this.form.controls.existe_bd_anterior.setValue('NO');
+      this.form.controls.existe_bd_anterior.enable();
     }
   }
 
@@ -592,7 +593,7 @@ export class PublicadorFormDialog {
     this.form.controls.entrenamiento_requerido.setValue('Primer entrenamiento');
     this.form.controls.entrenamiento_requerido.disable();
     this.form.controls.existe_bd_anterior.setValue('NO');
-    this.form.controls.existe_bd_anterior.disable();
+    this.form.controls.existe_bd_anterior.enable();
   }
 
   private populateForm(record: Publicador, opts: { enableWorkflowFields: boolean }): void {
