@@ -5,6 +5,9 @@
 /node_modules
 npm-debug.log
 
+# Environment
+.env
+
 # Tests
 /coverage
 

@@ -7,13 +7,20 @@ interface LogEntry {
   message: unknown;
 }
 
+function serializeMessage(message: unknown): unknown {
+  if (message instanceof Error) {
+    return { name: message.name, message: message.message, stack: message.stack };
+  }
+  return message;
+}
+
 export class StructuredLogger extends ConsoleLogger {
   protected formatMessage(level: string, message: unknown, context?: string) {
     const entry: LogEntry = {
       timestamp: new Date().toISOString(),
       level,
       context,
-      message,
+      message: serializeMessage(message),
     };
     return `${JSON.stringify(entry)}\n`;
   }
@@ -24,7 +31,11 @@ export class StructuredLogger extends ConsoleLogger {
 
   error(message: unknown, trace?: string, context?: string) {
     process.stderr.write(
-      this.formatMessage('error', trace ? { message, trace } : message, context),
+      this.formatMessage(
+        'error',
+        trace ? { message: serializeMessage(message), trace } : message,
+        context,
+      ),
     );
   }
 
