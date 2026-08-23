@@ -1,0 +1,19 @@
+<button
+  type="button"
+  class="role-switch"
+  role="switch"
+  [attr.aria-checked]="active() === 'participante'"
+  [attr.aria-label]="
+    active() === 'usuario' ? 'Cambiar a la vista de participante' : 'Cambiar a la vista de administración'
+  "
+  (click)="onToggle()"
+>
+  <span class="role-switch__option" [class.role-switch__option--active]="active() === 'usuario'">
+    <span class="material-symbols-outlined" aria-hidden="true">admin_panel_settings</span>
+    <span>Admin</span>
+  </span>
+  <span class="role-switch__option" [class.role-switch__option--active]="active() === 'participante'">
+    <span class="material-symbols-outlined" aria-hidden="true">person</span>
+    <span>Participante</span>
+  </span>
+</button>

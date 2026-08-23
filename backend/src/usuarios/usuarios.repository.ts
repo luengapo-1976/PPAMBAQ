@@ -26,7 +26,7 @@ export class UsuariosRepository {
     const { data, error } = await this.supabaseService
       .getClient()
       .from('usuarios')
-      .select('login, rol, password_hash')
+      .select('login, rol, password_hash, movil')
       .eq('login', login)
       .maybeSingle();
 

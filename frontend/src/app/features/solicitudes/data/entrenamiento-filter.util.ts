@@ -60,6 +60,49 @@ export function lugaresDisponibles(
   return [...lugares];
 }
 
+export interface GrupoEntrenamiento {
+  fecha: string;
+  codigoPunto: number;
+  publicadores: Publicador[];
+}
+
+/** Agrupa por fecha+lugar de entrenamiento (misma agrupación que usan tanto el PDF
+ * como el Excel de la lista de chequeo), ordenado por fecha y luego por nombre de
+ * punto, para que el rompimiento del listado sea idéntico en ambos formatos. */
+export function agruparPorEntrenamiento(
+  rows: Publicador[],
+  tipo: TipoEntrenamientoFiltro,
+  nombrePuntoPorCodigo: Map<number, string>,
+): GrupoEntrenamiento[] {
+  const campoFecha = fechaCampo(tipo);
+  const campoLugar = lugarCampo(tipo);
+  const grupos = new Map<string, GrupoEntrenamiento>();
+
+  for (const row of rows) {
+    const fecha = row[campoFecha];
+    const codigoPunto = row[campoLugar];
+    if (!fecha || codigoPunto == null) {
+      continue;
+    }
+    const key = `${fecha}|${codigoPunto}`;
+    const grupo = grupos.get(key);
+    if (grupo) {
+      grupo.publicadores.push(row);
+    } else {
+      grupos.set(key, { fecha, codigoPunto, publicadores: [row] });
+    }
+  }
+
+  return [...grupos.values()].sort((a, b) => {
+    if (a.fecha !== b.fecha) {
+      return a.fecha.localeCompare(b.fecha);
+    }
+    const nombreA = nombrePuntoPorCodigo.get(a.codigoPunto) ?? '';
+    const nombreB = nombrePuntoPorCodigo.get(b.codigoPunto) ?? '';
+    return nombreA.localeCompare(nombreB);
+  });
+}
+
 /** Solo incluye publicadores con fecha y lugar asignados para el tipo de entrenamiento elegido,
  * ya que este filtro existe para producir la lista de asistencia de un entrenamiento programado. */
 export function applyEntrenamientoFiltro(rows: Publicador[], filtro: EntrenamientoFiltro): Publicador[] {

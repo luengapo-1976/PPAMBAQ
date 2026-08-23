@@ -15,5 +15,18 @@ export function formatDateShort(dateStr: string | null | undefined): string {
   return `${yyyy}-${mm}-${dd}`;
 }
 
+/** Convierte una hora 'HH:MM:SS' (columna time de Postgres) a formato 12h, ej. '02:30 pm'. */
+export function formatHoraAmPm(time: string | null | undefined): string {
+  const match = /^(\d{1,2}):(\d{2})/.exec(time ?? '');
+  if (!match) {
+    return '—';
+  }
+  const hours = Number(match[1]);
+  const minutes = match[2];
+  const period = hours >= 12 ? 'pm' : 'am';
+  const hours12 = hours % 12 === 0 ? 12 : hours % 12;
+  return `${String(hours12).padStart(2, '0')}:${minutes} ${period}`;
+}
+
 export const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export const MOVIL_PATTERN = /^\d{1,10}$/;

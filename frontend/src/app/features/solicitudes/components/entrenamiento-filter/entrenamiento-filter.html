@@ -60,7 +60,14 @@
         [disabled]="!isActive() || exportingPdf() || filteredRows().length === 0"
         (click)="onExportPdf()"
       >
-        {{ exportingPdf() ? 'Generando PDF…' : 'Descargar lista de chequeo' }}
+        {{ exportingPdf() ? 'Generando PDF…' : 'Descargar lista de chequeo en PDF' }}
+      </app-button>
+      <app-button
+        icon="grid_on"
+        [disabled]="!isActive() || exportingExcel() || filteredRows().length === 0"
+        (click)="onExportExcel()"
+      >
+        {{ exportingExcel() ? 'Generando Excel…' : 'Descargar lista de chequeo en Excel' }}
       </app-button>
     </div>
   </div>

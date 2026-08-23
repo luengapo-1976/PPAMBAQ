@@ -69,7 +69,7 @@ export class Login {
     this.authService.login(login!, password!).subscribe({
       next: () => {
         this.submitting.set(false);
-        const returnUrl = this.activatedRoute.snapshot.queryParamMap.get('returnUrl') ?? '/dashboard';
+        const returnUrl = this.activatedRoute.snapshot.queryParamMap.get('returnUrl') ?? this.authService.defaultRoute();
         this.router.navigateByUrl(returnUrl);
       },
       error: (err: ApiError) => {

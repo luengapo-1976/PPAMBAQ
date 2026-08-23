@@ -1,15 +1,20 @@
 import { Component, ElementRef, HostListener, inject, input, output, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { Avatar } from '../../shared/ui/avatar/avatar';
+import { RoleSwitch, RoleSwitchValue } from '../../shared/ui/role-switch/role-switch';
 import { ChangePasswordDialog } from './components/change-password-dialog/change-password-dialog';
+import { AuthService } from '../../core/auth.service';
 
 @Component({
   selector: 'app-header',
-  imports: [Avatar, ChangePasswordDialog],
+  imports: [Avatar, RoleSwitch, ChangePasswordDialog],
   templateUrl: './header.html',
   styleUrl: './header.scss',
 })
 export class Header {
   private readonly elementRef = inject(ElementRef<HTMLElement>);
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
 
   readonly pageTitle = input('');
   readonly sidebarExpanded = input(true);
@@ -19,6 +24,14 @@ export class Header {
 
   protected readonly menuOpen = signal(false);
   protected readonly changePasswordOpen = signal(false);
+
+  protected readonly showRoleSwitch = this.authService.puedeAlternarVista;
+  protected readonly vistaActiva = this.authService.vistaActiva;
+
+  protected onSwitchVista(vista: RoleSwitchValue): void {
+    this.authService.setVista(vista);
+    this.router.navigateByUrl(vista === 'usuario' ? '/dashboard' : '/inicio');
+  }
 
   protected toggleMenu(): void {
     this.menuOpen.update((value) => !value);

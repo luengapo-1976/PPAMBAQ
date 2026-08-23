@@ -6,5 +6,6 @@ import { PuntosRepository } from './puntos.repository';
 @Module({
   controllers: [PuntosController],
   providers: [PuntosService, PuntosRepository],
+  exports: [PuntosRepository],
 })
 export class PuntosModule {}

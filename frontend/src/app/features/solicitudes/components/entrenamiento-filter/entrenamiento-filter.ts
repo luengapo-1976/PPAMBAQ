@@ -12,6 +12,7 @@ import {
   lugaresDisponibles,
 } from '../../data/entrenamiento-filter.util';
 import { exportEntrenamientoChecklistToPdf } from '../../data/entrenamiento-checklist-pdf.util';
+import { exportEntrenamientoChecklistToExcel } from '../../data/entrenamiento-checklist-excel.util';
 import { formatDateShort } from '../../data/publicador.utils';
 import { SnackbarService } from '../../../../shared/ui/snackbar/snackbar.service';
 
@@ -45,6 +46,7 @@ export class EntrenamientoFilter {
   readonly closed = output<void>();
 
   protected readonly exportingPdf = signal(false);
+  protected readonly exportingExcel = signal(false);
   protected readonly tipoOptions = TIPO_OPTIONS;
 
   protected readonly isActive = computed(() => this.filtro().tipo != null);
@@ -110,6 +112,26 @@ export class EntrenamientoFilter {
       this.snackbar.error('No se pudo generar el PDF de la lista de chequeo.');
     } finally {
       this.exportingPdf.set(false);
+    }
+  }
+
+  protected async onExportExcel(): Promise<void> {
+    const tipo = this.filtro().tipo;
+    if (!tipo) {
+      return;
+    }
+    const rows = this.filteredRows();
+    if (rows.length === 0) {
+      this.snackbar.show('No hay publicadores asignados para el filtro actual.', 'info');
+      return;
+    }
+    this.exportingExcel.set(true);
+    try {
+      await exportEntrenamientoChecklistToExcel(rows, tipo, this.puntos(), this.departamentos(), this.municipios());
+    } catch {
+      this.snackbar.error('No se pudo generar el Excel de la lista de chequeo.');
+    } finally {
+      this.exportingExcel.set(false);
     }
   }
 }

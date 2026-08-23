@@ -2,17 +2,11 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { Departamento, Municipio, Publicador } from './models';
 import { Punto } from '../../configuracion/data/models';
-import { TipoEntrenamientoFiltro, fechaCampo, lugarCampo } from './entrenamiento-filter.util';
+import { TipoEntrenamientoFiltro, agruparPorEntrenamiento } from './entrenamiento-filter.util';
 import { formatDateShort, nombreCompleto } from './publicador.utils';
 
 const PRIMARY_RGB: [number, number, number] = [74, 109, 167];
 const PAGE_MARGIN = 32;
-
-interface GrupoEntrenamiento {
-  fecha: string;
-  codigoPunto: number;
-  publicadores: Publicador[];
-}
 
 export async function exportEntrenamientoChecklistToPdf(
   rows: Publicador[],
@@ -21,38 +15,12 @@ export async function exportEntrenamientoChecklistToPdf(
   departamentos: Departamento[],
   municipios: Municipio[],
 ): Promise<void> {
-  const campoFecha = fechaCampo(tipo);
-  const campoLugar = lugarCampo(tipo);
   const puntosPorCodigo = new Map(puntos.map((p) => [p.codigo_punto, p]));
   const departamentosPorCodigo = new Map(departamentos.map((d) => [d.codigo_departamento, d]));
   const municipiosPorCodigo = new Map(municipios.map((m) => [m.codigo_municipio, m]));
+  const nombrePuntoPorCodigo = new Map(puntos.map((p) => [p.codigo_punto, p.nombre_punto]));
 
-  const grupos = new Map<string, GrupoEntrenamiento>();
-  for (const row of rows) {
-    const fecha = row[campoFecha];
-    const codigoPunto = row[campoLugar];
-    if (!fecha || codigoPunto == null) {
-      continue;
-    }
-    const key = `${fecha}|${codigoPunto}`;
-    const grupo = grupos.get(key);
-    if (grupo) {
-      grupo.publicadores.push(row);
-    } else {
-      grupos.set(key, { fecha, codigoPunto, publicadores: [row] });
-    }
-  }
-
-  /** El rompimiento del listado sigue el orden de la cabecera: primero por fecha
-   * de entrenamiento y, dentro de una misma fecha, por lugar. */
-  const gruposOrdenados = [...grupos.values()].sort((a, b) => {
-    if (a.fecha !== b.fecha) {
-      return a.fecha.localeCompare(b.fecha);
-    }
-    const nombreA = puntosPorCodigo.get(a.codigoPunto)?.nombre_punto ?? '';
-    const nombreB = puntosPorCodigo.get(b.codigoPunto)?.nombre_punto ?? '';
-    return nombreA.localeCompare(nombreB);
-  });
+  const gruposOrdenados = agruparPorEntrenamiento(rows, tipo, nombrePuntoPorCodigo);
 
   const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
   const pageWidth = doc.internal.pageSize.getWidth();

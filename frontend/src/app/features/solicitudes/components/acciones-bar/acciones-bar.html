@@ -111,10 +111,23 @@
   <p class="acciones-bar__confirm-text">
     Se actualizará(n) {{ selectedIds().size }} registro(s) seleccionado(s).
   </p>
-  <p class="acciones-bar__confirm-warning">
+  <div class="acciones-bar__confirm-warning">
     <span class="material-symbols-outlined" aria-hidden="true">warning</span>
-    <span>Esta opción borrará el lugar y fechas asignados a la última capacitación requerida y no podrá deshacerse.</span>
-  </p>
+    <div>
+      <p>
+        Se quitará la fecha y el lugar que tenía asignados cada persona seleccionada para su próxima
+        capacitación, y quedará pendiente de que se le vuelva a asignar:
+      </p>
+      <ul>
+        <li>Si tenía pendiente la <strong>primera</strong> capacitación, quedará como recién registrada, sin ninguna capacitación asignada.</li>
+        <li>Si tenía pendiente la <strong>segunda</strong> capacitación, quedará notificada solo para la primera.</li>
+      </ul>
+      <p>
+        Las capacitaciones a las que la persona ya asistió (con su asistencia confirmada) no se ven afectadas.
+        Esta acción <strong>no podrá deshacerse</strong>.
+      </p>
+    </div>
+  </div>
   <div class="acciones-bar__confirm-actions">
     <app-button
       variant="secondary"

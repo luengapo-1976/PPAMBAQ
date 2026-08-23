@@ -17,6 +17,7 @@ import { MensajesModule } from './mensajes/mensajes.module';
 import { AuthModule } from './auth/auth.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
 import { PuntosModule } from './puntos/puntos.module';
+import { TurnosModule } from './turnos/turnos.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 
@@ -40,6 +41,7 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
     AuthModule,
     UsuariosModule,
     PuntosModule,
+    TurnosModule,
   ],
   controllers: [AppController],
   providers: [

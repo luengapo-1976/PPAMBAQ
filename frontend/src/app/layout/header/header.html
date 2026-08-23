@@ -14,6 +14,9 @@
   </div>
 
   <div class="header__end">
+    @if (showRoleSwitch()) {
+      <app-role-switch [active]="vistaActiva()" (changed)="onSwitchVista($event)" />
+    }
     <div class="header__account">
       <button
         type="button"

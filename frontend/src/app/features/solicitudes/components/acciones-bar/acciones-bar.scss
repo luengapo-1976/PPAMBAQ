@@ -124,6 +124,23 @@
   flex-shrink: 0;
 }
 
+.acciones-bar__confirm-warning p {
+  margin: 0 0 var(--ppam-space-xs);
+}
+
+.acciones-bar__confirm-warning ul {
+  margin: 0 0 var(--ppam-space-xs);
+  padding-inline-start: var(--ppam-space-lg);
+}
+
+.acciones-bar__confirm-warning li + li {
+  margin-top: var(--ppam-space-xs);
+}
+
+.acciones-bar__confirm-warning p:last-child {
+  margin-bottom: 0;
+}
+
 .acciones-bar__confirm-actions {
   display: flex;
   justify-content: flex-end;

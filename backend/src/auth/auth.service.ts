@@ -2,11 +2,38 @@ import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { randomInt } from 'crypto';
 import { UsuariosRepository } from '../usuarios/usuarios.repository';
+import { PublicadoresRepository, PublicadorAuthProfile } from '../publicadores/publicadores.repository';
 import { PasswordService } from '../common/security/password.service';
 import { MailService } from '../common/mail/mail.service';
 import { LoginDto } from './dto/login.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
+
+export interface PublicadorPerfil {
+  id: string;
+  primer_nombre: string | null;
+  segundo_nombre: string | null;
+  primer_apellido: string | null;
+  segundo_apellido: string | null;
+  nombre_completo: string;
+}
+
+function nombreCompleto(publicador: PublicadorAuthProfile): string {
+  return [publicador.primer_nombre, publicador.segundo_nombre, publicador.primer_apellido, publicador.segundo_apellido]
+    .filter((part) => !!part && part.trim().length > 0)
+    .join(' ');
+}
+
+function toPerfil(publicador: PublicadorAuthProfile): PublicadorPerfil {
+  return {
+    id: publicador.id,
+    primer_nombre: publicador.primer_nombre,
+    segundo_nombre: publicador.segundo_nombre,
+    primer_apellido: publicador.primer_apellido,
+    segundo_apellido: publicador.segundo_apellido,
+    nombre_completo: nombreCompleto(publicador),
+  };
+}
 
 const INVALID_CREDENTIALS_MESSAGE = 'Usuario o contraseña incorrectos.';
 const INVALID_CURRENT_PASSWORD_MESSAGE = 'La contraseña actual no es correcta.';
@@ -29,6 +56,7 @@ export class AuthService {
 
   constructor(
     private readonly usuariosRepository: UsuariosRepository,
+    private readonly publicadoresRepository: PublicadoresRepository,
     private readonly passwordService: PasswordService,
     private readonly jwtService: JwtService,
     private readonly mailService: MailService,
@@ -36,21 +64,52 @@ export class AuthService {
 
   async login(dto: LoginDto) {
     const usuario = await this.usuariosRepository.findByLogin(dto.login);
-    if (!usuario) {
+
+    if (usuario) {
+      const passwordMatches = await this.passwordService.compare(dto.password, usuario.password_hash);
+      if (!passwordMatches) {
+        throw new UnauthorizedException(INVALID_CREDENTIALS_MESSAGE);
+      }
+
+      // Cruce por móvil: vincula este usuario con su publicador (si existe) para
+      // habilitar el switch entre el Dashboard y la landing de participante.
+      const movil = usuario.movil?.trim();
+      const publicador = movil ? await this.publicadoresRepository.findByMovil(movil) : null;
+
+      const accessToken = await this.jwtService.signAsync({
+        sub: usuario.login,
+        rol: usuario.rol,
+        publicadorId: publicador?.id ?? null,
+      });
+
+      return {
+        access_token: accessToken,
+        login: usuario.login,
+        rol: usuario.rol,
+        publicador: publicador ? toPerfil(publicador) : null,
+      };
+    }
+
+    // No existe en usuarios: intenta como login de participante (publicadores),
+    // donde el "password" ingresado debe coincidir con la columna movil.
+    const login = dto.login.trim();
+    const movil = dto.password.trim();
+    const publicador = await this.publicadoresRepository.findByLoginAndMovil(login, movil);
+    if (!publicador) {
       throw new UnauthorizedException(INVALID_CREDENTIALS_MESSAGE);
     }
 
-    const passwordMatches = await this.passwordService.compare(dto.password, usuario.password_hash);
-    if (!passwordMatches) {
-      throw new UnauthorizedException(INVALID_CREDENTIALS_MESSAGE);
-    }
-
-    const accessToken = await this.jwtService.signAsync({ sub: usuario.login, rol: usuario.rol });
+    const accessToken = await this.jwtService.signAsync({
+      sub: publicador.login ?? login,
+      rol: null,
+      publicadorId: publicador.id,
+    });
 
     return {
       access_token: accessToken,
-      login: usuario.login,
-      rol: usuario.rol,
+      login: publicador.login ?? login,
+      rol: null,
+      publicador: toPerfil(publicador),
     };
   }
 

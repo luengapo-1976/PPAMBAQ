@@ -399,6 +399,72 @@ export type Database = {
           },
         ]
       }
+      turnos: {
+        Row: {
+          codigo_punto: number
+          dia_nombre: string
+          dia_numero: number
+          estado_solicitud: string | null
+          fecha_modificacion: string | null
+          fecha_registro: string | null
+          hora_fin: string
+          hora_inicio: string
+          id: string
+          id_publicador: string | null
+          justificacion: string | null
+          observaciones: string | null
+          usuario_modifica: string | null
+          usuario_registra: string | null
+        }
+        Insert: {
+          codigo_punto: number
+          dia_nombre: string
+          dia_numero: number
+          estado_solicitud?: string | null
+          fecha_modificacion?: string | null
+          fecha_registro?: string | null
+          hora_fin: string
+          hora_inicio: string
+          id?: string
+          id_publicador?: string | null
+          justificacion?: string | null
+          observaciones?: string | null
+          usuario_modifica?: string | null
+          usuario_registra?: string | null
+        }
+        Update: {
+          codigo_punto?: number
+          dia_nombre?: string
+          dia_numero?: number
+          estado_solicitud?: string | null
+          fecha_modificacion?: string | null
+          fecha_registro?: string | null
+          hora_fin?: string
+          hora_inicio?: string
+          id?: string
+          id_publicador?: string | null
+          justificacion?: string | null
+          observaciones?: string | null
+          usuario_modifica?: string | null
+          usuario_registra?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "turnos_codigo_punto_fkey"
+            columns: ["codigo_punto"]
+            isOneToOne: false
+            referencedRelation: "puntos"
+            referencedColumns: ["codigo_punto"]
+          },
+          {
+            foreignKeyName: "turnos_id_publicador_fkey"
+            columns: ["id_publicador"]
+            isOneToOne: false
+            referencedRelation: "publicadores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       usuarios: {
         Row: {
           correo: string | null

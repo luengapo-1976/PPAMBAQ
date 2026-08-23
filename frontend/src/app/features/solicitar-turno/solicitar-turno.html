@@ -1,0 +1,226 @@
+<div class="solicitar-turno">
+  <a class="solicitar-turno__back" routerLink="/inicio">
+    <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span>
+    <span>Volver al inicio</span>
+  </a>
+
+  <header class="solicitar-turno__header">
+    <span class="solicitar-turno__icon material-symbols-outlined" aria-hidden="true">event_available</span>
+    <div>
+      <h1 class="solicitar-turno__title">Solicitar turno</h1>
+      <p class="solicitar-turno__legend">Selecciona a continuación el punto que te interesa:</p>
+    </div>
+  </header>
+
+  @if (tieneMisTurnos()) {
+    <section class="mis-turnos" aria-label="Tus turnos asignados">
+      <h2 class="mis-turnos__titulo" [class.mis-turnos__titulo--excedido]="excedeLimite()">
+        {{ misTurnosSolicitados() }}
+        {{ misTurnosSolicitados() === 1 ? 'turno asignado' : 'turnos asignados' }} de
+        {{ misTurnosMaximo() }} posibles
+      </h2>
+      <ul class="mis-turnos__lista">
+        @for (turno of misTurnos(); track turno.id) {
+          <li class="mis-turnos__item">
+            <strong>{{ turno.nombrePunto }}</strong> · {{ turno.diaNombre }} ·
+            {{ formatHora(turno.horaInicio) }} – {{ formatHora(turno.horaFin) }}
+          </li>
+        }
+      </ul>
+    </section>
+  }
+
+  <div class="filtros-row">
+    <app-search-select
+      [options]="puntoOptions()"
+      placeholder="Buscar punto…"
+      emptyMessage="No hay puntos disponibles"
+      [disabled]="loadingPuntos()"
+      [ngModel]="selectedCodigoPunto()"
+      (ngModelChange)="onSeleccionarPunto($event)"
+    />
+
+  </div>
+
+  @if (puntoSeleccionado(); as punto) {
+    <section class="punto-info" aria-label="Información del punto seleccionado">
+      <h2 class="punto-info__nombre">{{ punto.nombre_punto }}</h2>
+      <div class="punto-info__row">
+        <span class="material-symbols-outlined" aria-hidden="true">place</span>
+        <span>{{ punto.direccion || 'Sin dirección registrada' }}</span>
+      </div>
+
+      <button
+        type="button"
+        class="punto-info__disclosure"
+        [attr.aria-expanded]="contactoExpandido()"
+        aria-controls="punto-info-contacto"
+        (click)="onToggleContacto()"
+      >
+        <span class="material-symbols-outlined punto-info__disclosure-icon" [class.punto-info__disclosure-icon--open]="contactoExpandido()" aria-hidden="true">
+          chevron_right
+        </span>
+        <span>{{ contactoExpandido() ? 'Ocultar contacto' : 'Ver contacto del punto' }}</span>
+      </button>
+
+      @if (contactoExpandido()) {
+        <div class="punto-info__contacto" id="punto-info-contacto">
+          <div class="punto-info__row">
+            <span class="material-symbols-outlined" aria-hidden="true">badge</span>
+            <span>{{ punto.encargado || 'Sin encargado registrado' }}</span>
+          </div>
+          <div class="punto-info__row">
+            <span class="material-symbols-outlined" aria-hidden="true">call</span>
+            <span>{{ punto.movil || 'Sin móvil registrado' }}</span>
+          </div>
+        </div>
+      }
+    </section>
+
+    @if (mostrarFiltroDia()) {
+      <div class="dia-filtro" role="radiogroup" aria-label="Filtrar por día">
+        @for (opcion of diaOptions(); track opcion.value) {
+          <button
+            type="button"
+            class="dia-chip"
+            role="radio"
+            [attr.aria-checked]="selectedDiaFiltro() === opcion.value"
+            [class.dia-chip--active]="selectedDiaFiltro() === opcion.value"
+            (click)="selectedDiaFiltro.set(opcion.value)"
+          >
+            {{ opcion.label }}
+          </button>
+        }
+      </div>
+    }
+
+    <label class="solo-disponibles">
+      <input
+        type="checkbox"
+        class="ppam-checkbox"
+        [checked]="soloDisponibles()"
+        (change)="soloDisponibles.set(!soloDisponibles())"
+      />
+      <span>Filtrar solo los disponibles</span>
+    </label>
+
+    <div class="turnos-section">
+      <h2 class="solicitar-turno__subtitle">
+        {{ soloDisponibles() ? 'Turnos disponibles de este punto' : 'Turnos de este punto' }}
+      </h2>
+
+      @if (loadingTurnos()) {
+        <div class="solicitar-turno__skeleton">
+          @for (i of [1, 2, 3]; track i) {
+            <div class="skeleton-block"></div>
+          }
+        </div>
+      } @else {
+        @if (gruposPorDiaVisibles().length > 0) {
+          <p class="turnos-resumen">
+            {{ resumenTurnos().turnos }} {{ resumenTurnos().turnos === 1 ? 'turno' : 'turnos' }} ·
+            {{ resumenTurnos().disponibles }} {{ resumenTurnos().disponibles === 1 ? 'cupo disponible' : 'cupos disponibles' }}
+          </p>
+        }
+        @for (grupo of gruposPorDiaVisibles(); track grupo.diaNumero) {
+          <section class="dia-grupo">
+            <h3 class="dia-grupo__titulo">{{ grupo.diaNombre }}</h3>
+            <div class="pares-list">
+              @for (par of grupo.pares; track par.horaInicio + par.horaFin; let i = $index) {
+                <article
+                  class="par-card"
+                  [class.par-card--libre]="par.estado === 'libre'"
+                  [class.par-card--parcial]="par.estado === 'parcial'"
+                  [class.par-card--ocupado]="par.estado === 'ocupado'"
+                  [style.animation-delay.ms]="i * 40"
+                >
+                  <header class="par-card__header">
+                    <span class="material-symbols-outlined" aria-hidden="true">schedule</span>
+                    <span class="par-card__hora">{{ formatHora(par.horaInicio) }} – {{ formatHora(par.horaFin) }}</span>
+                    <span class="par-card__cupos">{{ par.disponibles }} de {{ par.turnos.length }} cupos disponibles</span>
+                  </header>
+                  <div class="par-card__slots">
+                    @for (turno of par.turnos; track turno.id) {
+                      <div class="slot" [class.slot--ocupado]="turno.disponibilidad === 'ocupado'">
+                        @if (turno.disponibilidad === 'ocupado') {
+                          <span class="estado-badge estado-badge--ocupado">
+                            <span class="material-symbols-outlined" aria-hidden="true">
+                              {{ turno.sexo_ocupante === 'F' ? 'woman' : 'man' }}
+                            </span>
+                            Turno ocupado
+                          </span>
+                        } @else {
+                          <div class="slot__disponible">
+                            <span class="estado-badge estado-badge--disponible">
+                              <span class="material-symbols-outlined" aria-hidden="true">event_available</span>
+                              {{ etiquetaDisponibilidad(turno) }}
+                            </span>
+                            <app-button
+                              type="button"
+                              [disabled]="isSolicitando(turno.id) || limiteAlcanzado()"
+                              (click)="onSolicitar(turno)"
+                            >
+                              {{ isSolicitando(turno.id) ? 'Enviando…' : 'Solicitar' }}
+                            </app-button>
+                          </div>
+                          @if (limiteAlcanzado()) {
+                            <p class="slot__limite">
+                              <span class="material-symbols-outlined" aria-hidden="true">block</span>
+                              Límite alcanzado. Libera {{ turnosALiberar() }} turno{{ turnosALiberar() === 1 ? '' : 's' }} si
+                              quieres solicitar este.
+                            </p>
+                          }
+                        }
+                      </div>
+                    }
+                  </div>
+                </article>
+              }
+            </div>
+          </section>
+        } @empty {
+          <div class="turnos-empty">
+            <span class="material-symbols-outlined" aria-hidden="true">event_busy</span>
+            <p>{{ turnosEmptyMensaje() }}</p>
+          </div>
+        }
+      }
+    </div>
+  }
+</div>
+
+<app-dialog [open]="dialogState() !== 'closed'" [title]="dialogTitulo()" (closed)="onDialogClosed()">
+  <app-button dialogToolbar type="button" [disabled]="primaryDisabled()" (click)="onPrimaryAction()">
+    {{ primaryLabel() }}
+  </app-button>
+  <app-button
+    dialogToolbar
+    type="button"
+    variant="secondary"
+    [style.display]="showSecondary() ? null : 'none'"
+    (click)="onCancelarDialog()"
+  >
+    Cancelar
+  </app-button>
+
+  @if (dialogState() === 'justificacion') {
+    <p class="solicitar-turno__dialog-texto" [innerHTML]="dialogMensajeHtml()"></p>
+    <label class="solicitar-turno__justificacion-label">
+      <span>Justificación (obligatoria)</span>
+      <textarea
+        class="ppam-textarea"
+        rows="4"
+        maxlength="500"
+        [ngModel]="justificacion()"
+        (ngModelChange)="justificacion.set($event)"
+      ></textarea>
+    </label>
+  } @else {
+    @if (dialogState() === 'resultado' && dialogResultadoOutcome() === 'aprobado') {
+      <div class="solicitar-turno__dialog-celebracion">
+        <span class="material-symbols-outlined" aria-hidden="true">celebration</span>
+      </div>
+    }
+    <p class="solicitar-turno__dialog-texto" [innerHTML]="dialogMensajeHtml()"></p>
+  }
+</app-dialog>

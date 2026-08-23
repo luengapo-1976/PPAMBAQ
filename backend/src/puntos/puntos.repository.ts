@@ -20,6 +20,21 @@ export class PuntosRepository {
     return data;
   }
 
+  async findByCodigo(codigo: number) {
+    const { data, error } = await this.supabaseService
+      .getClient()
+      .from('puntos')
+      .select('*')
+      .eq('codigo_punto', codigo)
+      .maybeSingle();
+
+    if (error) {
+      throw new InternalServerErrorException('No se pudo consultar el punto.');
+    }
+
+    return data;
+  }
+
   async create(payload: TablesInsert<'puntos'>) {
     const { data, error } = await this.supabaseService
       .getClient()
