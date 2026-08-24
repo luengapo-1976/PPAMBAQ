@@ -70,6 +70,15 @@
   background: #1a5c38;
 }
 
+.ppam-button--danger {
+  background: var(--ppam-error);
+  color: #ffffff;
+}
+
+.ppam-button--danger:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--ppam-error) 85%, black);
+}
+
 .ppam-button .material-symbols-outlined {
   color: currentColor;
 }

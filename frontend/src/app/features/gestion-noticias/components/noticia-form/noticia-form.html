@@ -1,0 +1,113 @@
+<app-dialog
+  [open]="open()"
+  [title]="dialogTitle()"
+  position="right"
+  rightWidth="50vw"
+  panelBackground="var(--ppam-surface)"
+  (closed)="onCancel()"
+>
+  <app-button dialogToolbar type="button" icon="save" [disabled]="form.invalid || saving() || uploading()" (click)="onGuardar()">
+    {{ saving() ? 'Guardando…' : 'Guardar' }}
+  </app-button>
+  <app-button
+    dialogToolbar
+    type="button"
+    variant="secondary"
+    icon="campaign"
+    [disabled]="form.invalid || saving() || uploading()"
+    (click)="onPublicarToggle()"
+  >
+    {{ publicarLabel() }}
+  </app-button>
+  <app-button dialogToolbar type="button" variant="ghost" icon="close" (click)="onCancel()">
+    Cancelar
+  </app-button>
+
+  <form class="noticia-form" [formGroup]="form" (ngSubmit)="onGuardar()">
+    <app-form-field label="Título" [required]="true" [control]="form.controls.titulo">
+      <input type="text" formControlName="titulo" class="ppam-input" maxlength="200" />
+    </app-form-field>
+
+    <app-form-field
+      label="Resumen"
+      [required]="true"
+      [control]="form.controls.resumen"
+      hint="Texto corto que se muestra en la tarjeta de la noticia (máx. 300 caracteres)."
+    >
+      <textarea formControlName="resumen" class="ppam-textarea" rows="3" maxlength="300"></textarea>
+    </app-form-field>
+
+    <app-form-field label="Imagen de portada">
+      <div class="noticia-form__imagen-control">
+        <div class="noticia-form__imagen-name" [class.noticia-form__imagen-name--empty]="!imagenFileName()">
+          {{ imagenFileName() || 'Sin imagen seleccionada' }}
+        </div>
+        @if (imagenFileName()) {
+          <button
+            type="button"
+            class="noticia-form__style-btn"
+            aria-label="Quitar imagen"
+            title="Quitar imagen"
+            (click)="onRemoveImagen()"
+          >
+            <span class="material-symbols-outlined" aria-hidden="true">close</span>
+          </button>
+        }
+        <app-button type="button" variant="secondary" [disabled]="uploading()" (click)="onExaminar()">
+          {{ uploading() ? 'Subiendo…' : 'Examinar' }}
+        </app-button>
+        <input #imagenInput type="file" accept="image/*" class="noticia-form__file-input" (change)="onFileSelected($event)" />
+      </div>
+    </app-form-field>
+
+    <app-form-field label="Contenido" [required]="true" [control]="form.controls.contenido">
+      <div class="noticia-form__editor">
+        <div class="noticia-form__editor-toolbar">
+          <button type="button" class="noticia-form__style-btn" aria-label="Negrita" title="Negrita" (click)="exec('bold')">
+            <span class="material-symbols-outlined" aria-hidden="true">format_bold</span>
+          </button>
+          <button type="button" class="noticia-form__style-btn" aria-label="Cursiva" title="Cursiva" (click)="exec('italic')">
+            <span class="material-symbols-outlined" aria-hidden="true">format_italic</span>
+          </button>
+          <button
+            type="button"
+            class="noticia-form__style-btn"
+            aria-label="Subrayado"
+            title="Subrayado"
+            (click)="exec('underline')"
+          >
+            <span class="material-symbols-outlined" aria-hidden="true">format_underlined</span>
+          </button>
+          <button
+            type="button"
+            class="noticia-form__style-btn"
+            aria-label="Lista con viñetas"
+            title="Lista con viñetas"
+            (click)="exec('insertUnorderedList')"
+          >
+            <span class="material-symbols-outlined" aria-hidden="true">format_list_bulleted</span>
+          </button>
+          <button
+            type="button"
+            class="noticia-form__style-btn"
+            aria-label="Lista numerada"
+            title="Lista numerada"
+            (click)="exec('insertOrderedList')"
+          >
+            <span class="material-symbols-outlined" aria-hidden="true">format_list_numbered</span>
+          </button>
+          <button type="button" class="noticia-form__style-btn" aria-label="Insertar enlace" title="Insertar enlace" (click)="onInsertLink()">
+            <span class="material-symbols-outlined" aria-hidden="true">link</span>
+          </button>
+        </div>
+        <div
+          #contenidoEditor
+          class="noticia-form__editor-body"
+          contenteditable="true"
+          (input)="onContenidoInput()"
+          (blur)="onContenidoInput()"
+        ></div>
+      </div>
+    </app-form-field>
+  </form>
+</app-dialog>

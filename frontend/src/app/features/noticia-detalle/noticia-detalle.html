@@ -1,0 +1,23 @@
+<app-participante-desktop-header />
+
+<div class="noticia-detalle">
+  @if (loading()) {
+    <div class="skeleton-block skeleton-block--image"></div>
+    <div class="skeleton-block skeleton-block--text"></div>
+    <div class="skeleton-block skeleton-block--text"></div>
+  } @else if (noticia(); as noticia) {
+    @if (noticia.imagen_url) {
+      <img class="noticia-detalle__image" [src]="noticia.imagen_url" [alt]="noticia.titulo" />
+    }
+    @if (noticia.fecha_publicacion) {
+      <span class="noticia-detalle__date">{{ formatDateShort(noticia.fecha_publicacion) }}</span>
+    }
+    <h1 class="noticia-detalle__title">{{ noticia.titulo }}</h1>
+    <div class="noticia-detalle__contenido" [innerHTML]="noticia.contenido"></div>
+  } @else {
+    <div class="noticia-detalle__empty">
+      <span class="material-symbols-outlined" aria-hidden="true">campaign</span>
+      <p>No se encontró esta noticia.</p>
+    </div>
+  }
+</div>

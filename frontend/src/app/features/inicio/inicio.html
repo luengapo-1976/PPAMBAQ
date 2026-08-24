@@ -1,23 +1,51 @@
-<div class="inicio">
-  <header class="inicio__topbar">
-    <div class="inicio__brand">
+<header class="inicio__topbar">
+  <div class="inicio__topbar-inner">
+    <a class="inicio__brand" routerLink="/inicio">
       <img class="inicio__brand-logo" src="images/LOGO.png" alt="" />
       <span class="inicio__brand-text">PPAM BAQ</span>
-    </div>
+    </a>
     <div class="inicio__topbar-end">
       @if (showRoleSwitch()) {
         <app-role-switch [active]="vistaActiva()" (changed)="onSwitchVista($event)" />
       }
-      <app-avatar [name]="nombre()" [size]="36" />
-      <button type="button" class="inicio__logout" (click)="onLogout()">
-        <span class="material-symbols-outlined" aria-hidden="true">logout</span>
-        <span>Salir</span>
-      </button>
-    </div>
-  </header>
+      <div class="inicio__account">
+        <button
+          type="button"
+          class="inicio__avatar-trigger"
+          [attr.aria-expanded]="menuOpen()"
+          aria-haspopup="menu"
+          aria-label="Abrir menú de cuenta"
+          (click)="toggleMenu()"
+        >
+          <app-avatar [name]="nombre()" [size]="36" />
+        </button>
 
+        @if (menuOpen()) {
+          <ul class="inicio__account-menu" role="menu">
+            <li role="none">
+              <button type="button" role="menuitem" class="inicio__account-menu-item" (click)="onChangePassword()">
+                <span class="material-symbols-outlined" aria-hidden="true">lock_reset</span>
+                <span>Cambiar contraseña</span>
+              </button>
+            </li>
+            <li role="none">
+              <button type="button" role="menuitem" class="inicio__account-menu-item" (click)="onLogout()">
+                <span class="material-symbols-outlined" aria-hidden="true">logout</span>
+                <span>Cerrar sesión</span>
+              </button>
+            </li>
+          </ul>
+        }
+      </div>
+    </div>
+  </div>
+</header>
+
+<img class="inicio__hero" src="images/Imagen actual.png" alt="Publicadores de la PPAM compartiendo en un punto de predicación" />
+
+<div class="inicio">
   <section class="inicio__greeting">
-    <h1 class="inicio__greeting-title">Hola, {{ nombre() }}</h1>
+    <h1 class="inicio__greeting-title">Hola, {{ primerNombre() }}</h1>
     <p class="inicio__greeting-subtitle">¿Qué deseas hacer hoy?</p>
   </section>
 
@@ -25,23 +53,70 @@
     @for (item of mainItems; track item.id) {
       <a class="menu-item" [routerLink]="item.route">
         <span class="menu-item__icon material-symbols-outlined" aria-hidden="true">{{ item.icon }}</span>
-        <span class="menu-item__body">
-          <span class="menu-item__title">{{ item.title }}</span>
-          <span class="menu-item__description">{{ item.description }}</span>
-        </span>
-        <span class="menu-item__chevron material-symbols-outlined" aria-hidden="true">chevron_right</span>
+        <span class="menu-item__eyebrow">{{ item.eyebrow }}</span>
+        <span class="menu-item__description">{{ item.description }}</span>
+        <span class="menu-item__cta">{{ item.cta }}</span>
       </a>
     }
-
-    <div class="inicio__menu-divider" aria-hidden="true"></div>
-
-    <a class="menu-item menu-item--sensitive" [routerLink]="bajaItem.route">
-      <span class="menu-item__icon material-symbols-outlined" aria-hidden="true">{{ bajaItem.icon }}</span>
-      <span class="menu-item__body">
-        <span class="menu-item__title">{{ bajaItem.title }}</span>
-        <span class="menu-item__description">{{ bajaItem.description }}</span>
-      </span>
-      <span class="menu-item__chevron material-symbols-outlined" aria-hidden="true">chevron_right</span>
-    </a>
   </nav>
+
+  @if (noticias().length > 0) {
+    <section class="inicio__noticias" aria-label="Últimas noticias">
+      <h2 class="inicio__noticias-title">Últimas noticias</h2>
+      <div class="inicio__noticias-grid">
+        @for (noticia of noticias(); track noticia.id) {
+          <a class="noticia-card" [routerLink]="['/noticias', noticia.id]">
+            @if (noticia.imagen_url) {
+              <img class="noticia-card__image" [src]="noticia.imagen_url" [alt]="noticia.titulo" />
+            } @else {
+              <div class="noticia-card__image noticia-card__image--placeholder">
+                <span class="material-symbols-outlined" aria-hidden="true">campaign</span>
+              </div>
+            }
+            <div class="noticia-card__body">
+              @if (noticia.fecha_publicacion) {
+                <span class="noticia-card__date">{{ formatDateShort(noticia.fecha_publicacion) }}</span>
+              }
+              <h3 class="noticia-card__title">{{ noticia.titulo }}</h3>
+              <p class="noticia-card__resumen">{{ noticia.resumen }}</p>
+            </div>
+          </a>
+        }
+      </div>
+    </section>
+  }
 </div>
+
+<footer class="inicio__cta">
+  <div class="inicio__cta-overlay">
+    <h2 class="inicio__cta-title">¿Necesitas alguna ayuda?</h2>
+    <app-button icon="mail" (click)="onAbrirContacto()">Escríbenos</app-button>
+  </div>
+  <div class="inicio__cta-bar">
+    <span>© 2026 PPAM BAQ.</span>
+    <button type="button" class="inicio__cta-top" aria-label="Volver arriba" (click)="onScrollToTop()">
+      <span class="material-symbols-outlined" aria-hidden="true">arrow_upward</span>
+    </button>
+  </div>
+</footer>
+
+<app-dialog [open]="contactoOpen()" title="Escríbenos" (closed)="onCerrarContacto()">
+  <app-button dialogToolbar type="button" [disabled]="!contactoMensaje().trim() || contactoEnviando()" (click)="onEnviarContacto()">
+    {{ contactoEnviando() ? 'Enviando…' : 'Enviar' }}
+  </app-button>
+  <app-button dialogToolbar type="button" variant="secondary" (click)="onCerrarContacto()">Cancelar</app-button>
+
+  <label class="inicio__contacto-field">
+    <span>Cuéntanos qué necesitas</span>
+    <textarea
+      class="ppam-textarea"
+      rows="5"
+      maxlength="1000"
+      placeholder="Escribe tu mensaje…"
+      [ngModel]="contactoMensaje()"
+      (ngModelChange)="contactoMensaje.set($event)"
+    ></textarea>
+  </label>
+</app-dialog>
+
+<app-change-password-dialog [open]="changePasswordOpen()" (closed)="changePasswordOpen.set(false)" />

@@ -10,11 +10,8 @@ export const envValidationSchema = Joi.object({
   SUPABASE_SERVICE_ROLE_KEY: Joi.string().required(),
   JWT_SECRET: Joi.string().min(32).required(),
   JWT_EXPIRES_IN: Joi.string().default('1h'),
-  // Opcionales hasta que se configuren credenciales SMTP reales: sin ellas,
+  // Opcional hasta que se configure una API key real de Resend: sin ella,
   // MailService.sendMail() falla en tiempo de ejecución (no en el arranque de Nest).
-  SMTP_HOST: Joi.string().allow('').optional(),
-  SMTP_PORT: Joi.number().default(587),
-  SMTP_USER: Joi.string().allow('').optional(),
-  SMTP_PASSWORD: Joi.string().allow('').optional(),
-  SMTP_FROM: Joi.string().allow('').optional(),
+  RESEND_API_KEY: Joi.string().allow('').optional(),
+  RESEND_FROM: Joi.string().allow('').optional(),
 });

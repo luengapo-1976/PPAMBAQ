@@ -1,35 +1,33 @@
-<div class="solicitar-turno">
-  <a class="solicitar-turno__back" routerLink="/inicio">
-    <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span>
-    <span>Volver al inicio</span>
-  </a>
+<app-participante-desktop-header />
 
-  <header class="solicitar-turno__header">
-    <span class="solicitar-turno__icon material-symbols-outlined" aria-hidden="true">event_available</span>
-    <div>
-      <h1 class="solicitar-turno__title">Solicitar turno</h1>
-      <p class="solicitar-turno__legend">Selecciona a continuación el punto que te interesa:</p>
-    </div>
-  </header>
+<div class="solicitar-turno">
 
   @if (tieneMisTurnos()) {
     <section class="mis-turnos" aria-label="Tus turnos asignados">
       <h2 class="mis-turnos__titulo" [class.mis-turnos__titulo--excedido]="excedeLimite()">
-        {{ misTurnosSolicitados() }}
+        {{ primerNombre() }}, tienes {{ misTurnosSolicitados() }}
         {{ misTurnosSolicitados() === 1 ? 'turno asignado' : 'turnos asignados' }} de
         {{ misTurnosMaximo() }} posibles
       </h2>
-      <ul class="mis-turnos__lista">
+      <div class="mis-turnos__grid">
         @for (turno of misTurnos(); track turno.id) {
-          <li class="mis-turnos__item">
-            <strong>{{ turno.nombrePunto }}</strong> · {{ turno.diaNombre }} ·
-            {{ formatHora(turno.horaInicio) }} – {{ formatHora(turno.horaFin) }}
-          </li>
+          <article class="mis-turnos__card">
+            <h3 class="mis-turnos__card-punto">{{ turno.nombrePunto }}</h3>
+            <div class="mis-turnos__card-row">
+              <span class="material-symbols-outlined" aria-hidden="true">calendar_today</span>
+              <span>{{ turno.diaNombre }}</span>
+            </div>
+            <div class="mis-turnos__card-row">
+              <span class="material-symbols-outlined" aria-hidden="true">schedule</span>
+              <span>{{ formatHora(turno.horaInicio) }} – {{ formatHora(turno.horaFin) }}</span>
+            </div>
+          </article>
         }
-      </ul>
+      </div>
     </section>
   }
 
+  <p class="solicitar-turno__select-legend">Selecciona el punto deseado</p>
   <div class="filtros-row">
     <app-search-select
       [options]="puntoOptions()"
@@ -118,7 +116,7 @@
       } @else {
         @if (gruposPorDiaVisibles().length > 0) {
           <p class="turnos-resumen">
-            {{ resumenTurnos().turnos }} {{ resumenTurnos().turnos === 1 ? 'turno' : 'turnos' }} ·
+            {{ resumenTurnos().turnos }} {{ resumenTurnos().turnos === 1 ? 'horario' : 'horarios' }} ·
             {{ resumenTurnos().disponibles }} {{ resumenTurnos().disponibles === 1 ? 'cupo disponible' : 'cupos disponibles' }}
           </p>
         }

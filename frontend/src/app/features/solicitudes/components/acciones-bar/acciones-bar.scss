@@ -18,6 +18,13 @@
   width: 72px;
 }
 
+/* Sin registros seleccionados, todas las acciones estarían deshabilitadas: no
+ * tiene sentido reservar espacio de pantalla (72px en desktop, 100% en móvil)
+ * para una barra inutilizable. Reaparece automáticamente al seleccionar. */
+.acciones-bar--hidden {
+  display: none;
+}
+
 .acciones-bar__header {
   display: flex;
   align-items: center;
@@ -98,9 +105,18 @@
   flex-shrink: 0;
 }
 
+/* En móvil la barra colapsada debe seguir siendo un riel angosto (72px), no
+ * ocupar toda la pantalla: por eso el override de "collapsed" va DESPUÉS del
+ * ancho 100% dentro del mismo media query — con igual especificidad, la regla
+ * que aparece después en el código gana la cascada, sin importar el orden de
+ * las clases en el HTML. */
 @media (max-width: 599px) {
   .acciones-bar {
     width: 100%;
+  }
+
+  .acciones-bar--collapsed {
+    width: 72px;
   }
 }
 

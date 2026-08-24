@@ -1,0 +1,111 @@
+:host {
+  display: block;
+}
+
+.noticia-detalle {
+  min-height: 100dvh;
+  background: var(--ppam-surface);
+  padding: var(--ppam-space-md);
+  padding-bottom: var(--ppam-space-2xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ppam-space-md);
+  box-sizing: border-box;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.noticia-detalle__image {
+  width: 100%;
+  max-height: 360px;
+  object-fit: cover;
+  border-radius: var(--ppam-radius-card);
+}
+
+.noticia-detalle__date {
+  font-size: var(--ppam-label-size);
+  font-weight: 600;
+  letter-spacing: var(--ppam-label-tracking);
+  text-transform: uppercase;
+  color: var(--ppam-on-surface-variant);
+}
+
+.noticia-detalle__title {
+  font-size: var(--ppam-h1-mobile-size);
+  line-height: var(--ppam-h1-mobile-line);
+  font-weight: var(--ppam-h1-weight);
+  color: var(--ppam-on-surface);
+}
+
+.noticia-detalle__contenido {
+  color: var(--ppam-on-surface);
+  font-size: var(--ppam-body-size);
+  line-height: var(--ppam-body-line);
+}
+
+.noticia-detalle__contenido p {
+  margin: 0 0 var(--ppam-space-md);
+}
+
+.noticia-detalle__contenido ul,
+.noticia-detalle__contenido ol {
+  padding-left: var(--ppam-space-lg);
+  margin: 0 0 var(--ppam-space-md);
+}
+
+.noticia-detalle__contenido a {
+  color: var(--ppam-primary);
+}
+
+.noticia-detalle__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ppam-space-sm);
+  padding: var(--ppam-space-2xl);
+  color: var(--ppam-outline);
+}
+
+.noticia-detalle__empty .material-symbols-outlined {
+  font-size: 48px;
+}
+
+.skeleton-block {
+  border-radius: var(--ppam-radius-card);
+  background: linear-gradient(
+    100deg,
+    var(--ppam-surface-container) 30%,
+    var(--ppam-surface-container-high) 50%,
+    var(--ppam-surface-container) 70%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+}
+
+.skeleton-block--image {
+  height: 220px;
+}
+
+.skeleton-block--text {
+  height: 20px;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@media (min-width: 1024px) {
+  .noticia-detalle {
+    padding: var(--ppam-space-xl);
+  }
+
+  .noticia-detalle__title {
+    font-size: var(--ppam-h1-size);
+    line-height: var(--ppam-h1-line);
+  }
+}

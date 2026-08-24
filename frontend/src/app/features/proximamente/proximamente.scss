@@ -13,29 +13,6 @@
   box-sizing: border-box;
 }
 
-.proximamente__back {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--ppam-space-xs);
-  align-self: flex-start;
-  min-height: var(--ppam-touch-target-min);
-  padding-inline: var(--ppam-space-sm);
-  border-radius: var(--ppam-radius-control);
-  color: var(--ppam-on-surface-variant);
-  text-decoration: none;
-  font-weight: 600;
-  font-size: var(--ppam-small-size);
-  transition:
-    background var(--ppam-motion-fast),
-    color var(--ppam-motion-fast);
-}
-
-.proximamente__back:hover,
-.proximamente__back:focus-visible {
-  background: var(--ppam-surface-container);
-  color: var(--ppam-on-surface);
-}
-
 .proximamente__content {
   flex: 1;
   display: flex;

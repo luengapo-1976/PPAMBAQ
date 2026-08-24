@@ -14,6 +14,56 @@ export type Database = {
   }
   public: {
     Tables: {
+      actividad_reportada: {
+        Row: {
+          arreglos_curso: string | null
+          cumplio_turno: string | null
+          fecha_actividad: string
+          fecha_modificacion: string | null
+          fecha_registro: string | null
+          id: string
+          id_turno: string
+          inicio_conversacion: string | null
+          observaciones: string | null
+          usuario_modifica: string | null
+          usuario_registra: string | null
+        }
+        Insert: {
+          arreglos_curso?: string | null
+          cumplio_turno?: string | null
+          fecha_actividad: string
+          fecha_modificacion?: string | null
+          fecha_registro?: string | null
+          id?: string
+          id_turno: string
+          inicio_conversacion?: string | null
+          observaciones?: string | null
+          usuario_modifica?: string | null
+          usuario_registra?: string | null
+        }
+        Update: {
+          arreglos_curso?: string | null
+          cumplio_turno?: string | null
+          fecha_actividad?: string
+          fecha_modificacion?: string | null
+          fecha_registro?: string | null
+          id?: string
+          id_turno?: string
+          inicio_conversacion?: string | null
+          observaciones?: string | null
+          usuario_modifica?: string | null
+          usuario_registra?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "actividad_reportada_id_turno_fkey"
+            columns: ["id_turno"]
+            isOneToOne: false
+            referencedRelation: "turnos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       circuitos: {
         Row: {
           codigo_circuito: string
@@ -182,6 +232,48 @@ export type Database = {
           },
         ]
       }
+      noticias: {
+        Row: {
+          contenido: string
+          estado: string
+          fecha_modificacion: string | null
+          fecha_publicacion: string | null
+          fecha_registro: string | null
+          id: string
+          imagen_url: string | null
+          resumen: string
+          titulo: string
+          usuario_modifica: string | null
+          usuario_registra: string | null
+        }
+        Insert: {
+          contenido: string
+          estado?: string
+          fecha_modificacion?: string | null
+          fecha_publicacion?: string | null
+          fecha_registro?: string | null
+          id?: string
+          imagen_url?: string | null
+          resumen: string
+          titulo: string
+          usuario_modifica?: string | null
+          usuario_registra?: string | null
+        }
+        Update: {
+          contenido?: string
+          estado?: string
+          fecha_modificacion?: string | null
+          fecha_publicacion?: string | null
+          fecha_registro?: string | null
+          id?: string
+          imagen_url?: string | null
+          resumen?: string
+          titulo?: string
+          usuario_modifica?: string | null
+          usuario_registra?: string | null
+        }
+        Relationships: []
+      }
       publicadores: {
         Row: {
           apellido_casada: string | null
@@ -193,7 +285,9 @@ export type Database = {
           entrenamiento_requerido: string | null
           estado: string | null
           estado_civil: string | null
+          estado_registro: string | null
           existe_bd_anterior: string | null
+          fecha_actualizacion_datos: string | null
           fecha_aprobacion: string | null
           fecha_bautismo: string | null
           fecha_cumple_requisitos: string | null
@@ -223,6 +317,7 @@ export type Database = {
           segundo_apellido: string | null
           segundo_nombre: string | null
           sexo: string | null
+          usuario_actualiza_datos: string | null
           usuario_modifica: string | null
           usuario_registra: string | null
         }
@@ -236,7 +331,9 @@ export type Database = {
           entrenamiento_requerido?: string | null
           estado?: string | null
           estado_civil?: string | null
+          estado_registro?: string | null
           existe_bd_anterior?: string | null
+          fecha_actualizacion_datos?: string | null
           fecha_aprobacion?: string | null
           fecha_bautismo?: string | null
           fecha_cumple_requisitos?: string | null
@@ -266,6 +363,7 @@ export type Database = {
           segundo_apellido?: string | null
           segundo_nombre?: string | null
           sexo?: string | null
+          usuario_actualiza_datos?: string | null
           usuario_modifica?: string | null
           usuario_registra?: string | null
         }
@@ -279,7 +377,9 @@ export type Database = {
           entrenamiento_requerido?: string | null
           estado?: string | null
           estado_civil?: string | null
+          estado_registro?: string | null
           existe_bd_anterior?: string | null
+          fecha_actualizacion_datos?: string | null
           fecha_aprobacion?: string | null
           fecha_bautismo?: string | null
           fecha_cumple_requisitos?: string | null
@@ -309,6 +409,7 @@ export type Database = {
           segundo_apellido?: string | null
           segundo_nombre?: string | null
           sexo?: string | null
+          usuario_actualiza_datos?: string | null
           usuario_modifica?: string | null
           usuario_registra?: string | null
         }
@@ -335,6 +436,171 @@ export type Database = {
             referencedColumns: ["codigo_municipio"]
           },
         ]
+      }
+      publicadores_retirados: {
+        Row: {
+          apellido_casada: string | null
+          asistio_primera_capacitacion: string
+          asistio_segunda_capacitacion: string
+          codigo_congregacion: number | null
+          codigo_departamento: string | null
+          codigo_municipio: string | null
+          correo_electronico: string | null
+          direccion: string | null
+          entrenamiento_requerido: string | null
+          estado: string | null
+          estado_civil: string | null
+          estado_solicitud_retiro: string | null
+          existe_bd_anterior: string | null
+          fecha_actualizacion_datos: string | null
+          fecha_aprobacion: string | null
+          fecha_bautismo: string | null
+          fecha_cumple_requisitos: string | null
+          fecha_modificacion: string | null
+          fecha_nacimiento: string | null
+          fecha_primer_entrenamiento: string | null
+          fecha_primera_capacitacion: string | null
+          fecha_registro: string | null
+          fecha_retiro: string | null
+          fecha_segunda_capacitacion: string | null
+          fecha_segundo_entrenamiento: string | null
+          fecha_solicitud: string | null
+          fecha_validacion_retiro: string | null
+          id: string
+          justificacion: string
+          login: string | null
+          lugar_primer_entrenamiento: string | null
+          lugar_primera_capacitacion: number | null
+          lugar_segunda_capacitacion: number | null
+          lugar_segundo_entrenamiento: string | null
+          mensaje_primer_entrenamiento: string | null
+          mensaje_segundo_entrenamiento: string | null
+          movil: string | null
+          nombre_conyuge: string | null
+          observaciones_retiro: string | null
+          participo_antes: string | null
+          primer_apellido: string | null
+          primer_nombre: string | null
+          privilegio_min: string | null
+          privilegio_ser: string | null
+          segundo_apellido: string | null
+          segundo_nombre: string | null
+          sexo: string | null
+          usuario_actualiza_datos: string | null
+          usuario_modifica: string | null
+          usuario_registra: string | null
+          usuario_retira: string | null
+          valida_retiro: string | null
+        }
+        Insert: {
+          apellido_casada?: string | null
+          asistio_primera_capacitacion?: string
+          asistio_segunda_capacitacion?: string
+          codigo_congregacion?: number | null
+          codigo_departamento?: string | null
+          codigo_municipio?: string | null
+          correo_electronico?: string | null
+          direccion?: string | null
+          entrenamiento_requerido?: string | null
+          estado?: string | null
+          estado_civil?: string | null
+          estado_solicitud_retiro?: string | null
+          existe_bd_anterior?: string | null
+          fecha_actualizacion_datos?: string | null
+          fecha_aprobacion?: string | null
+          fecha_bautismo?: string | null
+          fecha_cumple_requisitos?: string | null
+          fecha_modificacion?: string | null
+          fecha_nacimiento?: string | null
+          fecha_primer_entrenamiento?: string | null
+          fecha_primera_capacitacion?: string | null
+          fecha_registro?: string | null
+          fecha_retiro?: string | null
+          fecha_segunda_capacitacion?: string | null
+          fecha_segundo_entrenamiento?: string | null
+          fecha_solicitud?: string | null
+          fecha_validacion_retiro?: string | null
+          id: string
+          justificacion: string
+          login?: string | null
+          lugar_primer_entrenamiento?: string | null
+          lugar_primera_capacitacion?: number | null
+          lugar_segunda_capacitacion?: number | null
+          lugar_segundo_entrenamiento?: string | null
+          mensaje_primer_entrenamiento?: string | null
+          mensaje_segundo_entrenamiento?: string | null
+          movil?: string | null
+          nombre_conyuge?: string | null
+          observaciones_retiro?: string | null
+          participo_antes?: string | null
+          primer_apellido?: string | null
+          primer_nombre?: string | null
+          privilegio_min?: string | null
+          privilegio_ser?: string | null
+          segundo_apellido?: string | null
+          segundo_nombre?: string | null
+          sexo?: string | null
+          usuario_actualiza_datos?: string | null
+          usuario_modifica?: string | null
+          usuario_registra?: string | null
+          usuario_retira?: string | null
+          valida_retiro?: string | null
+        }
+        Update: {
+          apellido_casada?: string | null
+          asistio_primera_capacitacion?: string
+          asistio_segunda_capacitacion?: string
+          codigo_congregacion?: number | null
+          codigo_departamento?: string | null
+          codigo_municipio?: string | null
+          correo_electronico?: string | null
+          direccion?: string | null
+          entrenamiento_requerido?: string | null
+          estado?: string | null
+          estado_civil?: string | null
+          estado_solicitud_retiro?: string | null
+          existe_bd_anterior?: string | null
+          fecha_actualizacion_datos?: string | null
+          fecha_aprobacion?: string | null
+          fecha_bautismo?: string | null
+          fecha_cumple_requisitos?: string | null
+          fecha_modificacion?: string | null
+          fecha_nacimiento?: string | null
+          fecha_primer_entrenamiento?: string | null
+          fecha_primera_capacitacion?: string | null
+          fecha_registro?: string | null
+          fecha_retiro?: string | null
+          fecha_segunda_capacitacion?: string | null
+          fecha_segundo_entrenamiento?: string | null
+          fecha_solicitud?: string | null
+          fecha_validacion_retiro?: string | null
+          id?: string
+          justificacion?: string
+          login?: string | null
+          lugar_primer_entrenamiento?: string | null
+          lugar_primera_capacitacion?: number | null
+          lugar_segunda_capacitacion?: number | null
+          lugar_segundo_entrenamiento?: string | null
+          mensaje_primer_entrenamiento?: string | null
+          mensaje_segundo_entrenamiento?: string | null
+          movil?: string | null
+          nombre_conyuge?: string | null
+          observaciones_retiro?: string | null
+          participo_antes?: string | null
+          primer_apellido?: string | null
+          primer_nombre?: string | null
+          privilegio_min?: string | null
+          privilegio_ser?: string | null
+          segundo_apellido?: string | null
+          segundo_nombre?: string | null
+          sexo?: string | null
+          usuario_actualiza_datos?: string | null
+          usuario_modifica?: string | null
+          usuario_registra?: string | null
+          usuario_retira?: string | null
+          valida_retiro?: string | null
+        }
+        Relationships: []
       }
       puntos: {
         Row: {
@@ -401,10 +667,12 @@ export type Database = {
       }
       turnos: {
         Row: {
+          aprobado_por: string | null
           codigo_punto: number
           dia_nombre: string
           dia_numero: number
           estado_solicitud: string | null
+          fecha_aprobacion: string | null
           fecha_modificacion: string | null
           fecha_registro: string | null
           hora_fin: string
@@ -412,15 +680,19 @@ export type Database = {
           id: string
           id_publicador: string | null
           justificacion: string | null
+          justificacion_aprobacion: string | null
           observaciones: string | null
+          situacion_identificada: string | null
           usuario_modifica: string | null
           usuario_registra: string | null
         }
         Insert: {
+          aprobado_por?: string | null
           codigo_punto: number
           dia_nombre: string
           dia_numero: number
           estado_solicitud?: string | null
+          fecha_aprobacion?: string | null
           fecha_modificacion?: string | null
           fecha_registro?: string | null
           hora_fin: string
@@ -428,15 +700,19 @@ export type Database = {
           id?: string
           id_publicador?: string | null
           justificacion?: string | null
+          justificacion_aprobacion?: string | null
           observaciones?: string | null
+          situacion_identificada?: string | null
           usuario_modifica?: string | null
           usuario_registra?: string | null
         }
         Update: {
+          aprobado_por?: string | null
           codigo_punto?: number
           dia_nombre?: string
           dia_numero?: number
           estado_solicitud?: string | null
+          fecha_aprobacion?: string | null
           fecha_modificacion?: string | null
           fecha_registro?: string | null
           hora_fin?: string
@@ -444,7 +720,9 @@ export type Database = {
           id?: string
           id_publicador?: string | null
           justificacion?: string | null
+          justificacion_aprobacion?: string | null
           observaciones?: string | null
+          situacion_identificada?: string | null
           usuario_modifica?: string | null
           usuario_registra?: string | null
         }
@@ -458,6 +736,69 @@ export type Database = {
           },
           {
             foreignKeyName: "turnos_id_publicador_fkey"
+            columns: ["id_publicador"]
+            isOneToOne: false
+            referencedRelation: "publicadores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      turnos_entregados: {
+        Row: {
+          codigo_punto: number
+          dia_nombre: string
+          dia_numero: number
+          fecha_modificacion: string | null
+          fecha_registro: string | null
+          hora_fin: string
+          hora_inicio: string
+          id: string
+          id_publicador: string | null
+          motivo: string
+          observaciones: string | null
+          usuario_modifica: string | null
+          usuario_registra: string | null
+        }
+        Insert: {
+          codigo_punto: number
+          dia_nombre: string
+          dia_numero: number
+          fecha_modificacion?: string | null
+          fecha_registro?: string | null
+          hora_fin: string
+          hora_inicio: string
+          id?: string
+          id_publicador?: string | null
+          motivo: string
+          observaciones?: string | null
+          usuario_modifica?: string | null
+          usuario_registra?: string | null
+        }
+        Update: {
+          codigo_punto?: number
+          dia_nombre?: string
+          dia_numero?: number
+          fecha_modificacion?: string | null
+          fecha_registro?: string | null
+          hora_fin?: string
+          hora_inicio?: string
+          id?: string
+          id_publicador?: string | null
+          motivo?: string
+          observaciones?: string | null
+          usuario_modifica?: string | null
+          usuario_registra?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "turnos_entregados_codigo_punto_fkey"
+            columns: ["codigo_punto"]
+            isOneToOne: false
+            referencedRelation: "puntos"
+            referencedColumns: ["codigo_punto"]
+          },
+          {
+            foreignKeyName: "turnos_entregados_id_publicador_fkey"
             columns: ["id_publicador"]
             isOneToOne: false
             referencedRelation: "publicadores"

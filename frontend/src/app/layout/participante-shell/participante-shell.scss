@@ -1,0 +1,13 @@
+:host {
+  display: block;
+}
+
+/* Nada aquí toca el layout hasta los 599px: el <main> es un bloque normal, sin
+   scroll ni padding propios, así que el desktop queda exactamente como antes de
+   este shell (sigue siendo la página scrolleando el documento, como siempre). */
+@media (max-width: 599px) {
+  .participante-shell__main {
+    display: block;
+    padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+  }
+}

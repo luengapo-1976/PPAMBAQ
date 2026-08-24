@@ -138,8 +138,15 @@ export class Solicitudes {
   protected readonly displayedRows = signal<Publicador[]>([]);
 
   /** Ancho actual de la barra de acciones; los paneles abiertos desde ella se
-   * insertan a su izquierda usando este mismo valor como rightOffset. */
-  protected readonly accionesBarWidth = computed(() => (this.accionesBarCollapsed() ? '72px' : '360px'));
+   * insertan a su izquierda usando este mismo valor como rightOffset. Sin
+   * selección la barra se oculta por completo (ver acciones-bar.scss), así que
+   * tampoco debe reservarse espacio para ella. */
+  protected readonly accionesBarWidth = computed(() => {
+    if (this.selectedIds().size === 0) {
+      return '0px';
+    }
+    return this.accionesBarCollapsed() ? '72px' : '360px';
+  });
 
   constructor() {
     this.loadPublicadores();

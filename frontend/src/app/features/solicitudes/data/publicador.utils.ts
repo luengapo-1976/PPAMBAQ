@@ -34,6 +34,19 @@ export function formatDateShort(dateStr: string | null | undefined): string {
   return `${yyyy}-${mm}-${dd}`;
 }
 
+/** <input type="date"> solo acepta el valor EXACTO 'YYYY-MM-DD': si la API devuelve
+ * una fecha con hora/zona (ej. columna timestamp en vez de date), el input la
+ * ignora en silencio y queda vacío, sin ningún error visible. Se toma el prefijo
+ * de fecha tal cual (sin pasar por Date/getters locales) para no correr el día por
+ * zona horaria. */
+export function toDateInputValue(value: string | null | undefined): string {
+  if (!value) {
+    return '';
+  }
+  const match = /^(\d{4}-\d{2}-\d{2})/.exec(value);
+  return match ? match[1] : '';
+}
+
 export function toTitleCase(value: string): string {
   return value
     .toLowerCase()

@@ -1,0 +1,25 @@
+<div class="si-no-toggle">
+  <span class="si-no-toggle__label">{{ label() }}</span>
+  <div class="si-no-toggle__group" role="radiogroup" [attr.aria-label]="label()">
+    <button
+      type="button"
+      class="si-no-chip"
+      role="radio"
+      [attr.aria-checked]="value() === 'SI'"
+      [class.si-no-chip--active]="value() === 'SI'"
+      (click)="onSelect('SI')"
+    >
+      Sí
+    </button>
+    <button
+      type="button"
+      class="si-no-chip"
+      role="radio"
+      [attr.aria-checked]="value() === 'NO'"
+      [class.si-no-chip--active]="value() === 'NO'"
+      (click)="onSelect('NO')"
+    >
+      No
+    </button>
+  </div>
+</div>

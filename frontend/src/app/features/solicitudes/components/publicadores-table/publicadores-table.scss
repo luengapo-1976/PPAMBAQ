@@ -205,3 +205,101 @@
   cursor: pointer;
   accent-color: var(--ppam-primary-container);
 }
+
+.table-cards {
+  display: none;
+  flex-direction: column;
+  gap: var(--ppam-space-sm);
+}
+
+.table-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ppam-space-xs);
+  border: 1px solid var(--ppam-border-quiet);
+  border-radius: var(--ppam-radius-card);
+  background: var(--ppam-surface-container-lowest);
+  overflow: hidden;
+}
+
+.table-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--ppam-space-sm) var(--ppam-space-md);
+  border-bottom: 1px solid var(--ppam-border-quiet);
+}
+
+.table-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ppam-space-xs);
+  width: 100%;
+  padding: var(--ppam-space-md);
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.table-card__body:hover,
+.table-card__body:focus-visible {
+  background: var(--ppam-surface-container);
+  outline: none;
+}
+
+.table-card__name {
+  font-weight: 600;
+  color: var(--ppam-on-surface);
+}
+
+.table-card__row {
+  display: flex;
+  align-items: center;
+  gap: var(--ppam-space-sm);
+  color: var(--ppam-on-surface);
+  font-size: var(--ppam-small-size);
+}
+
+.table-card__row .material-symbols-outlined {
+  font-size: 18px;
+  color: var(--ppam-on-surface-variant);
+  flex-shrink: 0;
+}
+
+.table-card__row--muted {
+  color: var(--ppam-on-surface-variant);
+}
+
+/* En móvil la tabla de 13 columnas (aun con scroll horizontal) es impráctica de
+ * leer y tocar; se reemplaza por tarjetas apiladas. Va al final del archivo a
+ * propósito: con igual especificidad, la regla que aparece después en el código
+ * gana la cascada, sin importar el media query. */
+@media (max-width: 599px) {
+  .table-view--wide {
+    display: none;
+  }
+
+  .table-cards {
+    display: flex;
+  }
+}
+
+/* El label "¿Existe registro en BD anterior'?" + el select no caben en una
+ * pantalla angosta con "white-space: nowrap" (fuerza al select a mantener su
+ * min-width aunque no haya espacio). En móvil se apilan y el select toma el
+ * ancho completo. Al final a propósito, mismo motivo que los overrides de arriba. */
+@media (max-width: 599px) {
+  .table-toolbar__filter {
+    flex-direction: column;
+    align-items: stretch;
+    white-space: normal;
+    width: 100%;
+  }
+
+  .table-toolbar__filter app-select {
+    min-width: 0;
+    width: 100%;
+  }
+}

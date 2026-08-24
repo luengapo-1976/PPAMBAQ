@@ -1,17 +1,18 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 import { catchError, of } from 'rxjs';
 import { SearchSelect, SearchSelectOption } from '../../shared/ui/search-select/search-select';
 import { Dialog } from '../../shared/ui/dialog/dialog';
 import { Button } from '../../shared/ui/button/button';
 import { SnackbarService } from '../../shared/ui/snackbar/snackbar.service';
 import { ApiError } from '../../core/error.interceptor';
+import { AuthService } from '../../core/auth.service';
 import { LookupsService } from '../solicitudes/data/lookups.service';
 import { Punto } from '../configuracion/data/models';
 import { formatHoraAmPm } from '../../shared/utils/format.util';
 import { TurnosService } from './data/turnos.service';
 import { MiTurnoResumen, SolicitarTurnoOutcome, SolicitarTurnoResultado, TurnoResumen } from './data/models';
+import { ParticipanteDesktopHeader } from '../../layout/participante-desktop-header/participante-desktop-header';
 
 type DialogState = 'closed' | 'advertencia' | 'justificacion' | 'resultado';
 
@@ -56,7 +57,7 @@ function escapeRegExp(value: string): string {
 
 @Component({
   selector: 'app-solicitar-turno',
-  imports: [FormsModule, RouterLink, SearchSelect, Dialog, Button],
+  imports: [FormsModule, SearchSelect, Dialog, Button, ParticipanteDesktopHeader],
   templateUrl: './solicitar-turno.html',
   styleUrl: './solicitar-turno.scss',
 })
@@ -64,8 +65,13 @@ export class SolicitarTurno {
   private readonly lookupsService = inject(LookupsService);
   private readonly turnosService = inject(TurnosService);
   private readonly snackbar = inject(SnackbarService);
+  private readonly authService = inject(AuthService);
 
   protected readonly formatHora = formatHoraAmPm;
+
+  protected readonly primerNombre = computed(
+    () => this.authService.currentSession()?.publicador?.primer_nombre?.trim() || 'Publicador',
+  );
 
   protected readonly puntos = signal<Punto[]>([]);
   protected readonly loadingPuntos = signal(true);

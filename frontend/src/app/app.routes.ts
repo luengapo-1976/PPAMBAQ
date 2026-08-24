@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { Shell } from './layout/shell/shell';
+import { ParticipanteShell } from './layout/participante-shell/participante-shell';
 import { authGuard, guestGuard, usuarioAreaGuard } from './core/auth.guard';
 
 export const routes: Routes = [
@@ -10,71 +11,68 @@ export const routes: Routes = [
     canActivate: [guestGuard],
   },
   {
-    path: 'inicio',
-    loadComponent: () => import('./features/inicio/inicio').then((m) => m.Inicio),
-    title: 'Inicio · PPAM BAQ',
+    path: '',
+    component: ParticipanteShell,
     canActivate: [authGuard],
-  },
-  {
-    path: 'solicitar-turno',
-    loadComponent: () => import('./features/solicitar-turno/solicitar-turno').then((m) => m.SolicitarTurno),
-    title: 'Solicitar turno · PPAM BAQ',
-    canActivate: [authGuard],
-  },
-  {
-    path: 'devolver-turno',
-    loadComponent: () => import('./features/proximamente/proximamente').then((m) => m.Proximamente),
-    title: 'Devolver turno · PPAM BAQ',
-    data: {
-      title: 'Devolver turno',
-      icon: 'assignment_return',
-      description: 'Muy pronto podrás notificar la devolución de un turno ya asignado desde aquí.',
-    },
-    canActivate: [authGuard],
-  },
-  {
-    path: 'reportar-actividad',
-    loadComponent: () => import('./features/proximamente/proximamente').then((m) => m.Proximamente),
-    title: 'Reportar actividad del turno · PPAM BAQ',
-    data: {
-      title: 'Reportar actividad del turno',
-      icon: 'fact_check',
-      description: 'Muy pronto podrás registrar lo realizado durante tu turno de servicio desde aquí.',
-    },
-    canActivate: [authGuard],
-  },
-  {
-    path: 'actualizar-datos',
-    loadComponent: () => import('./features/proximamente/proximamente').then((m) => m.Proximamente),
-    title: 'Actualizar datos · PPAM BAQ',
-    data: {
-      title: 'Actualizar datos',
-      icon: 'manage_accounts',
-      description: 'Muy pronto podrás revisar y actualizar tu información personal desde aquí.',
-    },
-    canActivate: [authGuard],
-  },
-  {
-    path: 'mis-turnos',
-    loadComponent: () => import('./features/proximamente/proximamente').then((m) => m.Proximamente),
-    title: 'Consultar turnos actuales · PPAM BAQ',
-    data: {
-      title: 'Consultar turnos actuales',
-      icon: 'calendar_month',
-      description: 'Muy pronto podrás consultar tus próximos turnos programados desde aquí.',
-    },
-    canActivate: [authGuard],
-  },
-  {
-    path: 'solicitar-baja',
-    loadComponent: () => import('./features/proximamente/proximamente').then((m) => m.Proximamente),
-    title: 'Solicitar la baja · PPAM BAQ',
-    data: {
-      title: 'Solicitar la baja',
-      icon: 'person_remove',
-      description: 'Muy pronto podrás solicitar tu baja del programa de servicio desde aquí.',
-    },
-    canActivate: [authGuard],
+    children: [
+      {
+        path: 'inicio',
+        loadComponent: () => import('./features/inicio/inicio').then((m) => m.Inicio),
+        title: 'Inicio · PPAM BAQ',
+        data: { title: 'Inicio' },
+      },
+      {
+        path: 'solicitar-turno',
+        loadComponent: () => import('./features/solicitar-turno/solicitar-turno').then((m) => m.SolicitarTurno),
+        title: 'Solicitar turno · PPAM BAQ',
+        data: { title: 'Solicitar turno' },
+      },
+      {
+        path: 'devolver-turno',
+        loadComponent: () => import('./features/devolver-turno/devolver-turno').then((m) => m.DevolverTurno),
+        title: 'Devolver turno · PPAM BAQ',
+        data: { title: 'Devolver turno' },
+      },
+      {
+        path: 'reportar-actividad',
+        loadComponent: () =>
+          import('./features/reportar-actividad/reportar-actividad').then((m) => m.ReportarActividad),
+        title: 'Reportar actividad del turno · PPAM BAQ',
+        data: { title: 'Reportar actividad del turno' },
+      },
+      {
+        path: 'actualizar-datos',
+        loadComponent: () => import('./features/actualizar-datos/actualizar-datos').then((m) => m.ActualizarDatos),
+        title: 'Actualizar datos · PPAM BAQ',
+        data: { title: 'Actualizar datos' },
+      },
+      {
+        path: 'noticias/:id',
+        loadComponent: () => import('./features/noticia-detalle/noticia-detalle').then((m) => m.NoticiaDetalle),
+        title: 'Noticia · PPAM BAQ',
+        data: { title: 'Noticia' },
+      },
+      {
+        path: 'mis-turnos',
+        loadComponent: () => import('./features/proximamente/proximamente').then((m) => m.Proximamente),
+        title: 'Consultar turnos actuales · PPAM BAQ',
+        data: {
+          title: 'Consultar turnos actuales',
+          icon: 'calendar_month',
+          description: 'Muy pronto podrás consultar tus próximos turnos programados desde aquí.',
+        },
+      },
+      {
+        path: 'solicitar-baja',
+        loadComponent: () => import('./features/proximamente/proximamente').then((m) => m.Proximamente),
+        title: 'Solicitar la baja · PPAM BAQ',
+        data: {
+          title: 'Solicitar la baja',
+          icon: 'person_remove',
+          description: 'Muy pronto podrás solicitar tu baja del programa de servicio desde aquí.',
+        },
+      },
+    ],
   },
   {
     path: '',
@@ -100,6 +98,19 @@ export const routes: Routes = [
           import('./features/confirmar-asistencia/confirmar-asistencia').then((m) => m.ConfirmarAsistencia),
         title: 'Confirmar asistencia · PPAM BAQ',
         data: { title: 'Confirmar asistencia' },
+      },
+      {
+        path: 'casos-por-validar',
+        loadComponent: () =>
+          import('./features/casos-por-validar/casos-por-validar').then((m) => m.CasosPorValidar),
+        title: 'Casos por validar · PPAM BAQ',
+        data: { title: 'Casos por validar' },
+      },
+      {
+        path: 'gestion-noticias',
+        loadComponent: () => import('./features/gestion-noticias/gestion-noticias').then((m) => m.GestionNoticias),
+        title: 'Noticias · PPAM BAQ',
+        data: { title: 'Noticias' },
       },
       {
         path: 'configuracion/circuitos',

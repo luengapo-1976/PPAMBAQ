@@ -1,0 +1,76 @@
+<header class="pdh">
+  <div class="pdh__identity">
+    <a class="pdh__brand" routerLink="/inicio">
+      <img class="pdh__logo" src="images/LOGO.png" alt="" />
+      <span class="pdh__brand-text">PPAM BAQ</span>
+    </a>
+
+    <div class="pdh__end">
+      @if (showRoleSwitch()) {
+        <app-role-switch [active]="vistaActiva()" (changed)="onSwitchVista($event)" />
+      }
+      <div class="pdh__account">
+        <button
+          type="button"
+          class="pdh__avatar-trigger"
+          [attr.aria-expanded]="menuOpen()"
+          aria-haspopup="menu"
+          aria-label="Abrir menú de cuenta"
+          (click)="toggleMenu()"
+        >
+          <app-avatar [name]="nombre()" [size]="36" />
+        </button>
+
+        @if (menuOpen()) {
+          <ul class="pdh__menu" role="menu">
+            <li role="none">
+              <button type="button" role="menuitem" class="pdh__menu-item" (click)="onChangePassword()">
+                <span class="material-symbols-outlined" aria-hidden="true">lock_reset</span>
+                <span>Cambiar contraseña</span>
+              </button>
+            </li>
+            <li role="none">
+              <button type="button" role="menuitem" class="pdh__menu-item" (click)="onLogout()">
+                <span class="material-symbols-outlined" aria-hidden="true">logout</span>
+                <span>Cerrar sesión</span>
+              </button>
+            </li>
+          </ul>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="pdh__titlebar">
+    <!-- Espejo invisible de la navegación, mismo ancho exacto que la real (mismas
+         clases/contenido): permite que el título quede centrado de verdad respecto
+         a toda la barra sin importar cuánto ocupe la navegación, sin recurrir a un
+         ancho fijo a mano. No interactivo ni accesible a propósito (aria-hidden),
+         los controles reales están del lado derecho. -->
+    <div class="pdh__nav pdh__nav--ghost" aria-hidden="true">
+      @for (item of navItems; track item.id) {
+        <span class="pdh__nav-item">
+          <span class="material-symbols-outlined pdh__nav-icon">{{ item.icon }}</span>
+          <span class="pdh__nav-label">{{ item.label }}</span>
+        </span>
+      }
+    </div>
+
+    @if (title) {
+      <h1 class="pdh__title">{{ title }}</h1>
+    }
+
+    <nav class="pdh__nav" aria-label="Navegación principal">
+      @for (item of navItems; track item.id) {
+        <a class="pdh__nav-item" [routerLink]="item.route" routerLinkActive="pdh__nav-item--active" #rla="routerLinkActive">
+          <span class="material-symbols-outlined pdh__nav-icon" [class.pdh__nav-icon--active]="rla.isActive" aria-hidden="true">
+            {{ item.icon }}
+          </span>
+          <span class="pdh__nav-label">{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+  </div>
+</header>
+
+<app-change-password-dialog [open]="changePasswordOpen()" (closed)="changePasswordOpen.set(false)" />

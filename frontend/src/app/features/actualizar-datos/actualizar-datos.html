@@ -1,0 +1,233 @@
+<app-participante-desktop-header />
+
+<div class="actualizar-datos">
+
+  @if (loading()) {
+    <div class="actualizar-datos__skeleton">
+      @for (i of [1, 2, 3, 4]; track i) {
+        <div class="skeleton-block"></div>
+      }
+    </div>
+  } @else {
+    <p class="actualizar-datos__legend">
+      {{ primerNombre() }}, a continuación se presentan tus datos registrados. Por favor revísalos y cambia solo
+      aquellos que requieren ser actualizados. Al final da clic en el botón "Guardar" que encontrarás al final de
+      la página.
+    </p>
+
+    <form class="form-grid" [formGroup]="form" (ngSubmit)="onGuardar()">
+      <app-form-field label="Primer apellido" [control]="form.controls.primer_apellido">
+        <input
+          type="text"
+          formControlName="primer_apellido"
+          class="ppam-input"
+          maxlength="20"
+          (blur)="onBlurCapitalize('primer_apellido')"
+        />
+      </app-form-field>
+
+      <app-form-field label="Segundo apellido" [control]="form.controls.segundo_apellido">
+        <input
+          type="text"
+          formControlName="segundo_apellido"
+          class="ppam-input"
+          maxlength="20"
+          (blur)="onBlurCapitalize('segundo_apellido')"
+        />
+      </app-form-field>
+
+      <app-form-field label="Primer nombre" [control]="form.controls.primer_nombre">
+        <input
+          type="text"
+          formControlName="primer_nombre"
+          class="ppam-input"
+          maxlength="20"
+          (blur)="onBlurCapitalize('primer_nombre')"
+        />
+      </app-form-field>
+
+      <app-form-field label="Segundo nombre" [control]="form.controls.segundo_nombre">
+        <input
+          type="text"
+          formControlName="segundo_nombre"
+          class="ppam-input"
+          maxlength="20"
+          (blur)="onBlurCapitalize('segundo_nombre')"
+        />
+      </app-form-field>
+
+      <app-form-field label="Dirección" [control]="form.controls.direccion" class="form-field--wide">
+        <input
+          type="text"
+          formControlName="direccion"
+          class="ppam-input"
+          maxlength="100"
+          (blur)="onBlurCapitalize('direccion')"
+        />
+      </app-form-field>
+
+      <app-form-field label="Departamento" [control]="form.controls.codigo_departamento">
+        <app-search-select
+          formControlName="codigo_departamento"
+          [options]="departamentoOptions()"
+          placeholder="Buscar departamento…"
+        />
+      </app-form-field>
+
+      <app-form-field label="Ciudad / municipio" [control]="form.controls.codigo_municipio">
+        <app-search-select
+          formControlName="codigo_municipio"
+          [options]="municipioOptions()"
+          placeholder="Buscar municipio…"
+        />
+      </app-form-field>
+
+      <app-form-field label="Correo electrónico" [control]="form.controls.correo_electronico">
+        <input type="email" formControlName="correo_electronico" class="ppam-input" maxlength="100" />
+      </app-form-field>
+
+      <app-form-field label="Móvil" [control]="form.controls.movil">
+        <input type="tel" formControlName="movil" class="ppam-input" maxlength="10" inputmode="numeric" />
+      </app-form-field>
+
+      <app-form-field label="Congregación" [control]="form.controls.codigo_congregacion">
+        <app-search-select
+          formControlName="codigo_congregacion"
+          [options]="congregacionOptions()"
+          placeholder="Buscar congregación…"
+        />
+      </app-form-field>
+
+      <app-form-field label="Circuito">
+        <div class="ppam-input ppam-input--readonly">{{ circuitoDisplay() }}</div>
+      </app-form-field>
+
+      <app-form-field label="Fecha de nacimiento" [control]="form.controls.fecha_nacimiento">
+        <input type="date" formControlName="fecha_nacimiento" class="ppam-input" />
+      </app-form-field>
+
+      <app-form-field label="Edad">
+        <div class="ppam-input ppam-input--readonly">{{ edadDisplay() ?? '—' }}</div>
+      </app-form-field>
+
+      <app-form-field label="Sexo" [control]="form.controls.sexo">
+        <app-select formControlName="sexo" [options]="sexoOptions" placeholder="Seleccionar sexo…" />
+      </app-form-field>
+
+      <app-form-field label="Fecha de bautismo" [control]="form.controls.fecha_bautismo">
+        <input type="date" formControlName="fecha_bautismo" class="ppam-input" />
+      </app-form-field>
+
+      <app-form-field label="Años de bautismo">
+        <div class="ppam-input ppam-input--readonly">{{ aniosBautismoDisplay() ?? '—' }}</div>
+      </app-form-field>
+
+      <app-form-field label="Estado civil" [control]="form.controls.estado_civil">
+        <app-select formControlName="estado_civil" [options]="estadoCivilOptions" placeholder="Seleccionar…" />
+      </app-form-field>
+
+      @if (showNombreConyuge()) {
+        <app-form-field label="Nombre del cónyuge" [control]="form.controls.nombre_conyuge" class="form-field--wide">
+          <input
+            type="text"
+            formControlName="nombre_conyuge"
+            class="ppam-input"
+            maxlength="100"
+            (blur)="onBlurCapitalize('nombre_conyuge')"
+          />
+        </app-form-field>
+
+        <app-form-field label="Apellido de casada" [control]="form.controls.apellido_casada">
+          <input
+            type="text"
+            formControlName="apellido_casada"
+            class="ppam-input"
+            maxlength="20"
+            (blur)="onBlurCapitalize('apellido_casada')"
+          />
+        </app-form-field>
+      }
+
+      <app-form-field label="Privilegio ministerial" [control]="form.controls.privilegio_min">
+        <app-select formControlName="privilegio_min" [options]="privilegioMinOptions" placeholder="Seleccionar…" />
+      </app-form-field>
+
+      <app-form-field label="Privilegio de servicio" [control]="form.controls.privilegio_ser">
+        <app-select formControlName="privilegio_ser" [options]="privilegioSerOptions" placeholder="Seleccionar…" />
+      </app-form-field>
+
+      <app-form-field label="¿Participó antes?" [control]="form.controls.participo_antes">
+        <app-select formControlName="participo_antes" [options]="participoAntesOptions" placeholder="Seleccionar…" />
+      </app-form-field>
+    </form>
+
+    <div class="actualizar-datos__actions">
+      <app-button type="button" variant="danger" icon="person_remove" (click)="onAbrirBaja()">
+        Solicitar mi baja de la PPAM
+      </app-button>
+      <app-button type="button" icon="save" [disabled]="form.invalid || saving()" (click)="onGuardar()">
+        {{ saving() ? 'Guardando…' : 'Guardar' }}
+      </app-button>
+    </div>
+  }
+</div>
+
+<app-dialog [open]="resultadoAbierto()" title="Datos actualizados" (closed)="onCerrarResultado()">
+  <app-button dialogToolbar type="button" (click)="onCerrarResultado()">Entendido</app-button>
+
+  <div class="actualizar-datos__dialog-confirmacion">
+    <span class="material-symbols-outlined" aria-hidden="true">task_alt</span>
+  </div>
+  <p class="actualizar-datos__dialog-texto">{{ dialogMensaje() }}</p>
+</app-dialog>
+
+<app-dialog [open]="bajaPaso() !== 'cerrado'" [title]="bajaTitulo()" (closed)="onBajaDialogClosed()">
+  <app-button
+    dialogToolbar
+    type="button"
+    [variant]="bajaPrimaryVariant()"
+    [disabled]="bajaPrimaryDisabled()"
+    (click)="onBajaPrimaryAction()"
+  >
+    {{ bajaPrimaryLabel() }}
+  </app-button>
+  <app-button
+    dialogToolbar
+    type="button"
+    variant="secondary"
+    [style.display]="bajaMuestraCancelar() ? null : 'none'"
+    (click)="onCancelarBaja()"
+  >
+    Cancelar
+  </app-button>
+
+  @if (bajaPaso() === 'advertencia') {
+    <div class="actualizar-datos__baja-advertencia">
+      <span class="material-symbols-outlined" aria-hidden="true">warning</span>
+    </div>
+    <p class="actualizar-datos__dialog-texto">
+      {{ primerNombre() }}, es importante que tengas en cuenta que esta acción te retirará de la base de datos de
+      publicadores activos en la PPAM y liberará automáticamente todos los turnos que tengas asignados en este
+      momento. Es una acción irreversible y por eso te hacemos esta aclaración antes de continuar. Si llegaste a esta
+      opción por error, no pasa nada, solo devuélvete a la pantalla anterior o cierre esta ventana. Si deseas seguir
+      adelante, por favor da clic en el botón "Entiendo y deseo continuar".
+    </p>
+  } @else if (bajaPaso() === 'justificacion') {
+    <label class="actualizar-datos__baja-field">
+      <span>Justificación</span>
+      <textarea
+        class="ppam-textarea"
+        rows="4"
+        maxlength="1000"
+        placeholder="Cuéntanos brevemente el motivo de tu baja…"
+        [ngModel]="bajaJustificacion()"
+        (ngModelChange)="bajaJustificacion.set($event)"
+      ></textarea>
+    </label>
+  } @else if (bajaPaso() === 'confirmacion') {
+    <div class="actualizar-datos__dialog-confirmacion">
+      <span class="material-symbols-outlined" aria-hidden="true">volunteer_activism</span>
+    </div>
+    <p class="actualizar-datos__dialog-texto">{{ bajaMensaje() }}</p>
+  }
+</app-dialog>

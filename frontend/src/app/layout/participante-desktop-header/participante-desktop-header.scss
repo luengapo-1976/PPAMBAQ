@@ -1,0 +1,251 @@
+/* Cabecera SOLO para tablet/desktop — lo opuesto a ParticipanteNavbar (que es
+   solo móvil). No debe tocar nada por debajo de 600px, donde sigue mandando
+   ParticipanteNavbar sin cambios. */
+:host {
+  display: none;
+}
+
+@media (min-width: 600px) {
+  :host {
+    display: block;
+    /* Fija ambas filas (identidad + título) siempre visibles al hacer scroll,
+       igual que ParticipanteNavbar en móvil. */
+    position: sticky;
+    top: 0;
+    z-index: 30;
+  }
+}
+
+.pdh {
+  display: flex;
+  flex-direction: column;
+  background: var(--ppam-surface-container-lowest);
+  border-bottom: 1px solid var(--ppam-border-quiet);
+}
+
+/* Fila 1 — identidad: logo + cambio de vista + cuenta. Nunca compite por espacio
+   con el título ni la navegación (viven en la fila 2), así que siempre cabe en
+   una sola línea sin importar el ancho. */
+.pdh__identity {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ppam-space-sm);
+  min-height: 56px;
+  padding-inline: var(--ppam-space-lg);
+  box-sizing: border-box;
+}
+
+.pdh__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--ppam-space-sm);
+  min-width: 0;
+  text-decoration: none;
+}
+
+.pdh__logo {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.pdh__brand-text {
+  font-size: var(--ppam-card-title-size);
+  font-weight: 700;
+  color: var(--ppam-primary);
+  white-space: nowrap;
+}
+
+.pdh__end {
+  display: flex;
+  align-items: center;
+  gap: var(--ppam-space-sm);
+  flex-shrink: 0;
+}
+
+.pdh__account {
+  position: relative;
+}
+
+.pdh__avatar-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: var(--ppam-radius-full);
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  transition: box-shadow var(--ppam-motion-fast);
+}
+
+.pdh__avatar-trigger:hover,
+.pdh__avatar-trigger[aria-expanded='true'] {
+  box-shadow: 0 0 0 2px var(--ppam-primary-container);
+}
+
+.pdh__menu {
+  position: absolute;
+  top: calc(100% + var(--ppam-space-sm));
+  right: 0;
+  min-width: 220px;
+  margin: 0;
+  padding: var(--ppam-space-sm);
+  list-style: none;
+  background: var(--ppam-surface-container-lowest);
+  border-radius: var(--ppam-radius-card);
+  box-shadow: var(--ppam-elevation-2);
+  z-index: 10;
+}
+
+.pdh__menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--ppam-space-sm);
+  width: 100%;
+  min-height: var(--ppam-touch-target-min);
+  padding-inline: var(--ppam-space-sm);
+  border: 0;
+  border-radius: var(--ppam-radius-control);
+  background: transparent;
+  color: var(--ppam-on-surface);
+  font-family: inherit;
+  font-size: var(--ppam-body-size);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--ppam-motion-fast);
+}
+
+.pdh__menu-item:hover {
+  background: var(--ppam-surface-container);
+}
+
+/* Fila 2 — título + navegación entre las 5 pantallas de participante. Mismo azul
+   de fondo que la barra de título en móvil (ppam-navbar__titlebar), con texto e
+   íconos en blanco para el mismo contraste ya validado ahí. */
+.pdh__titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  row-gap: 2px;
+  gap: var(--ppam-space-md);
+  min-height: 48px;
+  padding-inline: var(--ppam-space-lg);
+  padding-block: var(--ppam-space-xs);
+  background: var(--ppam-primary-container);
+  box-sizing: border-box;
+}
+
+.pdh__title {
+  min-width: 0;
+  margin: 0;
+  font-size: var(--ppam-h3-size);
+  font-weight: var(--ppam-h3-weight);
+  line-height: var(--ppam-h3-line);
+  color: var(--ppam-on-primary);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: var(--ppam-label-tracking);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 1;
+}
+
+.pdh__nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+/* Espejo invisible de la navegación real (mismo markup/clases, así que siempre
+   mide exactamente lo mismo): con justify-content:space-between entre 3
+   elementos [espejo, título, navegación] de ancho espejo=navegación iguales, el
+   título queda matemáticamente centrado en toda la barra sin usar un ancho fijo
+   a mano. Solo se activa en pantallas lo bastante anchas como para que quepan
+   los DOS anchos completos de la navegación más el título (ver media query más
+   abajo) — en pantallas más angostas se oculta y el título simplemente queda
+   alineado a la izquierda, que es el layout que ya cabe siempre. */
+.pdh__nav--ghost {
+  display: none;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.pdh__nav-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding-inline: var(--ppam-space-sm);
+  border-radius: var(--ppam-radius-control);
+  color: var(--ppam-on-primary);
+  text-decoration: none;
+  font-size: var(--ppam-small-size);
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background var(--ppam-motion-fast);
+}
+
+.pdh__nav-item:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.pdh__nav-icon {
+  font-size: 20px;
+  color: currentColor;
+  transition: color 150ms ease;
+}
+
+/* Estado activo: mismo ícono pero relleno (FILL 1) además del fondo — el estado
+   nunca se comunica solo con color, la forma del ícono también cambia. Mismo
+   criterio que ya usa el tab bar móvil (ParticipanteTabbar). */
+.pdh__nav-icon--active {
+  font-variation-settings:
+    'FILL' 1,
+    'wght' 500,
+    'GRAD' 0,
+    'opsz' 20;
+}
+
+.pdh__nav-item--active {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+@media (min-width: 1024px) {
+  .pdh__identity,
+  .pdh__titlebar {
+    padding-inline: var(--ppam-space-xl);
+  }
+
+  .pdh__logo {
+    width: 36px;
+    height: 36px;
+  }
+
+  .pdh__nav-item {
+    padding-inline: var(--ppam-space-md);
+  }
+}
+
+/* Solo en pantallas anchas de verdad hay espacio para el espejo + la navegación
+   real + el título más largo ("Reportar actividad del turno") sin que nada se
+   apriete: dos veces el ancho de 5 ítems con ícono+texto (~600px cada uno) más
+   el título ronda 1550-1600px de contenido, así que 1440px se queda corto (se
+   probó y a ese ancho justo se rompe: envuelve y el título termina solapado con
+   la navegación). Por debajo de este punto el título se queda alineado a la
+   izquierda en vez de forzar un centrado que no cabe — layout que ya funciona
+   bien en cualquier ancho. */
+@media (min-width: 1680px) {
+  .pdh__nav--ghost {
+    display: flex;
+  }
+
+  .pdh__title {
+    flex-shrink: 0;
+  }
+}

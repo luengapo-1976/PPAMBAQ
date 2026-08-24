@@ -1,0 +1,17 @@
+<div class="gestion-noticias-page">
+  <div class="gestion-noticias-page__toolbar">
+    <app-button icon="add" (click)="onNewRecord()">Nueva noticia</app-button>
+  </div>
+
+  <section class="gestion-noticias-page__grid">
+    <app-noticias-table [rows]="noticias()" (editRecord)="onEditRecord($event)" />
+  </section>
+</div>
+
+<app-noticia-form
+  [open]="dialogOpen()"
+  [mode]="dialogMode()"
+  [record]="editingRecord()"
+  (closed)="onDialogClosed()"
+  (saved)="onSaved()"
+/>

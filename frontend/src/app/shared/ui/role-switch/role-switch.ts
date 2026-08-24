@@ -9,6 +9,9 @@ export type RoleSwitchValue = 'usuario' | 'participante';
 })
 export class RoleSwitch {
   readonly active = input.required<RoleSwitchValue>();
+  /** Fuerza el modo solo-ícono (sin esperar a que el viewport sea angosto) — para
+   * usarlo dentro de contenedores con poco espacio propio, como la navbar móvil. */
+  readonly compact = input(false);
   readonly changed = output<RoleSwitchValue>();
 
   protected onToggle(): void {

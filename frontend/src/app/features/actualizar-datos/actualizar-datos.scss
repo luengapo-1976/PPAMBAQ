@@ -1,0 +1,181 @@
+:host {
+  display: block;
+}
+
+.actualizar-datos {
+  min-height: 100dvh;
+  background: var(--ppam-surface);
+  padding: var(--ppam-space-md);
+  padding-bottom: var(--ppam-space-2xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ppam-space-xl);
+  box-sizing: border-box;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.actualizar-datos__legend {
+  margin: 0;
+  color: var(--ppam-on-surface-variant);
+}
+
+.actualizar-datos__skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ppam-space-sm);
+}
+
+.skeleton-block {
+  height: 60px;
+  border-radius: var(--ppam-radius-card);
+  background: linear-gradient(
+    100deg,
+    var(--ppam-surface-container) 30%,
+    var(--ppam-surface-container-high) 50%,
+    var(--ppam-surface-container) 70%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  align-items: start;
+  gap: var(--ppam-space-md) var(--ppam-space-lg);
+}
+
+::ng-deep .form-field--wide {
+  grid-column: 1 / -1;
+}
+
+.ppam-input {
+  width: 100%;
+  height: 44px;
+  padding-inline: var(--ppam-space-sm);
+  border-radius: var(--ppam-radius-control);
+  border: 1px solid var(--ppam-border-quiet);
+  background: var(--ppam-surface-container-lowest);
+  color: var(--ppam-on-surface);
+  font-family: inherit;
+  font-size: var(--ppam-body-size);
+  box-sizing: border-box;
+}
+
+.ppam-input:focus-visible {
+  outline: 2px solid var(--ppam-primary-container);
+  outline-offset: 1px;
+  border-color: var(--ppam-primary-container);
+}
+
+.ppam-input--readonly {
+  display: flex;
+  align-items: center;
+  background: var(--ppam-surface-container);
+  color: var(--ppam-on-surface-variant);
+}
+
+.actualizar-datos__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--ppam-space-sm);
+  flex-wrap: wrap;
+}
+
+.actualizar-datos__dialog-confirmacion {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--ppam-space-md);
+}
+
+.actualizar-datos__dialog-confirmacion .material-symbols-outlined {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--ppam-primary-container) 16%, white);
+  color: var(--ppam-primary-container);
+  font-size: 28px;
+}
+
+.actualizar-datos__dialog-texto {
+  margin: 0;
+  color: var(--ppam-on-surface);
+}
+
+.actualizar-datos__baja-advertencia {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--ppam-space-md);
+}
+
+.actualizar-datos__baja-advertencia .material-symbols-outlined {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--ppam-error) 14%, white);
+  color: var(--ppam-error);
+  font-size: 34px;
+}
+
+.actualizar-datos__baja-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: var(--ppam-small-size);
+  font-weight: 600;
+  color: var(--ppam-on-surface-variant);
+}
+
+.ppam-textarea {
+  width: 100%;
+  padding: var(--ppam-space-sm);
+  border-radius: var(--ppam-radius-control);
+  border: 1px solid var(--ppam-border-quiet);
+  background: var(--ppam-surface-container-lowest);
+  color: var(--ppam-on-surface);
+  font-family: inherit;
+  font-size: var(--ppam-body-size);
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+.ppam-textarea:focus-visible {
+  outline: 2px solid var(--ppam-primary-container);
+  outline-offset: 1px;
+  border-color: var(--ppam-primary-container);
+}
+
+@media (min-width: 600px) {
+  .actualizar-datos {
+    padding: var(--ppam-space-lg);
+  }
+}
+
+@media (min-width: 1024px) {
+  .actualizar-datos {
+    padding: var(--ppam-space-xl);
+    max-width: 1100px;
+  }
+}
+
+@media (max-width: 599px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}

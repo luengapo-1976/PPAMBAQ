@@ -1,0 +1,101 @@
+<app-participante-desktop-header />
+
+<div class="devolver-turno">
+  <p class="devolver-turno__legend">
+    {{ primerNombre() }}, a continuación se presentan los turnos que tienes asignados actualmente. Da clic en el
+    botón "Devolver turno" del horario que quieres liberar.
+  </p>
+
+  @if (loading()) {
+    <div class="devolver-turno__grid">
+      @for (i of [1, 2, 3]; track i) {
+        <div class="skeleton-block"></div>
+      }
+    </div>
+  } @else if (misTurnos().length === 0) {
+    <div class="devolver-turno__empty">
+      <span class="material-symbols-outlined" aria-hidden="true">event_busy</span>
+      <p>No tienes turnos asignados actualmente.</p>
+    </div>
+  } @else {
+    <div class="devolver-turno__grid">
+      @for (turno of misTurnos(); track turno.id) {
+        <article class="turno-card">
+          <h2 class="turno-card__punto">{{ turno.nombrePunto }}</h2>
+          <div class="turno-card__row">
+            <span class="material-symbols-outlined" aria-hidden="true">calendar_today</span>
+            <span>{{ turno.diaNombre }}</span>
+          </div>
+          <div class="turno-card__row">
+            <span class="material-symbols-outlined" aria-hidden="true">schedule</span>
+            <span>{{ formatHora(turno.horaInicio) }} – {{ formatHora(turno.horaFin) }}</span>
+          </div>
+          <app-button type="button" (click)="onAbrirDevolucion(turno)">Devolver turno</app-button>
+        </article>
+      }
+    </div>
+  }
+</div>
+
+<app-dialog [open]="dialogState() !== 'closed'" [title]="dialogTitulo()" (closed)="onDialogClosed()">
+  <app-button dialogToolbar type="button" [disabled]="primaryDisabled()" (click)="onPrimaryAction()">
+    {{ primaryLabel() }}
+  </app-button>
+  <app-button
+    dialogToolbar
+    type="button"
+    variant="secondary"
+    [style.display]="dialogState() === 'form' ? null : 'none'"
+    (click)="onCancelarDialog()"
+  >
+    Cancelar
+  </app-button>
+
+  @if (dialogState() === 'form') {
+    @if (turnoSeleccionado(); as turno) {
+      <p class="devolver-turno__dialog-punto">
+        <strong>{{ turno.nombrePunto }}</strong> · {{ turno.diaNombre }} ·
+        {{ formatHora(turno.horaInicio) }} – {{ formatHora(turno.horaFin) }}
+      </p>
+    }
+
+    <label class="devolver-turno__field">
+      <span>Motivo de la devolución</span>
+      <app-select
+        [options]="motivoOptions"
+        placeholder="Selecciona un motivo"
+        [ngModel]="motivo()"
+        (ngModelChange)="onMotivoChange($event)"
+      />
+    </label>
+
+    @if (motivo() === 'Otro') {
+      <label class="devolver-turno__field">
+        <span>Especifica cuál</span>
+        <input
+          type="text"
+          class="ppam-input"
+          maxlength="200"
+          [ngModel]="motivoOtro()"
+          (ngModelChange)="motivoOtro.set($event)"
+        />
+      </label>
+    }
+
+    <label class="devolver-turno__field">
+      <span>Observaciones (opcional)</span>
+      <textarea
+        class="ppam-textarea"
+        rows="3"
+        maxlength="500"
+        [ngModel]="observaciones()"
+        (ngModelChange)="observaciones.set($event)"
+      ></textarea>
+    </label>
+  } @else {
+    <div class="devolver-turno__dialog-confirmacion">
+      <span class="material-symbols-outlined" aria-hidden="true">task_alt</span>
+    </div>
+    <p class="devolver-turno__dialog-texto">{{ dialogMensaje() }}</p>
+  }
+</app-dialog>

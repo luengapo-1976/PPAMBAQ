@@ -1,0 +1,140 @@
+/* Barra estilo iOS: SOLO existe en móvil. La única forma de que esto afecte
+   desktop sería si esta regla min-width se rompiera; todo lo demás en este
+   archivo queda automáticamente fuera del alcance en pantallas grandes porque
+   el :host completo desaparece. */
+:host {
+  display: block;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+
+@media (min-width: 600px) {
+  :host {
+    display: none;
+  }
+}
+
+/* Fila 1 — identidad: mismo rol que la cabecera que ya tenía "Inicio" en desktop,
+   con fondo propio para diferenciarse del fondo de la página. */
+.ppam-navbar__identity {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ppam-space-sm);
+  /* flex-wrap como red de seguridad: en el ancho angosto que sí probamos (375px)
+     todo cabe en una fila, pero si un dispositivo aún más angosto no alcanza, es
+     preferible que pase a una segunda línea a que se recorte o desborde. */
+  flex-wrap: wrap;
+  row-gap: var(--ppam-space-xs);
+  padding: calc(env(safe-area-inset-top, 0px) + 8px) var(--ppam-space-md) 8px;
+  background: var(--ppam-surface-container-lowest);
+  border-bottom: 1px solid var(--ppam-border-quiet);
+  backdrop-filter: blur(20px) saturate(1.6);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+}
+
+.ppam-navbar__brand {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  text-decoration: none;
+}
+
+.ppam-navbar__logo {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.ppam-navbar__brand-text {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ppam-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ppam-navbar__identity-end {
+  display: flex;
+  align-items: center;
+  gap: var(--ppam-space-xs);
+  flex-shrink: 0;
+}
+
+/* Fila 2 — título: fondo distinto tanto de la fila de identidad como del cuerpo
+   de la página, para que las tres franjas se lean como capas separadas. */
+.ppam-navbar__titlebar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 var(--ppam-space-md);
+  background: var(--ppam-primary-container);
+}
+
+/* 17px/600 es el tamaño estándar de título de nav bar en iOS (no el "large title"
+   de 34px): a diferencia de ese, este SIEMPRE cabe en una sola línea, incluso con
+   el título más largo del menú ("Reportar actividad del turno") en un iPhone SE.
+   Se centra con position:absolute a todo el ancho de la barra (no con text-align
+   dentro de un flex:1) para que el centrado sea real y no se desplace hacia la
+   izquierda por el ancho del botón de la derecha. */
+.ppam-navbar__title {
+  position: absolute;
+  left: var(--ppam-space-2xl);
+  right: var(--ppam-space-2xl);
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--ppam-on-primary);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: var(--ppam-label-tracking);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ppam-navbar__icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ppam-on-surface-variant);
+  cursor: pointer;
+  /* Feedback táctil (opacidad/escala breve) en vez de :hover, que no aplica en touch. */
+  transition:
+    transform 120ms ease,
+    opacity 120ms ease;
+}
+
+.ppam-navbar__icon-btn:active {
+  transform: scale(0.9);
+  opacity: 0.6;
+}
+
+.ppam-navbar__icon-btn--trailing {
+  position: absolute;
+  right: 4px;
+}
+
+/* El botón de pantalla completa vive dentro de la barra de título (fondo fuerte),
+ * a diferencia del botón "Salir" que comparte la misma clase base en la fila de
+ * identidad (fondo claro) — por eso el color se sobreescribe aquí y no en la
+ * clase compartida .ppam-navbar__icon-btn. */
+.ppam-navbar__titlebar .ppam-navbar__icon-btn {
+  color: var(--ppam-on-primary);
+}
+
+.ppam-navbar__icon-btn .material-symbols-outlined {
+  font-size: 22px;
+}

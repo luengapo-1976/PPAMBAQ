@@ -4,6 +4,8 @@ export const NAV_ITEMS: NavItem[] = [
   { label: 'Dashboard', icon: 'dashboard', route: '/dashboard' },
   { label: 'Gestión de solicitudes', icon: 'assignment', route: '/solicitudes' },
   { label: 'Confirmar asistencia', icon: 'how_to_reg', route: '/confirmar-asistencia' },
+  { label: 'Casos por validar', icon: 'fact_check', route: '/casos-por-validar' },
+  { label: 'Noticias', icon: 'campaign', route: '/gestion-noticias' },
   {
     label: 'Configuración',
     icon: 'settings',

@@ -71,7 +71,7 @@
   </div>
 </div>
 
-<div class="table-scroll">
+<div class="table-scroll table-view--wide">
   <table class="ppam-table">
     <thead>
       <tr>
@@ -148,4 +148,45 @@
       }
     </tbody>
   </table>
+</div>
+
+<!-- Vista de tarjetas: móvil -->
+<div class="table-cards">
+  @for (row of sortedRows(); track row.id) {
+    <article class="table-card">
+      <div class="table-card__top">
+        <input
+          type="checkbox"
+          class="ppam-checkbox"
+          [checked]="selectedIds().has(row.id)"
+          (click)="$event.stopPropagation()"
+          (change)="toggleRow(row.id, $any($event.target).checked)"
+          [attr.aria-label]="'Seleccionar ' + nombreCompleto(row)"
+        />
+        <app-badge [tone]="estadoConfig[row.estado].tone">{{ row.estado }}</app-badge>
+      </div>
+      <button
+        type="button"
+        class="table-card__body"
+        [attr.aria-label]="'Editar ' + nombreCompleto(row)"
+        (click)="editRecord.emit(row)"
+      >
+        <span class="table-card__name">{{ nombreCompleto(row) }}</span>
+        <span class="table-card__row">
+          <span class="material-symbols-outlined" aria-hidden="true">church</span>
+          <span>{{ row.nombre_congregacion || '—' }}</span>
+        </span>
+        <span class="table-card__row">
+          <span class="material-symbols-outlined" aria-hidden="true">call</span>
+          <span>{{ row.movil || '—' }}</span>
+        </span>
+        <span class="table-card__row table-card__row--muted">
+          <span class="material-symbols-outlined" aria-hidden="true">event</span>
+          <span>Solicitado el {{ formatDateShort(row.fecha_solicitud) }}</span>
+        </span>
+      </button>
+    </article>
+  } @empty {
+    <p class="ppam-table__empty">No hay solicitudes que coincidan con el filtro actual.</p>
+  }
 </div>

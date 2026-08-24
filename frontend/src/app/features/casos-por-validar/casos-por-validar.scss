@@ -1,0 +1,221 @@
+:host {
+  display: block;
+}
+
+.casos-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ppam-space-lg);
+}
+
+.casos-page__kpis {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--ppam-space-md);
+}
+
+.skeleton-block {
+  border-radius: var(--ppam-radius-card);
+  background: linear-gradient(
+    100deg,
+    var(--ppam-surface-container) 30%,
+    var(--ppam-surface-container-high) 50%,
+    var(--ppam-surface-container) 70%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+}
+
+.skeleton-block--kpi {
+  height: 84px;
+}
+
+.skeleton-block--table {
+  height: 320px;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--ppam-border-quiet);
+  border-radius: var(--ppam-radius-card);
+  background: var(--ppam-surface-container-lowest);
+}
+
+.ppam-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--ppam-small-size);
+}
+
+.ppam-table th,
+.ppam-table td {
+  padding: var(--ppam-space-sm) var(--ppam-space-md);
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--ppam-border-quiet);
+}
+
+.ppam-table thead th {
+  background: var(--ppam-surface-container-low);
+  color: var(--ppam-on-surface-variant);
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+}
+
+.ppam-table__row {
+  cursor: pointer;
+  transition: background var(--ppam-motion-fast);
+}
+
+.ppam-table__row:hover,
+.ppam-table__row:focus-visible {
+  background: var(--ppam-surface-container);
+  outline: none;
+}
+
+.ppam-table__empty {
+  text-align: center;
+  color: var(--ppam-outline);
+  padding: var(--ppam-space-xl);
+  white-space: normal;
+}
+
+.casos-page__cards {
+  display: none;
+  flex-direction: column;
+  gap: var(--ppam-space-sm);
+}
+
+.caso-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ppam-space-xs);
+  padding: var(--ppam-space-md);
+  border: 1px solid var(--ppam-border-quiet);
+  border-radius: var(--ppam-radius-card);
+  background: var(--ppam-surface-container-lowest);
+  cursor: pointer;
+  transition: background var(--ppam-motion-fast);
+}
+
+.caso-card:hover,
+.caso-card:focus-visible {
+  background: var(--ppam-surface-container);
+  outline: none;
+}
+
+.caso-card__row {
+  display: flex;
+  align-items: center;
+  gap: var(--ppam-space-sm);
+  color: var(--ppam-on-surface);
+  font-size: var(--ppam-body-size);
+}
+
+.caso-card__row .material-symbols-outlined {
+  font-size: 20px;
+  color: var(--ppam-on-surface-variant);
+  flex-shrink: 0;
+}
+
+.caso-card__row--title {
+  font-weight: 600;
+}
+
+.caso-card__row--muted {
+  color: var(--ppam-on-surface-variant);
+  font-size: var(--ppam-small-size);
+}
+
+.caso-card__empty {
+  text-align: center;
+  color: var(--ppam-outline);
+  padding: var(--ppam-space-xl);
+  margin: 0;
+}
+
+.casos-page__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: var(--ppam-small-size);
+  font-weight: 600;
+  color: var(--ppam-on-surface-variant);
+}
+
+.ppam-textarea {
+  width: 100%;
+  padding: var(--ppam-space-sm);
+  border-radius: var(--ppam-radius-control);
+  border: 1px solid var(--ppam-border-quiet);
+  background: var(--ppam-surface-container-lowest);
+  color: var(--ppam-on-surface);
+  font-family: inherit;
+  font-size: var(--ppam-body-size);
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+.ppam-textarea:focus-visible {
+  outline: 2px solid var(--ppam-primary-container);
+  outline-offset: 1px;
+  border-color: var(--ppam-primary-container);
+}
+
+.casos-page__detalle {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--ppam-space-md);
+  margin: 0;
+}
+
+.casos-page__detalle dt {
+  font-size: var(--ppam-small-size);
+  font-weight: 600;
+  color: var(--ppam-on-surface-variant);
+}
+
+.casos-page__detalle dd {
+  margin: 2px 0 0;
+  color: var(--ppam-on-surface);
+}
+
+@media (max-width: 1023px) {
+  .casos-page__kpis {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 599px) {
+  .casos-page__kpis {
+    grid-template-columns: 1fr;
+  }
+
+  .casos-page__detalle {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* En móvil la tabla (con scroll horizontal) se reemplaza por tarjetas apiladas,
+   más fáciles de leer y tocar en pantallas angostas. Va al final a propósito:
+   con igual especificidad, la regla que aparece después en el código gana la
+   cascada, sin importar el media query. */
+@media (max-width: 599px) {
+  .casos-page__table-view {
+    display: none;
+  }
+
+  .casos-page__cards {
+    display: flex;
+  }
+}

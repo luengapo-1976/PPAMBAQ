@@ -15,61 +15,6 @@
   margin: 0 auto;
 }
 
-.solicitar-turno__back {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--ppam-space-xs);
-  align-self: flex-start;
-  min-height: var(--ppam-touch-target-min);
-  padding-inline: var(--ppam-space-sm);
-  border-radius: var(--ppam-radius-control);
-  color: var(--ppam-on-surface-variant);
-  text-decoration: none;
-  font-weight: 600;
-  font-size: var(--ppam-small-size);
-  transition:
-    background var(--ppam-motion-fast),
-    color var(--ppam-motion-fast);
-}
-
-.solicitar-turno__back:hover,
-.solicitar-turno__back:focus-visible {
-  background: var(--ppam-surface-container);
-  color: var(--ppam-on-surface);
-}
-
-/* Encabezado con ícono, mismo patrón que "Confirmar asistencia" para mantener
-   consistencia visual entre las pantallas del participante. */
-.solicitar-turno__header {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--ppam-space-md);
-}
-
-.solicitar-turno__icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  flex-shrink: 0;
-  border-radius: var(--ppam-radius-control);
-  background: color-mix(in srgb, var(--ppam-primary-container) 16%, white);
-  color: var(--ppam-primary-container);
-}
-
-.solicitar-turno__title {
-  font-size: var(--ppam-h1-mobile-size);
-  line-height: var(--ppam-h1-mobile-line);
-  font-weight: var(--ppam-h1-weight);
-  color: var(--ppam-on-surface);
-}
-
-.solicitar-turno__legend {
-  margin: 4px 0 0;
-  color: var(--ppam-on-surface-variant);
-}
-
 /* Resumen de los turnos que el publicador ya tiene solicitados: solo aparece cuando
    hay al menos uno, para no ocupar espacio con un "0 de 3" cuando no aporta nada. */
 .mis-turnos {
@@ -96,18 +41,49 @@
   color: color-mix(in srgb, var(--ppam-semantic-error) 80%, black);
 }
 
-.mis-turnos__lista {
-  display: flex;
-  flex-direction: column;
+.mis-turnos__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: var(--ppam-space-sm);
-  list-style: none;
-  margin: 0;
-  padding: 0;
 }
 
-.mis-turnos__item {
+.mis-turnos__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ppam-space-xs);
+  padding: var(--ppam-space-md);
+  background: var(--ppam-surface-container-lowest);
+  border: 1px solid var(--ppam-border-quiet);
+  border-radius: var(--ppam-radius-card);
+  box-shadow: var(--ppam-elevation-1);
+}
+
+.mis-turnos__card-punto {
   font-size: var(--ppam-small-size);
+  font-weight: 700;
   color: var(--ppam-on-surface);
+}
+
+.mis-turnos__card-row {
+  display: flex;
+  align-items: center;
+  gap: var(--ppam-space-xs);
+  font-size: var(--ppam-small-size);
+  color: var(--ppam-on-surface-variant);
+}
+
+.mis-turnos__card-row .material-symbols-outlined {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: var(--ppam-primary-container);
+  flex-shrink: 0;
+}
+
+.solicitar-turno__select-legend {
+  margin: 0;
+  color: var(--ppam-on-surface-variant);
+  font-weight: 600;
 }
 
 .punto-info {
@@ -601,10 +577,4 @@
     padding: var(--ppam-space-xl);
     max-width: 900px;
   }
-
-  .solicitar-turno__title {
-    font-size: var(--ppam-h1-size);
-    line-height: var(--ppam-h1-line);
-  }
-
 }

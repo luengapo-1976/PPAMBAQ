@@ -1,0 +1,316 @@
+<div class="casos-page">
+  @if (loading()) {
+    <div class="casos-page__kpis">
+      @for (i of [1, 2, 3, 4]; track i) {
+        <div class="skeleton-block skeleton-block--kpi"></div>
+      }
+    </div>
+    <div class="skeleton-block skeleton-block--table"></div>
+  } @else {
+    <section class="casos-page__kpis">
+      <app-stat-card
+        icon="pending_actions"
+        label="Turnos pendientes"
+        [count]="turnosPendientes().length"
+        [selected]="tipo() === 'turnos' && estado() === 'pendientes'"
+        (toggle)="onSelectCard('turnos', 'pendientes')"
+      />
+      <app-stat-card
+        icon="task_alt"
+        label="Turnos aprobados (histórico)"
+        [count]="turnosAprobados().length"
+        [selected]="tipo() === 'turnos' && estado() === 'aprobados'"
+        (toggle)="onSelectCard('turnos', 'aprobados')"
+      />
+      <app-stat-card
+        icon="person_remove"
+        label="Retiros pendientes"
+        [count]="retirosPendientes().length"
+        [selected]="tipo() === 'retiros' && estado() === 'pendientes'"
+        (toggle)="onSelectCard('retiros', 'pendientes')"
+      />
+      <app-stat-card
+        icon="assignment_turned_in"
+        label="Retiros aprobados (histórico)"
+        [count]="retirosAprobados().length"
+        [selected]="tipo() === 'retiros' && estado() === 'aprobados'"
+        (toggle)="onSelectCard('retiros', 'aprobados')"
+      />
+    </section>
+
+    <!-- Vista de tabla: escritorio y tablet -->
+    <div class="table-scroll casos-page__table-view">
+      @if (tipo() === 'turnos') {
+        <table class="ppam-table">
+          <thead>
+            <tr>
+              <th>Punto</th>
+              <th>Día</th>
+              <th>Hora</th>
+              <th>Publicador</th>
+              <th>Fecha de solicitud</th>
+              @if (estado() === 'aprobados') {
+                <th>Aprobado por</th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rowsTurnos(); track row.id) {
+              <tr class="ppam-table__row" tabindex="0" (click)="onVerDetalleTurno(row)">
+                <td>{{ row.nombrePunto }}</td>
+                <td>{{ row.diaNombre }}</td>
+                <td>{{ formatHoraAmPm(row.horaInicio) }} – {{ formatHoraAmPm(row.horaFin) }}</td>
+                <td>{{ row.nombrePublicador }}</td>
+                <td>{{ formatDateShort(row.fechaSolicitud) }}</td>
+                @if (estado() === 'aprobados') {
+                  <td>{{ row.aprobadoPor }}</td>
+                }
+              </tr>
+            } @empty {
+              <tr>
+                <td [attr.colspan]="estado() === 'aprobados' ? 6 : 5" class="ppam-table__empty">
+                  {{
+                    estado() === 'pendientes'
+                      ? 'No hay turnos pendientes por validar.'
+                      : 'Aún no se ha aprobado ningún turno por este medio.'
+                  }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      } @else {
+        <table class="ppam-table">
+          <thead>
+            <tr>
+              <th>Publicador</th>
+              <th>Congregación</th>
+              <th>Móvil</th>
+              <th>Fecha de solicitud</th>
+              @if (estado() === 'aprobados') {
+                <th>Aprobado por</th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rowsRetiros(); track row.id) {
+              <tr class="ppam-table__row" tabindex="0" (click)="onVerDetalleRetiro(row)">
+                <td>{{ nombreCompletoRetiro(row) }}</td>
+                <td>{{ congregacionNombre(row.codigo_congregacion) }}</td>
+                <td>{{ row.movil }}</td>
+                <td>{{ formatDateShort(row.fecha_retiro) }}</td>
+                @if (estado() === 'aprobados') {
+                  <td>{{ row.valida_retiro }}</td>
+                }
+              </tr>
+            } @empty {
+              <tr>
+                <td [attr.colspan]="estado() === 'aprobados' ? 5 : 4" class="ppam-table__empty">
+                  {{
+                    estado() === 'pendientes'
+                      ? 'No hay solicitudes de baja pendientes por validar.'
+                      : 'Aún no se ha aprobado ninguna baja.'
+                  }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+
+    <!-- Vista de tarjetas: móvil -->
+    <div class="casos-page__cards">
+      @if (tipo() === 'turnos') {
+        @for (row of rowsTurnos(); track row.id) {
+          <article class="caso-card" tabindex="0" (click)="onVerDetalleTurno(row)">
+            <div class="caso-card__row caso-card__row--title">
+              <span class="material-symbols-outlined" aria-hidden="true">place</span>
+              <span>{{ row.nombrePunto }}</span>
+            </div>
+            <div class="caso-card__row">
+              <span class="material-symbols-outlined" aria-hidden="true">calendar_today</span>
+              <span>{{ row.diaNombre }} · {{ formatHoraAmPm(row.horaInicio) }} – {{ formatHoraAmPm(row.horaFin) }}</span>
+            </div>
+            <div class="caso-card__row">
+              <span class="material-symbols-outlined" aria-hidden="true">person</span>
+              <span>{{ row.nombrePublicador }}</span>
+            </div>
+            <div class="caso-card__row caso-card__row--muted">
+              <span class="material-symbols-outlined" aria-hidden="true">event</span>
+              <span>Solicitado el {{ formatDateShort(row.fechaSolicitud) }}</span>
+            </div>
+            @if (estado() === 'aprobados') {
+              <div class="caso-card__row caso-card__row--muted">
+                <span class="material-symbols-outlined" aria-hidden="true">verified</span>
+                <span>Aprobado por {{ row.aprobadoPor }}</span>
+              </div>
+            }
+          </article>
+        } @empty {
+          <p class="caso-card__empty">
+            {{
+              estado() === 'pendientes'
+                ? 'No hay turnos pendientes por validar.'
+                : 'Aún no se ha aprobado ningún turno por este medio.'
+            }}
+          </p>
+        }
+      } @else {
+        @for (row of rowsRetiros(); track row.id) {
+          <article class="caso-card" tabindex="0" (click)="onVerDetalleRetiro(row)">
+            <div class="caso-card__row caso-card__row--title">
+              <span class="material-symbols-outlined" aria-hidden="true">person</span>
+              <span>{{ nombreCompletoRetiro(row) }}</span>
+            </div>
+            <div class="caso-card__row">
+              <span class="material-symbols-outlined" aria-hidden="true">church</span>
+              <span>{{ congregacionNombre(row.codigo_congregacion) }}</span>
+            </div>
+            <div class="caso-card__row">
+              <span class="material-symbols-outlined" aria-hidden="true">call</span>
+              <span>{{ row.movil || '—' }}</span>
+            </div>
+            <div class="caso-card__row caso-card__row--muted">
+              <span class="material-symbols-outlined" aria-hidden="true">event</span>
+              <span>Solicitado el {{ formatDateShort(row.fecha_retiro) }}</span>
+            </div>
+            @if (estado() === 'aprobados') {
+              <div class="caso-card__row caso-card__row--muted">
+                <span class="material-symbols-outlined" aria-hidden="true">verified</span>
+                <span>Aprobado por {{ row.valida_retiro }}</span>
+              </div>
+            }
+          </article>
+        } @empty {
+          <p class="caso-card__empty">
+            {{
+              estado() === 'pendientes'
+                ? 'No hay solicitudes de baja pendientes por validar.'
+                : 'Aún no se ha aprobado ninguna baja.'
+            }}
+          </p>
+        }
+      }
+    </div>
+  }
+</div>
+
+<app-dialog [open]="dialogPaso() !== 'cerrado'" [title]="dialogTitulo()" (closed)="onDialogClosed()">
+  <app-button
+    dialogToolbar
+    type="button"
+    [style.display]="dialogMuestraPrimario() ? null : 'none'"
+    [disabled]="dialogPrimaryDisabled()"
+    (click)="onDialogPrimaryAction()"
+  >
+    {{ dialogPrimaryLabel() }}
+  </app-button>
+  <app-button dialogToolbar type="button" variant="secondary" (click)="onDialogSecondaryAction()">
+    {{ dialogSecondaryLabel() }}
+  </app-button>
+
+  @if (dialogPaso() === 'justificacion') {
+    <label class="casos-page__field">
+      <span>{{ tipo() === 'turnos' ? 'Justificación de aprobación' : 'Observaciones de aprobación' }}</span>
+      <textarea
+        class="ppam-textarea"
+        rows="4"
+        maxlength="1000"
+        placeholder="Escribe el motivo de la aprobación…"
+        [ngModel]="justificacionAprobacion()"
+        (ngModelChange)="justificacionAprobacion.set($event)"
+      ></textarea>
+    </label>
+  } @else if (tipo() === 'turnos' && detalleTurno(); as turno) {
+    <dl class="casos-page__detalle">
+      <div>
+        <dt>Punto</dt>
+        <dd>{{ turno.nombrePunto }}</dd>
+      </div>
+      <div>
+        <dt>Día y hora</dt>
+        <dd>{{ turno.diaNombre }} · {{ formatHoraAmPm(turno.horaInicio) }} – {{ formatHoraAmPm(turno.horaFin) }}</dd>
+      </div>
+      <div>
+        <dt>Situación identificada</dt>
+        <dd>{{ turno.situacionIdentificada || '—' }}</dd>
+      </div>
+      <div>
+        <dt>Publicador</dt>
+        <dd>{{ turno.nombrePublicador }}</dd>
+      </div>
+      <div>
+        <dt>Edad</dt>
+        <dd>{{ yearsSince(turno.fechaNacimiento) ?? '—' }}</dd>
+      </div>
+      <div>
+        <dt>Fecha de solicitud</dt>
+        <dd>{{ formatDateShort(turno.fechaSolicitud) }}</dd>
+      </div>
+      @if (estado() === 'aprobados') {
+        <div>
+          <dt>Aprobado por</dt>
+          <dd>{{ turno.aprobadoPor || '—' }}</dd>
+        </div>
+        <div>
+          <dt>Justificación de aprobación</dt>
+          <dd>{{ turno.justificacionAprobacion || '—' }}</dd>
+        </div>
+        <div>
+          <dt>Fecha de aprobación</dt>
+          <dd>{{ formatDateShort(turno.fechaAprobacion) }}</dd>
+        </div>
+      }
+    </dl>
+  } @else if (detalleRetiro(); as retiro) {
+    <dl class="casos-page__detalle">
+      <div>
+        <dt>Publicador</dt>
+        <dd>{{ nombreCompletoRetiro(retiro) }}</dd>
+      </div>
+      <div>
+        <dt>Edad</dt>
+        <dd>{{ yearsSince(retiro.fecha_nacimiento) ?? '—' }}</dd>
+      </div>
+      <div>
+        <dt>Años de bautismo</dt>
+        <dd>{{ yearsSince(retiro.fecha_bautismo) ?? '—' }}</dd>
+      </div>
+      <div>
+        <dt>Privilegio de servicio</dt>
+        <dd>{{ retiro.privilegio_ser || '—' }}</dd>
+      </div>
+      <div>
+        <dt>Móvil</dt>
+        <dd>{{ retiro.movil || '—' }}</dd>
+      </div>
+      <div>
+        <dt>Congregación</dt>
+        <dd>{{ congregacionNombre(retiro.codigo_congregacion) }}</dd>
+      </div>
+      <div>
+        <dt>Justificación</dt>
+        <dd>{{ retiro.justificacion }}</dd>
+      </div>
+      <div>
+        <dt>Fecha de solicitud</dt>
+        <dd>{{ formatDateShort(retiro.fecha_retiro) }}</dd>
+      </div>
+      @if (estado() === 'aprobados') {
+        <div>
+          <dt>Aprobado por</dt>
+          <dd>{{ retiro.valida_retiro || '—' }}</dd>
+        </div>
+        <div>
+          <dt>Observaciones</dt>
+          <dd>{{ retiro.observaciones_retiro || '—' }}</dd>
+        </div>
+        <div>
+          <dt>Fecha de validación</dt>
+          <dd>{{ formatDateShort(retiro.fecha_validacion_retiro) }}</dd>
+        </div>
+      }
+    </dl>
+  }
+</app-dialog>

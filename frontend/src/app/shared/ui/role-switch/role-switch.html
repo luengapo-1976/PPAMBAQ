@@ -1,10 +1,11 @@
 <button
   type="button"
   class="role-switch"
+  [class.role-switch--compact]="compact()"
   role="switch"
   [attr.aria-checked]="active() === 'participante'"
   [attr.aria-label]="
-    active() === 'usuario' ? 'Cambiar a la vista de participante' : 'Cambiar a la vista de administración'
+    active() === 'usuario' ? 'Cambiar a la vista de usuario' : 'Cambiar a la vista de administración'
   "
   (click)="onToggle()"
 >
@@ -14,6 +15,6 @@
   </span>
   <span class="role-switch__option" [class.role-switch__option--active]="active() === 'participante'">
     <span class="material-symbols-outlined" aria-hidden="true">person</span>
-    <span>Participante</span>
+    <span>Usuario</span>
   </span>
 </button>

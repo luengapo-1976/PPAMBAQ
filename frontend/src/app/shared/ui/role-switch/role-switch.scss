@@ -56,3 +56,11 @@
     padding-inline: 8px;
   }
 }
+
+.role-switch--compact .role-switch__option span:last-child {
+  display: none;
+}
+
+.role-switch--compact .role-switch__option {
+  padding-inline: 8px;
+}

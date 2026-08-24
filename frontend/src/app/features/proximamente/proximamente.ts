@@ -1,11 +1,12 @@
 import { Component, inject } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
+import { ParticipanteDesktopHeader } from '../../layout/participante-desktop-header/participante-desktop-header';
 
 @Component({
   selector: 'app-proximamente',
-  imports: [RouterLink],
+  imports: [ParticipanteDesktopHeader],
   templateUrl: './proximamente.html',
   styleUrl: './proximamente.scss',
 })

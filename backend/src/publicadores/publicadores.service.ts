@@ -1,10 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PublicadoresRepository } from './publicadores.repository';
+import { TurnosRepository } from '../turnos/turnos.repository';
 import { CreatePublicadorDto } from './dto/create-publicador.dto';
 import { UpdatePublicadorDto } from './dto/update-publicador.dto';
+import { UpdateMisDatosDto } from './dto/update-mis-datos.dto';
+import { SolicitarBajaDto } from './dto/solicitar-baja.dto';
+import { AprobarRetiroDto } from './dto/aprobar-retiro.dto';
 import { MensajeRelacionadoCon } from './dto/notificar-entrenamiento.dto';
 import { AsignarLugarEntrenamientoDto, TipoEntrenamiento } from './dto/asignar-lugar-entrenamiento.dto';
-import { todayIsoDate } from '../common/audit/audit.util';
+import { todayIsoDate, todayIsoDateBogota } from '../common/audit/audit.util';
+import type { AuthenticatedUser } from '../auth/strategies/jwt.strategy';
+import type { TablesInsert } from '../supabase/database.types';
 
 interface CongregacionEmbed {
   nombre_congregacion: string;
@@ -29,7 +35,10 @@ function flatten(row: PublicadorRow) {
 
 @Injectable()
 export class PublicadoresService {
-  constructor(private readonly publicadoresRepository: PublicadoresRepository) {}
+  constructor(
+    private readonly publicadoresRepository: PublicadoresRepository,
+    private readonly turnosRepository: TurnosRepository,
+  ) {}
 
   async findAll() {
     const rows = await this.publicadoresRepository.findAll();
@@ -57,6 +66,126 @@ export class PublicadoresService {
       fecha_modificacion: todayIsoDate(),
     });
     return flatten(row as unknown as PublicadorRow);
+  }
+
+  /** Trae SOLO los datos propios del participante logueado (nunca a partir de un id
+   * que venga del cliente), para prellenar "Actualizar mis datos". */
+  async misDatos(user: AuthenticatedUser) {
+    if (!user.publicadorId) {
+      throw new ForbiddenException('Debes ingresar como participante para consultar tus datos.');
+    }
+    const row = await this.publicadoresRepository.findByIdFull(user.publicadorId);
+    if (!row) {
+      throw new NotFoundException('No se encontró tu registro de publicador.');
+    }
+    return flatten(row as unknown as PublicadorRow);
+  }
+
+  /** El participante solo puede actualizar su propio registro: el id nunca sale del
+   * token (user.publicadorId), nunca de un parámetro que el cliente pudiera manipular. */
+  async actualizarMisDatos(dto: UpdateMisDatosDto, user: AuthenticatedUser): Promise<{ mensaje: string }> {
+    if (!user.publicadorId) {
+      throw new ForbiddenException('Debes ingresar como participante para actualizar tus datos.');
+    }
+    const hoy = todayIsoDateBogota();
+    const row = await this.publicadoresRepository.update(user.publicadorId, {
+      ...dto,
+      usuario_modifica: user.login,
+      fecha_modificacion: hoy,
+      usuario_actualiza_datos: user.login,
+      fecha_actualizacion_datos: hoy,
+    });
+
+    const primerNombre = (row as unknown as PublicadorRow).primer_nombre as string | null;
+    return {
+      mensaje:
+        `${primerNombre?.trim() || 'Publicador'} muchas gracias por actualizar tus datos y contribuir de esta ` +
+        `manera con la calidad de la información de la PPAM BAQ. Deseamos que Jehová te siga bendiciendo en tu ` +
+        `fiel servicio.`,
+    };
+  }
+
+  /** Traslada el registro del participante logueado a publicadores_retirados y
+   * bloquea su acceso (sufijo en el móvil, que hace las veces de contraseña). Los
+   * turnos asignados NO se liberan aquí: eso ocurre solo cuando el equipo de
+   * administradores aprueba la solicitud (ver PublicadoresService.aprobarRetiro).
+   * Igual que actualizarMisDatos, el id nunca sale del token: siempre se actúa
+   * sobre user.publicadorId. */
+  async solicitarBaja(dto: SolicitarBajaDto, user: AuthenticatedUser): Promise<{ mensaje: string }> {
+    if (!user.publicadorId) {
+      throw new ForbiddenException('Debes ingresar como participante para solicitar tu baja.');
+    }
+    const row = await this.publicadoresRepository.findByIdFull(user.publicadorId);
+    if (!row) {
+      throw new NotFoundException('No se encontró tu registro de publicador.');
+    }
+
+    const { congregaciones, ...datos } = row as PublicadorRow;
+    const hoy = todayIsoDateBogota();
+
+    await this.publicadoresRepository.insertRetirado({
+      ...(datos as TablesInsert<'publicadores_retirados'>),
+      justificacion: dto.justificacion.trim(),
+      fecha_retiro: hoy,
+      usuario_retira: user.login,
+      estado_solicitud_retiro: 'PENDIENTE VALIDACIÓN',
+    });
+
+    const movilActual = (datos.movil as string | null) ?? '';
+    await this.publicadoresRepository.update(user.publicadorId, {
+      movil: `${movilActual}_pendiente_retiro`,
+      usuario_modifica: user.login,
+      fecha_modificacion: hoy,
+    });
+
+    const primerNombre = ((datos.primer_nombre as string | null) ?? '').trim() || 'Publicador';
+    return {
+      mensaje:
+        `${primerNombre} muchas gracias por el tiempo y el esfuerzo que has dedicado a apoyar esta faceta de la ` +
+        `predicación con los exhibidores. Valoramos mucho tu disposición para servir a Jehová de esta manera. ` +
+        `Esperamos que, si en algún momento tus circunstancias te lo permiten, podamos volver a verte participando ` +
+        `con nosotros en esta faceta del servicio. ¡Muchas gracias por todo!.`,
+    };
+  }
+
+  async retirosPendientes() {
+    return this.publicadoresRepository.findRetirosPendientes();
+  }
+
+  async retirosAprobados() {
+    return this.publicadoresRepository.findRetirosAprobados();
+  }
+
+  /** Aprueba una solicitud de baja: solo aquí (nunca al solicitarla) se liberan
+   * los turnos del publicador y se marca su registro como INACTIVO. */
+  async aprobarRetiro(id: string, dto: AprobarRetiroDto, user: AuthenticatedUser): Promise<{ mensaje: string }> {
+    const hoy = todayIsoDateBogota();
+    const aprobado = await this.publicadoresRepository.aprobarRetiro(id, {
+      estado_solicitud_retiro: 'APROBADO',
+      valida_retiro: user.login,
+      observaciones_retiro: dto.observaciones.trim(),
+      fecha_validacion_retiro: hoy,
+    });
+    if (!aprobado) {
+      throw new ConflictException('Esta solicitud de baja ya fue procesada.');
+    }
+
+    await this.turnosRepository.liberarTodosDelPublicador(id, {
+      id_publicador: null,
+      estado_solicitud: null,
+      observaciones: null,
+      justificacion: null,
+      usuario_modifica: user.login,
+      fecha_modificacion: hoy,
+    });
+
+    await this.publicadoresRepository.update(id, {
+      estado_registro: 'INACTIVO',
+      usuario_modifica: user.login,
+      fecha_modificacion: hoy,
+    });
+
+    return { mensaje: 'La solicitud de baja fue aprobada correctamente.' };
   }
 
   async notificarEntrenamiento(ids: string[], mensajeRelacionadoCon: MensajeRelacionadoCon, usuarioLogin: string) {

@@ -1,0 +1,34 @@
+<div class="ppam-navbar">
+  <header class="ppam-navbar__identity">
+    <a class="ppam-navbar__brand" routerLink="/inicio">
+      <img class="ppam-navbar__logo" src="images/LOGO.png" alt="" />
+      <span class="ppam-navbar__brand-text">PPAM BAQ</span>
+    </a>
+
+    <div class="ppam-navbar__identity-end">
+      @if (showRoleSwitch()) {
+        <app-role-switch [active]="vistaActiva()" [compact]="true" (changed)="onSwitchVista($event)" />
+      }
+      <app-avatar [name]="nombre()" [size]="32" />
+      <button type="button" class="ppam-navbar__icon-btn" (click)="onLogout()" aria-label="Salir">
+        <span class="material-symbols-outlined" aria-hidden="true">logout</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="ppam-navbar__titlebar">
+    <h1 class="ppam-navbar__title">{{ title() }}</h1>
+    @if (fullscreenSupported) {
+      <button
+        type="button"
+        class="ppam-navbar__icon-btn ppam-navbar__icon-btn--trailing"
+        (click)="onToggleFullscreen()"
+        [attr.aria-label]="isFullscreen() ? 'Salir de pantalla completa' : 'Ver en pantalla completa'"
+      >
+        <span class="material-symbols-outlined" aria-hidden="true">
+          {{ isFullscreen() ? 'fullscreen_exit' : 'fullscreen' }}
+        </span>
+      </button>
+    }
+  </div>
+</div>

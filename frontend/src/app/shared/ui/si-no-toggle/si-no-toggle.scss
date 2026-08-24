@@ -1,0 +1,44 @@
+:host {
+  display: block;
+}
+
+.si-no-toggle__label {
+  display: block;
+  margin-bottom: var(--ppam-space-xs);
+  font-size: var(--ppam-small-size);
+  font-weight: 600;
+  color: var(--ppam-on-surface-variant);
+}
+
+.si-no-toggle__group {
+  display: flex;
+  gap: var(--ppam-space-xs);
+}
+
+.si-no-chip {
+  min-width: 72px;
+  min-height: var(--ppam-touch-target-min);
+  padding-inline: var(--ppam-space-md);
+  border: 1px solid var(--ppam-border-quiet);
+  border-radius: var(--ppam-radius-full);
+  background: var(--ppam-surface-container-lowest);
+  color: var(--ppam-on-surface-variant);
+  font-family: inherit;
+  font-size: var(--ppam-body-size);
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background var(--ppam-motion-fast),
+    color var(--ppam-motion-fast),
+    border-color var(--ppam-motion-fast);
+}
+
+.si-no-chip:hover {
+  background: var(--ppam-surface-container);
+}
+
+.si-no-chip--active {
+  background: var(--ppam-primary-container);
+  border-color: var(--ppam-primary-container);
+  color: var(--ppam-on-primary);
+}

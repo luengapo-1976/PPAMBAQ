@@ -1,0 +1,73 @@
+:host {
+  display: block;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+}
+
+@media (min-width: 600px) {
+  :host {
+    display: none;
+  }
+}
+
+.ppam-tabbar {
+  display: flex;
+  padding: 6px 4px calc(env(safe-area-inset-bottom, 0px) + 6px);
+  background: color-mix(in srgb, var(--ppam-surface-container-lowest) 82%, transparent);
+  backdrop-filter: blur(20px) saturate(1.6);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+  border-top: 1px solid var(--ppam-border-quiet);
+}
+
+/* Cada tab ocupa una porción igual de la barra, así el ancho tocable siempre supera
+   por mucho el mínimo de 44x44pt aunque el ícono en sí se mantenga en 24px. */
+.tab-item {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 44px;
+  padding-block: 4px;
+  border-radius: var(--ppam-radius-control);
+  color: var(--ppam-on-surface-variant);
+  text-decoration: none;
+  transition:
+    transform 120ms ease,
+    opacity 120ms ease;
+}
+
+.tab-item:active {
+  transform: scale(0.94);
+  opacity: 0.7;
+}
+
+.tab-item__icon {
+  font-size: 24px;
+  color: currentColor;
+  transition: color 150ms ease;
+}
+
+/* Estado activo: mismo ícono pero relleno (FILL 1), como en iOS — nunca se comunica
+   el estado solo con color, la forma del ícono también cambia. */
+.tab-item__icon--active {
+  font-variation-settings:
+    'FILL' 1,
+    'wght' 500,
+    'GRAD' 0,
+    'opsz' 24;
+}
+
+.tab-item--active {
+  color: var(--ppam-primary-container);
+}
+
+.tab-item__label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}

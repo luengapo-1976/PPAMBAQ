@@ -2,6 +2,9 @@ import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { PublicadoresService } from './publicadores.service';
 import { CreatePublicadorDto } from './dto/create-publicador.dto';
 import { UpdatePublicadorDto } from './dto/update-publicador.dto';
+import { UpdateMisDatosDto } from './dto/update-mis-datos.dto';
+import { SolicitarBajaDto } from './dto/solicitar-baja.dto';
+import { AprobarRetiroDto } from './dto/aprobar-retiro.dto';
 import { NotificarEntrenamientoDto } from './dto/notificar-entrenamiento.dto';
 import { AsignarLugarEntrenamientoDto } from './dto/asignar-lugar-entrenamiento.dto';
 import { QuitarLugarEntrenamientoDto } from './dto/quitar-lugar-entrenamiento.dto';
@@ -17,6 +20,11 @@ export class PublicadoresController {
   @Get()
   findAll() {
     return this.publicadoresService.findAll();
+  }
+
+  @Get('me')
+  misDatos(@CurrentUser() user: AuthenticatedUser) {
+    return this.publicadoresService.misDatos(user);
   }
 
   @Post()
@@ -52,6 +60,31 @@ export class PublicadoresController {
   @Patch('marcar-existe-bd-anterior')
   marcarExisteBdAnterior(@Body() dto: MarcarExisteBdAnteriorDto, @CurrentUser() user: AuthenticatedUser) {
     return this.publicadoresService.marcarExisteBdAnterior(dto.ids, user.login);
+  }
+
+  @Patch('me')
+  actualizarMisDatos(@Body() dto: UpdateMisDatosDto, @CurrentUser() user: AuthenticatedUser) {
+    return this.publicadoresService.actualizarMisDatos(dto, user);
+  }
+
+  @Post('me/solicitar-baja')
+  solicitarBaja(@Body() dto: SolicitarBajaDto, @CurrentUser() user: AuthenticatedUser) {
+    return this.publicadoresService.solicitarBaja(dto, user);
+  }
+
+  @Get('retiros/pendientes')
+  retirosPendientes() {
+    return this.publicadoresService.retirosPendientes();
+  }
+
+  @Get('retiros/aprobados')
+  retirosAprobados() {
+    return this.publicadoresService.retirosAprobados();
+  }
+
+  @Post('retiros/:id/aprobar')
+  aprobarRetiro(@Param('id') id: string, @Body() dto: AprobarRetiroDto, @CurrentUser() user: AuthenticatedUser) {
+    return this.publicadoresService.aprobarRetiro(id, dto, user);
   }
 
   @Patch(':id')

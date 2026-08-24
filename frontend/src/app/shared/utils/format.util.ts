@@ -28,5 +28,12 @@ export function formatHoraAmPm(time: string | null | undefined): string {
   return `${String(hours12).padStart(2, '0')}:${minutes} ${period}`;
 }
 
+/** Fecha actual en la zona horaria de Colombia (America/Bogota), como 'YYYY-MM-DD'.
+ * Mismo criterio que el equivalente en el backend (todayIsoDateBogota): no asume
+ * que el navegador corre en esa zona horaria. */
+export function todayIsoDateBogota(): string {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Bogota' }).format(new Date());
+}
+
 export const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export const MOVIL_PATTERN = /^\d{1,10}$/;

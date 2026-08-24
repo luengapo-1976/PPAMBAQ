@@ -1,0 +1,14 @@
+<nav class="ppam-tabbar" aria-label="Navegación principal">
+  @for (item of items; track item.id) {
+    <a class="tab-item" [routerLink]="item.route" routerLinkActive="tab-item--active" #rla="routerLinkActive">
+      <span
+        class="material-symbols-outlined tab-item__icon"
+        [class.tab-item__icon--active]="rla.isActive"
+        aria-hidden="true"
+      >
+        {{ item.icon }}
+      </span>
+      <span class="tab-item__label">{{ item.label }}</span>
+    </a>
+  }
+</nav>
