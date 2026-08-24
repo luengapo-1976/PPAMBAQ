@@ -1,0 +1,16 @@
+{
+  "name": "PPAM BAQ",
+  "short_name": "PPAM BAQ",
+  "start_url": "/inicio",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f1f1f1",
+  "theme_color": "#30548d",
+  "icons": [
+    {
+      "src": "images/LOGO.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
