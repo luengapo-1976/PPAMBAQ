@@ -1,0 +1,1 @@
+var o={REGISTRADO:{icon:"how_to_reg",tone:"info",label:"Registrado"},"NOTIFICADO PRIMER ENTRENAMIENTO":{icon:"campaign",tone:"warning",label:"Notificado 1er entrenamiento"},"NOTIFICADO SEGUNDO ENTRENAMIENTO":{icon:"campaign",tone:"warning",label:"Notificado 2do entrenamiento"},"CUMPLE REQUISITOS":{icon:"verified",tone:"success",label:"Cumple requisitos"}};export{o};

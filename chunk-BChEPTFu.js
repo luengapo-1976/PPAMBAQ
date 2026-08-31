@@ -1,0 +1,1 @@
+import {a}from'./chunk-BRDPW8sK.js';function m(r){return [...r].sort((o,t)=>a(o).localeCompare(a(t),"es")).map(o=>({value:o.id,label:`${a(o)} - ${o.movil||"sin m\xF3vil"}`}))}export{m};

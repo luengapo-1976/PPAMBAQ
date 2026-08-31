@@ -1,0 +1,1 @@
+var o=["Ocupado (mis circunstancias han cambiado)","Salud (enfermedad, cirug\xEDa, etc.)","Temporal (asignaci\xF3n, viaje, etc.)","Traslado (me mud\xE9)","Cambio de Punto","Otro"];export{o};
