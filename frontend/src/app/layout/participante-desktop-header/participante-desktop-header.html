@@ -24,7 +24,12 @@
         @if (menuOpen()) {
           <ul class="pdh__menu" role="menu">
             <li role="none">
-              <button type="button" role="menuitem" class="pdh__menu-item" (click)="onChangePassword()">
+              <button
+                type="button"
+                role="menuitem"
+                class="pdh__menu-item"
+                (click)="onChangePassword()"
+              >
                 <span class="material-symbols-outlined" aria-hidden="true">lock_reset</span>
                 <span>Cambiar contraseña</span>
               </button>
@@ -48,7 +53,7 @@
          ancho fijo a mano. No interactivo ni accesible a propósito (aria-hidden),
          los controles reales están del lado derecho. -->
     <div class="pdh__nav pdh__nav--ghost" aria-hidden="true">
-      @for (item of navItems; track item.id) {
+      @for (item of navItems(); track item.id) {
         <span class="pdh__nav-item">
           <span class="material-symbols-outlined pdh__nav-icon">{{ item.icon }}</span>
           <span class="pdh__nav-label">{{ item.label }}</span>
@@ -61,9 +66,18 @@
     }
 
     <nav class="pdh__nav" aria-label="Navegación principal">
-      @for (item of navItems; track item.id) {
-        <a class="pdh__nav-item" [routerLink]="item.route" routerLinkActive="pdh__nav-item--active" #rla="routerLinkActive">
-          <span class="material-symbols-outlined pdh__nav-icon" [class.pdh__nav-icon--active]="rla.isActive" aria-hidden="true">
+      @for (item of navItems(); track item.id) {
+        <a
+          class="pdh__nav-item"
+          [routerLink]="item.route"
+          routerLinkActive="pdh__nav-item--active"
+          #rla="routerLinkActive"
+        >
+          <span
+            class="material-symbols-outlined pdh__nav-icon"
+            [class.pdh__nav-icon--active]="rla.isActive"
+            aria-hidden="true"
+          >
             {{ item.icon }}
           </span>
           <span class="pdh__nav-label">{{ item.label }}</span>
@@ -73,4 +87,7 @@
   </div>
 </header>
 
-<app-change-password-dialog [open]="changePasswordOpen()" (closed)="changePasswordOpen.set(false)" />
+<app-change-password-dialog
+  [open]="changePasswordOpen()"
+  (closed)="changePasswordOpen.set(false)"
+/>

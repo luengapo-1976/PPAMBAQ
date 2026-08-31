@@ -39,6 +39,87 @@
   color: var(--ppam-on-surface-variant);
 }
 
+.turnos-asignados {
+  margin-top: var(--ppam-space-lg);
+  padding-top: var(--ppam-space-lg);
+  border-top: 1px solid var(--ppam-border-quiet);
+}
+
+.turnos-asignados__titulo {
+  margin-bottom: var(--ppam-space-sm);
+  font-size: var(--ppam-card-title-size);
+  font-weight: var(--ppam-card-title-weight);
+  color: var(--ppam-primary-container);
+}
+
+.turnos-asignados__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--ppam-space-sm);
+}
+
+/* En desktop hay espacio de sobra en el panel lateral (70vw): se ensanchan las
+   tarjetas para que el horario ("Lunes · 3:00 pm – 5:00 pm") quepa en una sola
+   línea, en vez de forzar el mismo mínimo angosto que usa mobile/tablet. */
+@media (min-width: 1024px) {
+  .turnos-asignados__grid {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  }
+}
+
+.turnos-asignados__card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--ppam-space-xs);
+  padding: var(--ppam-space-md);
+  background: var(--ppam-surface-container-lowest);
+  border: 1px solid var(--ppam-border-quiet);
+  border-radius: var(--ppam-radius-card);
+  box-shadow: var(--ppam-elevation-1);
+}
+
+.turnos-asignados__card-row {
+  display: flex;
+  align-items: center;
+  gap: var(--ppam-space-xs);
+  font-size: var(--ppam-small-size);
+  color: var(--ppam-on-surface-variant);
+}
+
+.turnos-asignados__card-row--punto {
+  font-weight: 700;
+  color: var(--ppam-on-surface);
+}
+
+.turnos-asignados__card-row .material-symbols-outlined {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: var(--ppam-primary-container);
+  flex-shrink: 0;
+}
+
+.turnos-asignados__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding-inline: var(--ppam-space-sm);
+  height: 24px;
+  border-radius: var(--ppam-radius-full);
+  background: var(--ppam-semantic-warning-container);
+  color: var(--ppam-semantic-warning);
+  font-size: var(--ppam-label-size);
+  font-weight: 600;
+}
+
+.turnos-asignados__badge .material-symbols-outlined {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
 @media (max-width: 599px) {
   .form-grid {
     grid-template-columns: 1fr;
@@ -71,7 +152,11 @@
 
 .duplicate-item--selected {
   border-color: var(--ppam-primary-container);
-  background: color-mix(in srgb, var(--ppam-primary-container) 8%, var(--ppam-surface-container-lowest));
+  background: color-mix(
+    in srgb,
+    var(--ppam-primary-container) 8%,
+    var(--ppam-surface-container-lowest)
+  );
 }
 
 .duplicate-item input[type='radio'] {

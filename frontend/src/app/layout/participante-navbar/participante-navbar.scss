@@ -99,6 +99,73 @@
   text-overflow: ellipsis;
 }
 
+/* Ancla el menú de cuenta (ver más abajo): a propósito NO es .ppam-navbar__identity
+   (esa tiene backdrop-filter, que en Chromium pinta mal a un descendiente en
+   position:absolute que se extiende más allá de su propio borde). Este wrapper
+   envuelve a <header> y, como hermano de esta, al <ul> del menú. */
+.ppam-navbar__identity-wrap {
+  position: relative;
+}
+
+.ppam-navbar__account {
+  position: relative;
+}
+
+.ppam-navbar__avatar-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: var(--ppam-radius-full);
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  transition: box-shadow var(--ppam-motion-fast);
+}
+
+.ppam-navbar__avatar-trigger[aria-expanded='true'] {
+  box-shadow: 0 0 0 2px var(--ppam-primary-container);
+}
+
+.ppam-navbar__menu {
+  position: absolute;
+  top: calc(100% + var(--ppam-space-sm));
+  right: var(--ppam-space-md);
+  min-width: 220px;
+  margin: 0;
+  padding: var(--ppam-space-sm);
+  list-style: none;
+  background: var(--ppam-surface-container-lowest);
+  border-radius: var(--ppam-radius-card);
+  box-shadow: var(--ppam-elevation-2);
+  z-index: 10;
+}
+
+.ppam-navbar__menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--ppam-space-sm);
+  width: 100%;
+  min-height: var(--ppam-touch-target-min);
+  padding-inline: var(--ppam-space-sm);
+  border: 0;
+  border-radius: var(--ppam-radius-control);
+  background: transparent;
+  color: var(--ppam-on-surface);
+  font-family: inherit;
+  font-size: var(--ppam-body-size);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 120ms ease,
+    opacity 120ms ease;
+}
+
+.ppam-navbar__menu-item:active {
+  transform: scale(0.98);
+  opacity: 0.7;
+}
+
 .ppam-navbar__icon-btn {
   display: flex;
   align-items: center;

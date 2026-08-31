@@ -1,0 +1,63 @@
+<div class="config-page">
+  @if (loading()) {
+    <div class="skeleton-block"></div>
+  } @else {
+    <section class="textos-legales__card">
+      <h2 class="textos-legales__titulo">Autorización de tratamiento de datos personales</h2>
+      <p class="textos-legales__hint">
+        Este es el texto que se le muestra a cada publicador la primera vez que ingresa a la
+        plataforma. El switch publica o despublica esta versión de inmediato, sin necesidad de
+        guardar. "Guardar nueva versión" crea una versión nueva del contenido (no se pierde el
+        historial de versiones anteriores), con el estado que tenga el switch en ese momento.
+      </p>
+
+      <label class="textos-legales__field">
+        <span>Contenido del aviso</span>
+        <textarea
+          class="ppam-textarea"
+          rows="16"
+          [ngModel]="contenido()"
+          (ngModelChange)="contenido.set($event)"
+        ></textarea>
+      </label>
+
+      <div class="textos-legales__publicar">
+        <app-switch
+          [checked]="publicar()"
+          [disabled]="!versionCargada() || actualizandoEstado()"
+          labelOn="Publicado - vigente para los publicadores"
+          labelOff="Sin publicar - guardado como borrador"
+          (changed)="onPublicarChange($event)"
+        />
+      </div>
+
+      <app-button
+        type="button"
+        icon="save"
+        [disabled]="!puedeGuardar() || saving()"
+        (click)="onGuardar()"
+      >
+        {{ saving() ? 'Guardando…' : 'Guardar nueva versión' }}
+      </app-button>
+    </section>
+
+    @if (historial().length > 1) {
+      <section class="textos-legales__historial">
+        <h3 class="textos-legales__historial-titulo">Versiones anteriores</h3>
+        <ul class="textos-legales__historial-list">
+          @for (version of historial(); track version.id) {
+            @if (version.id !== versionCargada()?.id) {
+              <li class="textos-legales__historial-item">
+                <span class="material-symbols-outlined" aria-hidden="true">history</span>
+                <span>Publicada el {{ formatDateShort(version.fecha_registro) }}</span>
+                @if (version.usuario_registra) {
+                  <span>· {{ version.usuario_registra }}</span>
+                }
+              </li>
+            }
+          }
+        </ul>
+      </section>
+    }
+  }
+</div>

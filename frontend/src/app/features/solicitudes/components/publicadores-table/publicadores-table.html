@@ -127,11 +127,11 @@
           <td>{{ nombreCompleto(row) }}</td>
           <td>{{ row.sexo === 'F' ? 'Femenino' : 'Masculino' }}</td>
           <td>{{ row.estado_civil }}</td>
-          <td>{{ row.nombre_conyuge || '—' }}</td>
+          <td>{{ row.nombre_conyuge || '-' }}</td>
           <td>{{ row.movil }}</td>
           <td>{{ row.correo_electronico }}</td>
-          <td>{{ row.nombre_congregacion || '—' }}</td>
-          <td>{{ row.codigo_circuito || '—' }}</td>
+          <td>{{ row.nombre_congregacion || '-' }}</td>
+          <td>{{ row.codigo_circuito || '-' }}</td>
           <td>{{ row.entrenamiento_requerido }}</td>
           <td>
             <app-badge [tone]="estadoConfig[row.estado].tone">{{ row.estado }}</app-badge>
@@ -174,11 +174,11 @@
         <span class="table-card__name">{{ nombreCompleto(row) }}</span>
         <span class="table-card__row">
           <span class="material-symbols-outlined" aria-hidden="true">church</span>
-          <span>{{ row.nombre_congregacion || '—' }}</span>
+          <span>{{ row.nombre_congregacion || '-' }}</span>
         </span>
         <span class="table-card__row">
           <span class="material-symbols-outlined" aria-hidden="true">call</span>
-          <span>{{ row.movil || '—' }}</span>
+          <span>{{ row.movil || '-' }}</span>
         </span>
         <span class="table-card__row table-card__row--muted">
           <span class="material-symbols-outlined" aria-hidden="true">event</span>

@@ -15,8 +15,16 @@ export class CasosPorValidarService {
     return this.api.get<TurnoValidacionResumen[]>('turnos/validacion/aprobados');
   }
 
+  turnosRechazados(): Observable<TurnoValidacionResumen[]> {
+    return this.api.get<TurnoValidacionResumen[]>('turnos/validacion/rechazados');
+  }
+
   aprobarTurno(id: string, justificacion: string): Observable<{ mensaje: string }> {
     return this.api.post<{ mensaje: string }>(`turnos/${id}/aprobar-solicitud`, { justificacion });
+  }
+
+  rechazarTurno(id: string, justificacion: string): Observable<{ mensaje: string }> {
+    return this.api.post<{ mensaje: string }>(`turnos/${id}/rechazar-solicitud`, { justificacion });
   }
 
   retirosPendientes(): Observable<RetiroResumen[]> {
@@ -28,6 +36,8 @@ export class CasosPorValidarService {
   }
 
   aprobarRetiro(id: string, observaciones: string): Observable<{ mensaje: string }> {
-    return this.api.post<{ mensaje: string }>(`publicadores/retiros/${id}/aprobar`, { observaciones });
+    return this.api.post<{ mensaje: string }>(`publicadores/retiros/${id}/aprobar`, {
+      observaciones,
+    });
   }
 }

@@ -20,12 +20,15 @@ export class NoticiasService {
     return this.noticiasRepository.findById(id);
   }
 
-  create(dto: CreateNoticiaDto, usuarioLogin: string) {
+  async create(dto: CreateNoticiaDto, usuarioLogin: string) {
     const hoy = todayIsoDateBogota();
+    const maxOrden = await this.noticiasRepository.findMaxOrden();
+
     return this.noticiasRepository.create({
       ...dto,
       estado: dto.estado ?? 'BORRADOR',
       fecha_publicacion: dto.estado === 'PUBLICADA' ? hoy : null,
+      orden: maxOrden + 1,
       usuario_registra: usuarioLogin,
       fecha_registro: hoy,
     });
@@ -35,7 +38,9 @@ export class NoticiasService {
    * previa) se fija la fecha de publicación; republicar no la vuelve a mover. */
   async update(id: string, dto: UpdateNoticiaDto, usuarioLogin: string) {
     const hoy = todayIsoDateBogota();
-    const payload: UpdateNoticiaDto & { fecha_publicacion?: string } = { ...dto };
+    const payload: UpdateNoticiaDto & { fecha_publicacion?: string } = {
+      ...dto,
+    };
 
     if (dto.estado === 'PUBLICADA') {
       const actual = await this.noticiasRepository.findById(id);
@@ -49,5 +54,17 @@ export class NoticiasService {
       usuario_modifica: usuarioLogin,
       fecha_modificacion: hoy,
     });
+  }
+
+  remove(id: string) {
+    return this.noticiasRepository.delete(id);
+  }
+
+  mover(id: string, direccion: 'arriba' | 'abajo') {
+    return this.noticiasRepository.moverOrden(id, direccion);
+  }
+
+  uploadImagen(file: Express.Multer.File) {
+    return this.noticiasRepository.uploadImagen(file);
   }
 }

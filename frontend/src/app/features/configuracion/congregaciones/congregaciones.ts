@@ -26,7 +26,8 @@ export class Congregaciones {
   protected readonly loading = signal(true);
 
   protected readonly nombreDepartamento = (codigo: string): string =>
-    this.departamentos().find((d) => d.codigo_departamento === codigo)?.nombre_departamento ?? codigo;
+    this.departamentos().find((d) => d.codigo_departamento === codigo)?.nombre_departamento ??
+    codigo;
 
   protected readonly nombreMunicipio = (codigo: string): string =>
     this.municipios().find((m) => m.codigo_municipio === codigo)?.nombre_municipio ?? codigo;
@@ -44,12 +45,28 @@ export class Congregaciones {
       label: 'Departamento',
       value: (row) => this.nombreDepartamento(row.codigo_departamento),
     },
-    { key: 'codigo_circuito', label: 'Circuito', value: (row) => row.codigo_circuito ?? '—' },
-    { key: 'correo_congregacion', label: 'Correo', value: (row) => row.correo_congregacion ?? '—' },
-    { key: 'usuario_registra', label: 'Usuario registra', value: (row) => row.usuario_registra ?? '—' },
-    { key: 'fecha_registro', label: 'Fecha registro', value: (row) => formatDateShort(row.fecha_registro) },
-    { key: 'usuario_modifica', label: 'Usuario modifica', value: (row) => row.usuario_modifica ?? '—' },
-    { key: 'fecha_modificacion', label: 'Fecha modificación', value: (row) => formatDateShort(row.fecha_modificacion) },
+    { key: 'codigo_circuito', label: 'Circuito', value: (row) => row.codigo_circuito ?? '-' },
+    { key: 'correo_congregacion', label: 'Correo', value: (row) => row.correo_congregacion ?? '-' },
+    {
+      key: 'usuario_registra',
+      label: 'Usuario registra',
+      value: (row) => row.usuario_registra ?? '-',
+    },
+    {
+      key: 'fecha_registro',
+      label: 'Fecha registro',
+      value: (row) => formatDateShort(row.fecha_registro),
+    },
+    {
+      key: 'usuario_modifica',
+      label: 'Usuario modifica',
+      value: (row) => row.usuario_modifica ?? '-',
+    },
+    {
+      key: 'fecha_modificacion',
+      label: 'Fecha modificación',
+      value: (row) => formatDateShort(row.fecha_modificacion),
+    },
   ]);
 
   protected readonly rowId = (row: Congregacion) => String(row.codigo_congregacion);

@@ -1,0 +1,105 @@
+<div class="table-scroll">
+  <table class="ppam-table">
+    <thead>
+      <tr>
+        <th>Acciones</th>
+        <th>Miniatura</th>
+        <th>Tipo</th>
+        <th>Título</th>
+        <th>Fecha máxima</th>
+        <th>Visibilidad</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of rows(); track row.id; let first = $first; let last = $last) {
+        <tr>
+          <td>
+            <div class="ppam-table__actions">
+              <button
+                type="button"
+                class="ppam-table__edit-btn"
+                [attr.aria-label]="'Editar ' + row.titulo"
+                title="Editar registro"
+                (click)="editRecord.emit(row)"
+              >
+                <span class="material-symbols-outlined" aria-hidden="true">edit</span>
+              </button>
+              <button
+                type="button"
+                class="ppam-table__edit-btn"
+                aria-label="Subir"
+                title="Subir"
+                [disabled]="first"
+                (click)="moveUp.emit(row)"
+              >
+                <span class="material-symbols-outlined" aria-hidden="true">keyboard_arrow_up</span>
+              </button>
+              <button
+                type="button"
+                class="ppam-table__edit-btn"
+                aria-label="Bajar"
+                title="Bajar"
+                [disabled]="last"
+                (click)="moveDown.emit(row)"
+              >
+                <span class="material-symbols-outlined" aria-hidden="true"
+                  >keyboard_arrow_down</span
+                >
+              </button>
+              <button
+                type="button"
+                class="ppam-table__edit-btn ppam-table__edit-btn--danger"
+                aria-label="Eliminar"
+                title="Eliminar"
+                (click)="onDelete(row)"
+              >
+                <span class="material-symbols-outlined" aria-hidden="true">delete</span>
+              </button>
+            </div>
+          </td>
+          <td>
+            @if (row.tipo === 'IMAGEN' && row.imagen_url) {
+              <img class="ppam-table__thumb" [src]="row.imagen_url" alt="" />
+            } @else if (row.tipo === 'VIDEO' && getYoutubeThumbnail(row.video_url)) {
+              <img class="ppam-table__thumb" [src]="getYoutubeThumbnail(row.video_url)" alt="" />
+            } @else {
+              <div class="ppam-table__thumb ppam-table__thumb--placeholder">
+                <span class="material-symbols-outlined" aria-hidden="true">smart_display</span>
+              </div>
+            }
+          </td>
+          <td>
+            <app-badge [tone]="row.tipo === 'IMAGEN' ? 'info' : 'neutral'">{{
+              row.tipo === 'IMAGEN' ? 'Imagen' : 'Video'
+            }}</app-badge>
+          </td>
+          <td>{{ row.titulo }}</td>
+          <td>
+            @if (row.fecha_maxima_publicacion) {
+              {{ formatDateShort(row.fecha_maxima_publicacion) }}
+              @if (estaVencida(row)) {
+                <app-badge tone="warning">Vencido</app-badge>
+              }
+            } @else {
+              Sin vencimiento
+            }
+          </td>
+          <td>
+            <app-switch
+              [checked]="row.activo"
+              labelOn="Visible"
+              labelOff="Oculto"
+              (changed)="onToggleActivo(row, $event)"
+            />
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="6" class="ppam-table__empty">
+            Todavía no hay elementos de capacitación registrados.
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

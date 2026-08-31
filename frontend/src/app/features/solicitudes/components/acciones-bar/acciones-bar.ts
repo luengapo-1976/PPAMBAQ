@@ -113,12 +113,16 @@ export class AccionesBar {
       next: ({ actualizados }) => {
         this.removingLugarEntrenamiento.set(false);
         this.confirmQuitarLugarOpen.set(false);
-        this.snackbar.success(`Se actualizó el lugar de entrenamiento de ${actualizados} registro(s).`);
+        this.snackbar.success(
+          `Se actualizó el lugar de entrenamiento de ${actualizados} registro(s).`,
+        );
         this.updated.emit();
       },
       error: () => {
         this.removingLugarEntrenamiento.set(false);
-        this.snackbar.error('No se pudo quitar el lugar de entrenamiento de los registros seleccionados.');
+        this.snackbar.error(
+          'No se pudo quitar el lugar de entrenamiento de los registros seleccionados.',
+        );
       },
     });
   }

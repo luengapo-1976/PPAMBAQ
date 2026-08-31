@@ -19,11 +19,11 @@ export function yearsSince(dateStr: string | null | undefined): number | null {
 
 export function formatDateShort(dateStr: string | null | undefined): string {
   if (!dateStr) {
-    return '—';
+    return '-';
   }
   const date = new Date(dateStr);
   if (Number.isNaN(date.getTime())) {
-    return '—';
+    return '-';
   }
   /** Se leen los componentes en UTC: las fechas de la API vienen como 'YYYY-MM-DD'
    * (sin hora), que Date interpreta como medianoche UTC; usar getters locales

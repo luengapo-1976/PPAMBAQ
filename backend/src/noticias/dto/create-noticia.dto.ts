@@ -1,4 +1,10 @@
-import { IsIn, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+import {
+  IsIn,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 
 const ESTADOS = ['BORRADOR', 'PUBLICADA'] as const;
 
@@ -22,6 +28,14 @@ export class CreateNoticiaDto {
   imagen_url?: string | null;
 
   @IsOptional()
+  @IsString()
+  storage_path?: string | null;
+
+  @IsOptional()
   @IsIn(ESTADOS)
   estado?: (typeof ESTADOS)[number];
+
+  @IsOptional()
+  @IsString()
+  fecha_maxima_publicacion?: string | null;
 }

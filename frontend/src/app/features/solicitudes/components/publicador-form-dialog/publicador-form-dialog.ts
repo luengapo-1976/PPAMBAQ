@@ -4,11 +4,17 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { Dialog } from '../../../../shared/ui/dialog/dialog';
 import { Button } from '../../../../shared/ui/button/button';
 import { Select, SelectOption } from '../../../../shared/ui/select/select';
-import { SearchSelect, SearchSelectOption } from '../../../../shared/ui/search-select/search-select';
+import {
+  SearchSelect,
+  SearchSelectOption,
+} from '../../../../shared/ui/search-select/search-select';
 import { FormField } from '../../../../shared/ui/form-field/form-field';
 import { SnackbarService } from '../../../../shared/ui/snackbar/snackbar.service';
 import { ApiError } from '../../../../core/error.interceptor';
 import { PublicadoresService } from '../../data/publicadores.service';
+import { TurnosService } from '../../../solicitar-turno/data/turnos.service';
+import { MiTurnoResumen, TurnoHistorialItem } from '../../../solicitar-turno/data/models';
+import { Timeline, TimelineItem } from '../../../../shared/ui/timeline/timeline';
 import {
   Congregacion,
   Departamento,
@@ -37,17 +43,28 @@ import {
   toTitleCase,
   yearsSince,
 } from '../../data/publicador.utils';
-import { DuplicateCandidate, DuplicateReason, findDuplicateCandidates } from '../../data/duplicate-check';
+import { formatHoraAmPm } from '../../../../shared/utils/format.util';
+import {
+  DuplicateCandidate,
+  DuplicateReason,
+  findDuplicateCandidates,
+} from '../../data/duplicate-check';
 import { parseS73Pdf, S73ImportValues } from '../../data/s73-import.util';
 import { Punto } from '../../../configuracion/data/models';
 
-const ESTADO_CIVIL_OPTIONS: SelectOption[] = ['Casado', 'Soltero', 'Divorciado', 'Separado', 'Viudo'].map(
-  (value) => ({ value, label: value }),
+const ESTADO_CIVIL_OPTIONS: SelectOption[] = [
+  'Casado',
+  'Soltero',
+  'Divorciado',
+  'Separado',
+  'Viudo',
+].map((value) => ({ value, label: value }));
+const PRIVILEGIO_MIN_OPTIONS: SelectOption[] = ['Ninguno', 'Anciano', 'Siervo ministerial'].map(
+  (value) => ({
+    value,
+    label: value,
+  }),
 );
-const PRIVILEGIO_MIN_OPTIONS: SelectOption[] = ['Ninguno', 'Anciano', 'Siervo ministerial'].map((value) => ({
-  value,
-  label: value,
-}));
 const PRIVILEGIO_SER_OPTIONS: SelectOption[] = [
   'Publicador',
   'Precursor regular',
@@ -76,13 +93,14 @@ const NOMBRE_CONYUGE_ESTADOS_CIVILES = ['Casado', 'Separado'];
 
 @Component({
   selector: 'app-publicador-form-dialog',
-  imports: [ReactiveFormsModule, Dialog, Button, Select, SearchSelect, FormField],
+  imports: [ReactiveFormsModule, Dialog, Button, Select, SearchSelect, FormField, Timeline],
   templateUrl: './publicador-form-dialog.html',
   styleUrl: './publicador-form-dialog.scss',
 })
 export class PublicadorFormDialog {
   private readonly fb = inject(FormBuilder);
   private readonly publicadoresService = inject(PublicadoresService);
+  private readonly turnosService = inject(TurnosService);
   private readonly snackbar = inject(SnackbarService);
 
   readonly open = input(false);
@@ -101,6 +119,8 @@ export class PublicadorFormDialog {
 
   protected readonly saving = signal(false);
   protected readonly importingS73 = signal(false);
+  protected readonly turnosAsignados = signal<MiTurnoResumen[]>([]);
+  protected readonly historialSolicitudes = signal<TurnoHistorialItem[]>([]);
 
   protected readonly estadoCivilOptions = ESTADO_CIVIL_OPTIONS;
   protected readonly privilegioMinOptions = PRIVILEGIO_MIN_OPTIONS;
@@ -112,6 +132,7 @@ export class PublicadorFormDialog {
   protected readonly entrenamientoRequeridoOptions = ENTRENAMIENTO_REQUERIDO_OPTIONS;
   protected readonly nombreCompleto = nombreCompleto;
   protected readonly formatDateShort = formatDateShort;
+  protected readonly formatHora = formatHoraAmPm;
 
   private isPatchingForm = false;
 
@@ -140,7 +161,10 @@ export class PublicadorFormDialog {
     direccion: ['', [Validators.required, Validators.maxLength(100)]],
     codigo_departamento: ['', Validators.required],
     codigo_municipio: [{ value: '', disabled: true }, Validators.required],
-    correo_electronico: ['', [Validators.required, Validators.pattern(EMAIL_PATTERN), Validators.maxLength(100)]],
+    correo_electronico: [
+      '',
+      [Validators.required, Validators.pattern(EMAIL_PATTERN), Validators.maxLength(100)],
+    ],
     movil: ['', [Validators.required, Validators.pattern(MOVIL_PATTERN)]],
     codigo_congregacion: ['', Validators.required],
     fecha_nacimiento: ['', Validators.required],
@@ -154,32 +178,48 @@ export class PublicadorFormDialog {
     participo_antes: ['', Validators.required],
     fecha_solicitud: ['', Validators.required],
     estado: [{ value: 'REGISTRADO', disabled: true }, Validators.required],
-    entrenamiento_requerido: [{ value: 'Primer entrenamiento', disabled: true }, Validators.required],
+    entrenamiento_requerido: [
+      { value: 'Primer entrenamiento', disabled: true },
+      Validators.required,
+    ],
     fecha_aprobacion: [''],
     fecha_cumple_requisitos: [''],
     existe_bd_anterior: [{ value: 'NO', disabled: true }, Validators.required],
   });
 
-  private readonly selectedDepartamento = toSignal(this.form.controls.codigo_departamento.valueChanges, {
+  private readonly selectedDepartamento = toSignal(
+    this.form.controls.codigo_departamento.valueChanges,
+    {
+      initialValue: '',
+    },
+  );
+  private readonly selectedCongregacionCodigo = toSignal(
+    this.form.controls.codigo_congregacion.valueChanges,
+    {
+      initialValue: '',
+    },
+  );
+  private readonly selectedSexo = toSignal(this.form.controls.sexo.valueChanges, {
     initialValue: '',
   });
-  private readonly selectedCongregacionCodigo = toSignal(this.form.controls.codigo_congregacion.valueChanges, {
-    initialValue: '',
-  });
-  private readonly selectedSexo = toSignal(this.form.controls.sexo.valueChanges, { initialValue: '' });
   private readonly selectedEstadoCivil = toSignal(this.form.controls.estado_civil.valueChanges, {
     initialValue: '',
   });
   private readonly fechaNacimiento = toSignal(this.form.controls.fecha_nacimiento.valueChanges, {
     initialValue: '',
   });
-  private readonly fechaBautismo = toSignal(this.form.controls.fecha_bautismo.valueChanges, { initialValue: '' });
+  private readonly fechaBautismo = toSignal(this.form.controls.fecha_bautismo.valueChanges, {
+    initialValue: '',
+  });
   private readonly selectedEstadoValue = toSignal(this.form.controls.estado.valueChanges, {
     initialValue: this.form.controls.estado.value,
   });
 
   protected readonly departamentoOptions = computed<SearchSelectOption[]>(() =>
-    this.departamentos().map((d) => ({ value: d.codigo_departamento, label: d.nombre_departamento })),
+    this.departamentos().map((d) => ({
+      value: d.codigo_departamento,
+      label: d.nombre_departamento,
+    })),
   );
 
   protected readonly municipioOptions = computed<SearchSelectOption[]>(() => {
@@ -190,13 +230,18 @@ export class PublicadorFormDialog {
   });
 
   protected readonly congregacionOptions = computed<SearchSelectOption[]>(() =>
-    this.congregaciones().map((c) => ({ value: String(c.codigo_congregacion), label: c.nombre_congregacion })),
+    this.congregaciones().map((c) => ({
+      value: String(c.codigo_congregacion),
+      label: c.nombre_congregacion,
+    })),
   );
 
   protected readonly circuitoDisplay = computed(() => {
     const codigo = this.selectedCongregacionCodigo();
-    const congregacion = this.congregaciones().find((c) => String(c.codigo_congregacion) === String(codigo));
-    return congregacion?.codigo_circuito ?? '—';
+    const congregacion = this.congregaciones().find(
+      (c) => String(c.codigo_congregacion) === String(codigo),
+    );
+    return congregacion?.codigo_circuito ?? '-';
   });
 
   protected readonly edadDisplay = computed(() => yearsSince(this.fechaNacimiento()));
@@ -225,7 +270,9 @@ export class PublicadorFormDialog {
   });
 
   protected readonly showNombreConyuge = computed(
-    () => this.selectedSexo() === 'F' && NOMBRE_CONYUGE_ESTADOS_CIVILES.includes(this.selectedEstadoCivil() ?? ''),
+    () =>
+      this.selectedSexo() === 'F' &&
+      NOMBRE_CONYUGE_ESTADOS_CIVILES.includes(this.selectedEstadoCivil() ?? ''),
   );
 
   protected readonly showFechaAprobacion = computed(
@@ -234,6 +281,10 @@ export class PublicadorFormDialog {
 
   protected readonly dialogTitle = computed(() =>
     this.mode() === 'create' ? 'Nueva solicitud' : 'Editar solicitud',
+  );
+
+  protected readonly timelineItems = computed<TimelineItem[]>(() =>
+    this.historialSolicitudes().map((item) => this.toTimelineItem(item)),
   );
 
   constructor() {
@@ -245,54 +296,64 @@ export class PublicadorFormDialog {
       this.matchedExistingId.set(null);
       this.dismissedDuplicateKeys.set(new Set());
       this.duplicateDialogOpen.set(false);
+      this.turnosAsignados.set([]);
+      this.historialSolicitudes.set([]);
       if (this.mode() === 'create') {
         this.applyCreateDefaults();
       } else {
         const record = this.record();
         if (record) {
           this.populateForm(record, { enableWorkflowFields: true });
+          this.cargarTurnosAsignados(record.id);
+          this.cargarHistorialSolicitudes(record.id);
         }
       }
     });
 
-    this.form.controls.codigo_departamento.valueChanges.pipe(takeUntilDestroyed()).subscribe((depto) => {
-      const municipioControl = this.form.controls.codigo_municipio;
-      if (depto) {
-        municipioControl.enable({ emitEvent: false });
-      } else {
-        municipioControl.disable({ emitEvent: false });
-      }
-      if (this.isPatchingForm) {
-        return;
-      }
-      const current = municipioControl.value;
-      const stillValid = this.municipios().some(
-        (m) => m.codigo_municipio === current && m.codigo_departamento === depto,
-      );
-      if (current && !stillValid) {
-        municipioControl.setValue('');
-      }
-    });
-
-    this.form.controls.entrenamiento_requerido.valueChanges.pipe(takeUntilDestroyed()).subscribe((value) => {
-      if (this.isPatchingForm || this.mode() !== 'edit') {
-        return;
-      }
-      if (value === 'Entrenamiento completado') {
-        const today = todayIsoDate();
-        this.form.controls.estado.setValue('CUMPLE REQUISITOS');
-        this.form.controls.fecha_cumple_requisitos.setValue(today);
-        if (!this.form.controls.fecha_aprobacion.value) {
-          this.form.controls.fecha_aprobacion.setValue(today);
+    this.form.controls.codigo_departamento.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe((depto) => {
+        const municipioControl = this.form.controls.codigo_municipio;
+        if (depto) {
+          municipioControl.enable({ emitEvent: false });
+        } else {
+          municipioControl.disable({ emitEvent: false });
         }
-      }
-    });
+        if (this.isPatchingForm) {
+          return;
+        }
+        const current = municipioControl.value;
+        const stillValid = this.municipios().some(
+          (m) => m.codigo_municipio === current && m.codigo_departamento === depto,
+        );
+        if (current && !stillValid) {
+          municipioControl.setValue('');
+        }
+      });
+
+    this.form.controls.entrenamiento_requerido.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe((value) => {
+        if (this.isPatchingForm || this.mode() !== 'edit') {
+          return;
+        }
+        if (value === 'Entrenamiento completado') {
+          const today = todayIsoDate();
+          this.form.controls.estado.setValue('CUMPLE REQUISITOS');
+          this.form.controls.fecha_cumple_requisitos.setValue(today);
+          if (!this.form.controls.fecha_aprobacion.value) {
+            this.form.controls.fecha_aprobacion.setValue(today);
+          }
+        }
+      });
 
     effect(() => {
       const visible = this.showNombreConyuge();
       const required = visible && this.mode() !== 'edit';
       const control = this.form.controls.nombre_conyuge;
-      control.setValidators(required ? [Validators.required, Validators.maxLength(100)] : [Validators.maxLength(100)]);
+      control.setValidators(
+        required ? [Validators.required, Validators.maxLength(100)] : [Validators.maxLength(100)],
+      );
       if (!visible && control.value) {
         control.setValue('', { emitEvent: false });
       }
@@ -303,7 +364,9 @@ export class PublicadorFormDialog {
       const visible = this.showNombreConyuge();
       const required = visible && this.mode() !== 'edit';
       const control = this.form.controls.apellido_casada;
-      control.setValidators(required ? [Validators.required, Validators.maxLength(20)] : [Validators.maxLength(20)]);
+      control.setValidators(
+        required ? [Validators.required, Validators.maxLength(20)] : [Validators.maxLength(20)],
+      );
       if (!visible && control.value) {
         control.setValue('', { emitEvent: false });
       }
@@ -396,7 +459,9 @@ export class PublicadorFormDialog {
           participo_antes: toNullable(raw.participo_antes) as ParticipoAntes | null,
           fecha_solicitud: toNullable(raw.fecha_solicitud),
           estado: toNullable(raw.estado) as EstadoSolicitud | null,
-          entrenamiento_requerido: toNullable(raw.entrenamiento_requerido) as EntrenamientoRequerido | null,
+          entrenamiento_requerido: toNullable(
+            raw.entrenamiento_requerido,
+          ) as EntrenamientoRequerido | null,
           existe_bd_anterior: toNullable(raw.existe_bd_anterior) as ExisteBdAnterior | null,
         }
       : {
@@ -426,7 +491,9 @@ export class PublicadorFormDialog {
         };
 
     if (raw.estado === 'CUMPLE REQUISITOS') {
-      payload.fecha_aprobacion = isEdit ? toNullable(raw.fecha_aprobacion) : raw.fecha_aprobacion || null;
+      payload.fecha_aprobacion = isEdit
+        ? toNullable(raw.fecha_aprobacion)
+        : raw.fecha_aprobacion || null;
       payload.fecha_cumple_requisitos = isEdit
         ? toNullable(raw.fecha_cumple_requisitos)
         : raw.fecha_cumple_requisitos || null;
@@ -442,7 +509,9 @@ export class PublicadorFormDialog {
     request$.subscribe({
       next: () => {
         this.saving.set(false);
-        this.snackbar.success(targetId ? 'Solicitud actualizada correctamente.' : 'Solicitud registrada correctamente.');
+        this.snackbar.success(
+          targetId ? 'Solicitud actualizada correctamente.' : 'Solicitud registrada correctamente.',
+        );
         this.form.reset();
         this.matchedExistingId.set(null);
         this.saved.emit();
@@ -467,15 +536,24 @@ export class PublicadorFormDialog {
     this.importingS73.set(true);
     try {
       const bytes = await file.arrayBuffer();
-      const { values, warnings } = await parseS73Pdf(bytes, this.departamentos(), this.municipios(), this.congregaciones());
+      const { values, warnings } = await parseS73Pdf(
+        bytes,
+        this.departamentos(),
+        this.municipios(),
+        this.congregaciones(),
+      );
       this.applyImportedData(values);
       if (warnings.length > 0) {
         this.snackbar.show(`Importado. Revisa antes de guardar: ${warnings.join(' ')}`, 'info');
       } else {
-        this.snackbar.success('Datos importados desde el PDF S-73. Revisa el formulario antes de guardar.');
+        this.snackbar.success(
+          'Datos importados desde el PDF S-73. Revisa el formulario antes de guardar.',
+        );
       }
     } catch {
-      this.snackbar.error('No se pudo leer el archivo. Verifica que sea un formulario S-73 con campos rellenables.');
+      this.snackbar.error(
+        'No se pudo leer el archivo. Verifica que sea un formulario S-73 con campos rellenables.',
+      );
     } finally {
       this.importingS73.set(false);
     }
@@ -512,7 +590,10 @@ export class PublicadorFormDialog {
     this.populateForm(candidate.publicador, { enableWorkflowFields: true });
     this.matchedExistingId.set(candidate.publicador.id);
     this.duplicateDialogOpen.set(false);
-    this.snackbar.show('Se cargaron los datos del registro existente. Al guardar, se actualizará esa solicitud.', 'info');
+    this.snackbar.show(
+      'Se cargaron los datos del registro existente. Al guardar, se actualizará esa solicitud.',
+      'info',
+    );
   }
 
   private checkForDuplicates(): void {
@@ -520,7 +601,8 @@ export class PublicadorFormDialog {
       return;
     }
     const raw = this.form.getRawValue();
-    const excludeId = this.mode() === 'edit' ? (this.record()?.id ?? null) : this.matchedExistingId();
+    const excludeId =
+      this.mode() === 'edit' ? (this.record()?.id ?? null) : this.matchedExistingId();
     const candidates = findDuplicateCandidates(
       {
         primerApellido: raw.primer_apellido ?? '',
@@ -558,7 +640,8 @@ export class PublicadorFormDialog {
    * validaciones originales sin cambios. */
   private configureValidatorsForMode(): void {
     const isEdit = this.mode() === 'edit';
-    const req = (validators: ValidatorFn[]): ValidatorFn[] => (isEdit ? validators : [Validators.required, ...validators]);
+    const req = (validators: ValidatorFn[]): ValidatorFn[] =>
+      isEdit ? validators : [Validators.required, ...validators];
 
     this.form.controls.primer_apellido.setValidators(req([Validators.maxLength(20)]));
     this.form.controls.primer_nombre.setValidators(req([Validators.maxLength(20)]));
@@ -585,6 +668,64 @@ export class PublicadorFormDialog {
     for (const control of Object.values(this.form.controls)) {
       control.updateValueAndValidity({ emitEvent: false });
     }
+  }
+
+  private cargarTurnosAsignados(publicadorId: string): void {
+    this.turnosService.contarSolicitados(publicadorId).subscribe({
+      next: (conteo) => this.turnosAsignados.set(conteo.turnos),
+      error: () => this.turnosAsignados.set([]),
+    });
+  }
+
+  private cargarHistorialSolicitudes(publicadorId: string): void {
+    this.turnosService.historialSolicitudes(publicadorId).subscribe({
+      next: (historial) => this.historialSolicitudes.set(historial),
+      error: () => this.historialSolicitudes.set([]),
+    });
+  }
+
+  private toTimelineItem(item: TurnoHistorialItem): TimelineItem {
+    const turnoDetalle = {
+      label: 'Turno',
+      value: `${item.nombrePunto} · ${item.diaNombre} · ${this.formatHora(item.horaInicio)} – ${this.formatHora(item.horaFin)}`,
+    };
+
+    if (item.tipo === 'rechazado') {
+      return {
+        titulo: 'Solicitud rechazada',
+        fecha: this.formatDateShort(item.fecha),
+        variant: 'error',
+        icon: 'cancel',
+        detalles: [turnoDetalle, { label: 'Justificación', value: item.justificacion || '-' }],
+      };
+    }
+
+    if (item.tipo === 'devuelto') {
+      return {
+        titulo: 'Turno devuelto',
+        fecha: this.formatDateShort(item.fecha),
+        variant: 'warning',
+        icon: 'assignment_return',
+        detalles: [
+          turnoDetalle,
+          { label: 'Motivo', value: item.motivo || '-' },
+          ...(item.observacion ? [{ label: 'Observación', value: item.observacion }] : []),
+        ],
+      };
+    }
+
+    return {
+      titulo: 'Turno solicitado',
+      fecha: this.formatDateShort(item.fecha),
+      variant: 'neutral',
+      icon: 'event_available',
+      detalles: [
+        turnoDetalle,
+        ...(item.justificacion
+          ? [{ label: 'Justificación (caso de revisión)', value: item.justificacion }]
+          : []),
+      ],
+    };
   }
 
   private applyCreateDefaults(): void {

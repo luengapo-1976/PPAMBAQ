@@ -1,0 +1,24 @@
+<div class="aviso">
+  <div class="aviso__card">
+    <span class="aviso__icon material-symbols-outlined" aria-hidden="true">gavel</span>
+    <h1 class="aviso__titulo">Autorización para el tratamiento de tus datos personales</h1>
+
+    @if (loading()) {
+      <div class="aviso__skeleton">
+        @for (i of [1, 2, 3, 4]; track i) {
+          <div class="skeleton-block"></div>
+        }
+      </div>
+    } @else {
+      <div class="aviso__texto">
+        @for (parrafo of parrafos(); track $index) {
+          <p>{{ parrafo }}</p>
+        }
+      </div>
+
+      <app-button type="button" [disabled]="aceptando()" (click)="onAceptar()">
+        {{ aceptando() ? 'Registrando…' : 'Acepto' }}
+      </app-button>
+    }
+  </div>
+</div>

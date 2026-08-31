@@ -4,7 +4,10 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { Dialog } from '../../../../../shared/ui/dialog/dialog';
 import { Button } from '../../../../../shared/ui/button/button';
 import { FormField } from '../../../../../shared/ui/form-field/form-field';
-import { SearchSelect, SearchSelectOption } from '../../../../../shared/ui/search-select/search-select';
+import {
+  SearchSelect,
+  SearchSelectOption,
+} from '../../../../../shared/ui/search-select/search-select';
 import { SnackbarService } from '../../../../../shared/ui/snackbar/snackbar.service';
 import { ApiError } from '../../../../../core/error.interceptor';
 import { EMAIL_PATTERN } from '../../../../../shared/utils/format.util';
@@ -45,12 +48,18 @@ export class CongregacionFormDialog {
     codigo_departamento: ['', Validators.required],
     codigo_municipio: [{ value: '', disabled: true }, Validators.required],
     codigo_circuito: ['', Validators.required],
-    correo_congregacion: ['', [Validators.required, Validators.pattern(EMAIL_PATTERN), Validators.maxLength(100)]],
+    correo_congregacion: [
+      '',
+      [Validators.required, Validators.pattern(EMAIL_PATTERN), Validators.maxLength(100)],
+    ],
   });
 
-  private readonly selectedDepartamento = toSignal(this.form.controls.codigo_departamento.valueChanges, {
-    initialValue: '',
-  });
+  private readonly selectedDepartamento = toSignal(
+    this.form.controls.codigo_departamento.valueChanges,
+    {
+      initialValue: '',
+    },
+  );
 
   protected readonly departamentoOptions = computed<SearchSelectOption[]>(() =>
     this.departamentos().map((d) => ({
@@ -63,7 +72,10 @@ export class CongregacionFormDialog {
     const depto = this.selectedDepartamento();
     return this.municipios()
       .filter((m) => !depto || m.codigo_departamento === depto)
-      .map((m) => ({ value: m.codigo_municipio, label: `${m.codigo_municipio} - ${m.nombre_municipio}` }));
+      .map((m) => ({
+        value: m.codigo_municipio,
+        label: `${m.codigo_municipio} - ${m.nombre_municipio}`,
+      }));
   });
 
   protected readonly circuitoOptions = computed<SearchSelectOption[]>(() =>
@@ -89,24 +101,26 @@ export class CongregacionFormDialog {
       }
     });
 
-    this.form.controls.codigo_departamento.valueChanges.pipe(takeUntilDestroyed()).subscribe((depto) => {
-      const municipioControl = this.form.controls.codigo_municipio;
-      if (depto) {
-        municipioControl.enable({ emitEvent: false });
-      } else {
-        municipioControl.disable({ emitEvent: false });
-      }
-      if (this.isPatchingForm) {
-        return;
-      }
-      const current = municipioControl.value;
-      const stillValid = this.municipios().some(
-        (m) => m.codigo_municipio === current && m.codigo_departamento === depto,
-      );
-      if (current && !stillValid) {
-        municipioControl.setValue('');
-      }
-    });
+    this.form.controls.codigo_departamento.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe((depto) => {
+        const municipioControl = this.form.controls.codigo_municipio;
+        if (depto) {
+          municipioControl.enable({ emitEvent: false });
+        } else {
+          municipioControl.disable({ emitEvent: false });
+        }
+        if (this.isPatchingForm) {
+          return;
+        }
+        const current = municipioControl.value;
+        const stillValid = this.municipios().some(
+          (m) => m.codigo_municipio === current && m.codigo_departamento === depto,
+        );
+        if (current && !stillValid) {
+          municipioControl.setValue('');
+        }
+      });
   }
 
   protected onCancel(): void {
@@ -153,7 +167,9 @@ export class CongregacionFormDialog {
       next: () => {
         this.saving.set(false);
         this.snackbar.success(
-          this.mode() === 'edit' ? 'Congregación actualizada correctamente.' : 'Congregación registrada correctamente.',
+          this.mode() === 'edit'
+            ? 'Congregación actualizada correctamente.'
+            : 'Congregación registrada correctamente.',
         );
         this.form.reset();
         this.saved.emit();

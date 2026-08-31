@@ -1,15 +1,32 @@
-import { Component, ElementRef, computed, effect, inject, input, output, signal, viewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  computed,
+  effect,
+  inject,
+  input,
+  output,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Dialog } from '../../../../shared/ui/dialog/dialog';
 import { Button } from '../../../../shared/ui/button/button';
 import { Badge } from '../../../../shared/ui/badge/badge';
-import { SearchSelect, SearchSelectOption } from '../../../../shared/ui/search-select/search-select';
+import {
+  SearchSelect,
+  SearchSelectOption,
+} from '../../../../shared/ui/search-select/search-select';
 import { FormField } from '../../../../shared/ui/form-field/form-field';
 import { SnackbarService } from '../../../../shared/ui/snackbar/snackbar.service';
 import { ApiError } from '../../../../core/error.interceptor';
 import { MensajesService } from '../../data/mensajes.service';
 import { Mensaje } from '../../data/models';
-import { MENSAJE_TOKENS, MENSAJE_TOKENS_CON_HERMANO, MensajeToken } from '../../data/mensaje-tokens';
+import {
+  MENSAJE_TOKENS,
+  MENSAJE_TOKENS_CON_HERMANO,
+  MensajeToken,
+} from '../../data/mensaje-tokens';
 
 const MAX_ADJUNTO_SIZE_BYTES = 10 * 1024 * 1024;
 const MENTION_MENU_WIDTH = 300;
@@ -48,14 +65,33 @@ function findActiveMention(value: string, cursor: number): { start: number; quer
  * un <div> espejo que replica su tipografía/paddings — técnica estándar para
  * ubicar overlays (menús de menciones, etc.) junto al caret de un textarea,
  * que no expone esa posición de forma nativa. */
-function getCaretCoordinates(textarea: HTMLTextAreaElement, position: number): { top: number; left: number; height: number } {
+function getCaretCoordinates(
+  textarea: HTMLTextAreaElement,
+  position: number,
+): { top: number; left: number; height: number } {
   const mirror = document.createElement('div');
   const style = getComputedStyle(textarea);
   const mirroredProps: (keyof CSSStyleDeclaration)[] = [
-    'boxSizing', 'width', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft',
-    'borderTopWidth', 'borderRightWidth', 'borderBottomWidth', 'borderLeftWidth',
-    'fontFamily', 'fontSize', 'fontWeight', 'fontStyle', 'letterSpacing', 'lineHeight',
-    'textTransform', 'wordSpacing', 'whiteSpace', 'overflowWrap',
+    'boxSizing',
+    'width',
+    'paddingTop',
+    'paddingRight',
+    'paddingBottom',
+    'paddingLeft',
+    'borderTopWidth',
+    'borderRightWidth',
+    'borderBottomWidth',
+    'borderLeftWidth',
+    'fontFamily',
+    'fontSize',
+    'fontWeight',
+    'fontStyle',
+    'letterSpacing',
+    'lineHeight',
+    'textTransform',
+    'wordSpacing',
+    'whiteSpace',
+    'overflowWrap',
   ];
   for (const prop of mirroredProps) {
     (mirror.style as unknown as Record<string, string>)[prop as string] = style[prop] as string;
@@ -112,7 +148,9 @@ export class MensajeForm {
   private readonly textareaRef = viewChild<ElementRef<HTMLTextAreaElement>>('mensajeTextarea');
   private readonly fileInputRef = viewChild<ElementRef<HTMLInputElement>>('adjuntoInput');
 
-  protected readonly dialogTitle = computed(() => (this.mode() === 'create' ? 'Nuevo mensaje' : 'Editar mensaje'));
+  protected readonly dialogTitle = computed(() =>
+    this.mode() === 'create' ? 'Nuevo mensaje' : 'Editar mensaje',
+  );
 
   protected readonly tipoOptions = computed<SearchSelectOption[]>(() =>
     this.tipos().map((tipo) => ({ value: tipo, label: tipo })),
@@ -243,7 +281,10 @@ export class MensajeForm {
     const viewportWidth = document.documentElement.clientWidth;
     const viewportHeight = document.documentElement.clientHeight;
     const left = Math.min(Math.max(caret.left, 8), viewportWidth - MENTION_MENU_WIDTH - 8);
-    const top = Math.min(caret.top + caret.height + 4, viewportHeight - MENTION_MENU_MAX_HEIGHT - 8);
+    const top = Math.min(
+      caret.top + caret.height + 4,
+      viewportHeight - MENTION_MENU_MAX_HEIGHT - 8,
+    );
     this.mentionPosition.set({ top, left });
   }
 
@@ -339,12 +380,16 @@ export class MensajeForm {
 
     const editing = this.record();
     this.saving.set(true);
-    const request$ = editing ? this.mensajesService.update(editing.id, payload) : this.mensajesService.create(payload);
+    const request$ = editing
+      ? this.mensajesService.update(editing.id, payload)
+      : this.mensajesService.create(payload);
 
     request$.subscribe({
       next: () => {
         this.saving.set(false);
-        this.snackbar.success(editing ? 'Mensaje actualizado correctamente.' : 'Mensaje guardado correctamente.');
+        this.snackbar.success(
+          editing ? 'Mensaje actualizado correctamente.' : 'Mensaje guardado correctamente.',
+        );
         this.form.reset();
         this.adjuntoFileName.set(null);
         this.saved.emit();
@@ -368,6 +413,8 @@ export class MensajeForm {
       mensaje: record.mensaje,
       adjunto_asociado: record.adjunto_asociado,
     });
-    this.adjuntoFileName.set(record.adjunto_asociado ? fileNameFromUrl(record.adjunto_asociado) : null);
+    this.adjuntoFileName.set(
+      record.adjunto_asociado ? fileNameFromUrl(record.adjunto_asociado) : null,
+    );
   }
 }

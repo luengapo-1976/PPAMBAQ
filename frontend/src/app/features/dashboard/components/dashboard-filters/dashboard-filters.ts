@@ -1,6 +1,9 @@
 import { Component, computed, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { SearchSelect, SearchSelectOption } from '../../../../shared/ui/search-select/search-select';
+import {
+  SearchSelect,
+  SearchSelectOption,
+} from '../../../../shared/ui/search-select/search-select';
 import { Button } from '../../../../shared/ui/button/button';
 import { Congregacion, Departamento, Municipio } from '../../../solicitudes/data/models';
 import { Circuito } from '../../../configuracion/data/models';
@@ -32,7 +35,10 @@ export class DashboardFiltersComponent {
     const depto = this.filters().codigoDepartamento;
     return this.municipios()
       .filter((m) => !depto || m.codigo_departamento === depto)
-      .map((m) => ({ value: m.codigo_municipio, label: `${m.codigo_municipio} - ${m.nombre_municipio}` }));
+      .map((m) => ({
+        value: m.codigo_municipio,
+        label: `${m.codigo_municipio} - ${m.nombre_municipio}`,
+      }));
   });
 
   protected readonly circuitoOptions = computed<SearchSelectOption[]>(() =>
@@ -79,7 +85,9 @@ export class DashboardFiltersComponent {
   protected onDepartamentoChange(value: string | null): void {
     const current = this.filters();
     const municipioStillValid = value
-      ? this.municipios().some((m) => m.codigo_municipio === current.codigoMunicipio && m.codigo_departamento === value)
+      ? this.municipios().some(
+          (m) => m.codigo_municipio === current.codigoMunicipio && m.codigo_departamento === value,
+        )
       : true;
     const nextMunicipio = municipioStillValid ? current.codigoMunicipio : null;
     this.filtersChange.emit({
@@ -100,7 +108,9 @@ export class DashboardFiltersComponent {
     this.filtersChange.emit({
       ...current,
       codigoMunicipio: value,
-      codigoCongregacion: this.congregacionStillValid(current.codigoCongregacion, { codigoMunicipio: value })
+      codigoCongregacion: this.congregacionStillValid(current.codigoCongregacion, {
+        codigoMunicipio: value,
+      })
         ? current.codigoCongregacion
         : null,
     });
@@ -111,14 +121,19 @@ export class DashboardFiltersComponent {
     this.filtersChange.emit({
       ...current,
       codigoCircuito: value,
-      codigoCongregacion: this.congregacionStillValid(current.codigoCongregacion, { codigoCircuito: value })
+      codigoCongregacion: this.congregacionStillValid(current.codigoCongregacion, {
+        codigoCircuito: value,
+      })
         ? current.codigoCongregacion
         : null,
     });
   }
 
   protected onCongregacionChange(value: string | null): void {
-    this.filtersChange.emit({ ...this.filters(), codigoCongregacion: value ? Number(value) : null });
+    this.filtersChange.emit({
+      ...this.filters(),
+      codigoCongregacion: value ? Number(value) : null,
+    });
   }
 
   protected onFechaDesdeChange(value: string): void {
@@ -135,12 +150,16 @@ export class DashboardFiltersComponent {
 
   private congregacionStillValid(
     codigoCongregacion: number | null,
-    overrides: Partial<Pick<DashboardFilters, 'codigoDepartamento' | 'codigoMunicipio' | 'codigoCircuito'>>,
+    overrides: Partial<
+      Pick<DashboardFilters, 'codigoDepartamento' | 'codigoMunicipio' | 'codigoCircuito'>
+    >,
   ): boolean {
     if (codigoCongregacion == null) {
       return true;
     }
-    const congregacion = this.congregaciones().find((c) => c.codigo_congregacion === codigoCongregacion);
+    const congregacion = this.congregaciones().find(
+      (c) => c.codigo_congregacion === codigoCongregacion,
+    );
     if (!congregacion) {
       return false;
     }

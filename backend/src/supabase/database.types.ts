@@ -4,973 +4,1276 @@ export type Json =
   | boolean
   | null
   | { [key: string]: Json | undefined }
-  | Json[]
+  | Json[];
 
 export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
-  }
+    PostgrestVersion: '14.5';
+  };
   public: {
     Tables: {
+      aceptaciones_legales: {
+        Row: {
+          aceptado: boolean;
+          fecha_aceptacion: string;
+          fecha_registro: string | null;
+          id: string;
+          id_publicador: string;
+          id_texto_legal: string;
+          usuario_registra: string | null;
+        };
+        Insert: {
+          aceptado?: boolean;
+          fecha_aceptacion: string;
+          fecha_registro?: string | null;
+          id?: string;
+          id_publicador: string;
+          id_texto_legal: string;
+          usuario_registra?: string | null;
+        };
+        Update: {
+          aceptado?: boolean;
+          fecha_aceptacion?: string;
+          fecha_registro?: string | null;
+          id?: string;
+          id_publicador?: string;
+          id_texto_legal?: string;
+          usuario_registra?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'aceptaciones_legales_id_publicador_fkey';
+            columns: ['id_publicador'];
+            isOneToOne: false;
+            referencedRelation: 'publicadores';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'aceptaciones_legales_id_texto_legal_fkey';
+            columns: ['id_texto_legal'];
+            isOneToOne: false;
+            referencedRelation: 'textos_legales';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       actividad_reportada: {
         Row: {
-          arreglos_curso: string | null
-          cumplio_turno: string | null
-          fecha_actividad: string
-          fecha_modificacion: string | null
-          fecha_registro: string | null
-          id: string
-          id_turno: string
-          inicio_conversacion: string | null
-          observaciones: string | null
-          usuario_modifica: string | null
-          usuario_registra: string | null
-        }
+          arreglos_curso: string | null;
+          cumplio_turno: string | null;
+          fecha_actividad: string;
+          fecha_modificacion: string | null;
+          fecha_registro: string | null;
+          id: string;
+          id_turno: string;
+          inicio_conversacion: string | null;
+          observaciones: string | null;
+          usuario_modifica: string | null;
+          usuario_registra: string | null;
+        };
         Insert: {
-          arreglos_curso?: string | null
-          cumplio_turno?: string | null
-          fecha_actividad: string
-          fecha_modificacion?: string | null
-          fecha_registro?: string | null
-          id?: string
-          id_turno: string
-          inicio_conversacion?: string | null
-          observaciones?: string | null
-          usuario_modifica?: string | null
-          usuario_registra?: string | null
-        }
+          arreglos_curso?: string | null;
+          cumplio_turno?: string | null;
+          fecha_actividad: string;
+          fecha_modificacion?: string | null;
+          fecha_registro?: string | null;
+          id?: string;
+          id_turno: string;
+          inicio_conversacion?: string | null;
+          observaciones?: string | null;
+          usuario_modifica?: string | null;
+          usuario_registra?: string | null;
+        };
         Update: {
-          arreglos_curso?: string | null
-          cumplio_turno?: string | null
-          fecha_actividad?: string
-          fecha_modificacion?: string | null
-          fecha_registro?: string | null
-          id?: string
-          id_turno?: string
-          inicio_conversacion?: string | null
-          observaciones?: string | null
-          usuario_modifica?: string | null
-          usuario_registra?: string | null
-        }
+          arreglos_curso?: string | null;
+          cumplio_turno?: string | null;
+          fecha_actividad?: string;
+          fecha_modificacion?: string | null;
+          fecha_registro?: string | null;
+          id?: string;
+          id_turno?: string;
+          inicio_conversacion?: string | null;
+          observaciones?: string | null;
+          usuario_modifica?: string | null;
+          usuario_registra?: string | null;
+        };
         Relationships: [
           {
-            foreignKeyName: "actividad_reportada_id_turno_fkey"
-            columns: ["id_turno"]
-            isOneToOne: false
-            referencedRelation: "turnos"
-            referencedColumns: ["id"]
+            foreignKeyName: 'actividad_reportada_id_turno_fkey';
+            columns: ['id_turno'];
+            isOneToOne: false;
+            referencedRelation: 'turnos';
+            referencedColumns: ['id'];
           },
-        ]
-      }
+        ];
+      };
+      banners: {
+        Row: {
+          activo: boolean;
+          alto_px: number;
+          ancho_px: number;
+          fecha_modificacion: string | null;
+          fecha_registro: string | null;
+          id: string;
+          imagen_url: string;
+          orden: number;
+          storage_path: string;
+          usuario_modifica: string | null;
+          usuario_registra: string | null;
+        };
+        Insert: {
+          activo?: boolean;
+          alto_px: number;
+          ancho_px: number;
+          fecha_modificacion?: string | null;
+          fecha_registro?: string | null;
+          id?: string;
+          imagen_url: string;
+          orden: number;
+          storage_path: string;
+          usuario_modifica?: string | null;
+          usuario_registra?: string | null;
+        };
+        Update: {
+          activo?: boolean;
+          alto_px?: number;
+          ancho_px?: number;
+          fecha_modificacion?: string | null;
+          fecha_registro?: string | null;
+          id?: string;
+          imagen_url?: string;
+          orden?: number;
+          storage_path?: string;
+          usuario_modifica?: string | null;
+          usuario_registra?: string | null;
+        };
+        Relationships: [];
+      };
+      capacitaciones: {
+        Row: {
+          activo: boolean;
+          fecha_maxima_publicacion: string | null;
+          fecha_modificacion: string | null;
+          fecha_registro: string | null;
+          id: string;
+          imagen_url: string | null;
+          orden: number;
+          resumen: string;
+          storage_path: string | null;
+          tipo: string;
+          titulo: string;
+          usuario_modifica: string | null;
+          usuario_registra: string | null;
+          video_url: string | null;
+        };
+        Insert: {
+          activo?: boolean;
+          fecha_maxima_publicacion?: string | null;
+          fecha_modificacion?: string | null;
+          fecha_registro?: string | null;
+          id?: string;
+          imagen_url?: string | null;
+          orden: number;
+          resumen: string;
+          storage_path?: string | null;
+          tipo: string;
+          titulo: string;
+          usuario_modifica?: string | null;
+          usuario_registra?: string | null;
+          video_url?: string | null;
+        };
+        Update: {
+          activo?: boolean;
+          fecha_maxima_publicacion?: string | null;
+          fecha_modificacion?: string | null;
+          fecha_registro?: string | null;
+          id?: string;
+          imagen_url?: string | null;
+          orden?: number;
+          resumen?: string;
+          storage_path?: string | null;
+          tipo?: string;
+          titulo?: string;
+          usuario_modifica?: string | null;
+          usuario_registra?: string | null;
+          video_url?: string | null;
+        };
+        Relationships: [];
+      };
       circuitos: {
         Row: {
-          codigo_circuito: string
-          correo_electronico: string | null
-          fecha_modificacion: string | null
-          fecha_registro: string | null
-          movil: string | null
-          nombre_viajante: string | null
-          usuario_modifica: string | null
-          usuario_registra: string | null
-        }
+          codigo_circuito: string;
+          correo_electronico: string | null;
+          fecha_modificacion: string | null;
+          fecha_registro: string | null;
+          movil: string | null;
+          nombre_viajante: string | null;
+          usuario_modifica: string | null;
+          usuario_registra: string | null;
+        };
         Insert: {
-          codigo_circuito: string
-          correo_electronico?: string | null
-          fecha_modificacion?: string | null
-          fecha_registro?: string | null
-          movil?: string | null
-          nombre_viajante?: string | null
-          usuario_modifica?: string | null
-          usuario_registra?: string | null
-        }
+          codigo_circuito: string;
+          correo_electronico?: string | null;
+          fecha_modificacion?: string | null;
+          fecha_registro?: string | null;
+          movil?: string | null;
+          nombre_viajante?: string | null;
+          usuario_modifica?: string | null;
+          usuario_registra?: string | null;
+        };
         Update: {
-          codigo_circuito?: string
-          correo_electronico?: string | null
-          fecha_modificacion?: string | null
-          fecha_registro?: string | null
-          movil?: string | null
-          nombre_viajante?: string | null
-          usuario_modifica?: string | null
-          usuario_registra?: string | null
-        }
-        Relationships: []
-      }
+          codigo_circuito?: string;
+          correo_electronico?: string | null;
+          fecha_modificacion?: string | null;
+          fecha_registro?: string | null;
+          movil?: string | null;
+          nombre_viajante?: string | null;
+          usuario_modifica?: string | null;
+          usuario_registra?: string | null;
+        };
+        Relationships: [];
+      };
       congregaciones: {
         Row: {
-          codigo_circuito: string | null
-          codigo_congregacion: number
-          codigo_departamento: string
-          codigo_municipio: string
-          correo_congregacion: string | null
-          fecha_modificacion: string | null
-          fecha_registro: string | null
-          nombre_congregacion: string
-          usuario_modifica: string | null
-          usuario_registra: string | null
-        }
+          codigo_circuito: string | null;
+          codigo_congregacion: number;
+          codigo_departamento: string;
+          codigo_municipio: string;
+          correo_congregacion: string | null;
+          fecha_modificacion: string | null;
+          fecha_registro: string | null;
+          nombre_congregacion: string;
+          usuario_modifica: string | null;
+          usuario_registra: string | null;
+        };
         Insert: {
-          codigo_circuito?: string | null
-          codigo_congregacion: number
-          codigo_departamento: string
-          codigo_municipio: string
-          correo_congregacion?: string | null
-          fecha_modificacion?: string | null
-          fecha_registro?: string | null
-          nombre_congregacion: string
-          usuario_modifica?: string | null
-          usuario_registra?: string | null
-        }
+          codigo_circuito?: string | null;
+          codigo_congregacion: number;
+          codigo_departamento: string;
+          codigo_municipio: string;
+          correo_congregacion?: string | null;
+          fecha_modificacion?: string | null;
+          fecha_registro?: string | null;
+          nombre_congregacion: string;
+          usuario_modifica?: string | null;
+          usuario_registra?: string | null;
+        };
         Update: {
-          codigo_circuito?: string | null
-          codigo_congregacion?: number
-          codigo_departamento?: string
-          codigo_municipio?: string
-          correo_congregacion?: string | null
-          fecha_modificacion?: string | null
-          fecha_registro?: string | null
-          nombre_congregacion?: string
-          usuario_modifica?: string | null
-          usuario_registra?: string | null
-        }
+          codigo_circuito?: string | null;
+          codigo_congregacion?: number;
+          codigo_departamento?: string;
+          codigo_municipio?: string;
+          correo_congregacion?: string | null;
+          fecha_modificacion?: string | null;
+          fecha_registro?: string | null;
+          nombre_congregacion?: string;
+          usuario_modifica?: string | null;
+          usuario_registra?: string | null;
+        };
         Relationships: [
           {
-            foreignKeyName: "congregaciones_codigo_circuito_fkey"
-            columns: ["codigo_circuito"]
-            isOneToOne: false
-            referencedRelation: "circuitos"
-            referencedColumns: ["codigo_circuito"]
+            foreignKeyName: 'congregaciones_codigo_circuito_fkey';
+            columns: ['codigo_circuito'];
+            isOneToOne: false;
+            referencedRelation: 'circuitos';
+            referencedColumns: ['codigo_circuito'];
           },
           {
-            foreignKeyName: "congregaciones_codigo_departamento_fkey"
-            columns: ["codigo_departamento"]
-            isOneToOne: false
-            referencedRelation: "departamentos"
-            referencedColumns: ["codigo_departamento"]
+            foreignKeyName: 'congregaciones_codigo_departamento_fkey';
+            columns: ['codigo_departamento'];
+            isOneToOne: false;
+            referencedRelation: 'departamentos';
+            referencedColumns: ['codigo_departamento'];
           },
           {
-            foreignKeyName: "congregaciones_codigo_municipio_fkey"
-            columns: ["codigo_municipio"]
-            isOneToOne: false
-            referencedRelation: "municipios"
-            referencedColumns: ["codigo_municipio"]
+            foreignKeyName: 'congregaciones_codigo_municipio_fkey';
+            columns: ['codigo_municipio'];
+            isOneToOne: false;
+            referencedRelation: 'municipios';
+            referencedColumns: ['codigo_municipio'];
           },
-        ]
-      }
+        ];
+      };
       departamentos: {
         Row: {
-          codigo_departamento: string
-          nombre_departamento: string
-        }
+          codigo_departamento: string;
+          nombre_departamento: string;
+        };
         Insert: {
-          codigo_departamento: string
-          nombre_departamento: string
-        }
+          codigo_departamento: string;
+          nombre_departamento: string;
+        };
         Update: {
-          codigo_departamento?: string
-          nombre_departamento?: string
-        }
-        Relationships: []
-      }
+          codigo_departamento?: string;
+          nombre_departamento?: string;
+        };
+        Relationships: [];
+      };
       mensajes: {
         Row: {
-          adjunto_asociado: string | null
-          fecha_modificacion: string | null
-          fecha_registro: string | null
-          id: string
-          mensaje: string | null
-          tipo: string | null
-          usuario_modifica: string | null
-          usuario_registra: string | null
-        }
+          adjunto_asociado: string | null;
+          fecha_modificacion: string | null;
+          fecha_registro: string | null;
+          id: string;
+          mensaje: string | null;
+          tipo: string | null;
+          usuario_modifica: string | null;
+          usuario_registra: string | null;
+        };
         Insert: {
-          adjunto_asociado?: string | null
-          fecha_modificacion?: string | null
-          fecha_registro?: string | null
-          id?: string
-          mensaje?: string | null
-          tipo?: string | null
-          usuario_modifica?: string | null
-          usuario_registra?: string | null
-        }
+          adjunto_asociado?: string | null;
+          fecha_modificacion?: string | null;
+          fecha_registro?: string | null;
+          id?: string;
+          mensaje?: string | null;
+          tipo?: string | null;
+          usuario_modifica?: string | null;
+          usuario_registra?: string | null;
+        };
         Update: {
-          adjunto_asociado?: string | null
-          fecha_modificacion?: string | null
-          fecha_registro?: string | null
-          id?: string
-          mensaje?: string | null
-          tipo?: string | null
-          usuario_modifica?: string | null
-          usuario_registra?: string | null
-        }
-        Relationships: []
-      }
+          adjunto_asociado?: string | null;
+          fecha_modificacion?: string | null;
+          fecha_registro?: string | null;
+          id?: string;
+          mensaje?: string | null;
+          tipo?: string | null;
+          usuario_modifica?: string | null;
+          usuario_registra?: string | null;
+        };
+        Relationships: [];
+      };
       municipios: {
         Row: {
-          codigo_departamento: string
-          codigo_municipio: string
-          nombre_municipio: string
-        }
+          codigo_departamento: string;
+          codigo_municipio: string;
+          nombre_municipio: string;
+        };
         Insert: {
-          codigo_departamento: string
-          codigo_municipio: string
-          nombre_municipio: string
-        }
+          codigo_departamento: string;
+          codigo_municipio: string;
+          nombre_municipio: string;
+        };
         Update: {
-          codigo_departamento?: string
-          codigo_municipio?: string
-          nombre_municipio?: string
-        }
+          codigo_departamento?: string;
+          codigo_municipio?: string;
+          nombre_municipio?: string;
+        };
         Relationships: [
           {
-            foreignKeyName: "municipios_codigo_departamento_fkey"
-            columns: ["codigo_departamento"]
-            isOneToOne: false
-            referencedRelation: "departamentos"
-            referencedColumns: ["codigo_departamento"]
+            foreignKeyName: 'municipios_codigo_departamento_fkey';
+            columns: ['codigo_departamento'];
+            isOneToOne: false;
+            referencedRelation: 'departamentos';
+            referencedColumns: ['codigo_departamento'];
           },
-        ]
-      }
+        ];
+      };
       noticias: {
         Row: {
-          contenido: string
-          estado: string
-          fecha_modificacion: string | null
-          fecha_publicacion: string | null
-          fecha_registro: string | null
-          id: string
-          imagen_url: string | null
-          resumen: string
-          titulo: string
-          usuario_modifica: string | null
-          usuario_registra: string | null
-        }
+          contenido: string;
+          estado: string;
+          fecha_maxima_publicacion: string | null;
+          fecha_modificacion: string | null;
+          fecha_publicacion: string | null;
+          fecha_registro: string | null;
+          id: string;
+          imagen_url: string | null;
+          orden: number;
+          resumen: string;
+          storage_path: string | null;
+          titulo: string;
+          usuario_modifica: string | null;
+          usuario_registra: string | null;
+        };
         Insert: {
-          contenido: string
-          estado?: string
-          fecha_modificacion?: string | null
-          fecha_publicacion?: string | null
-          fecha_registro?: string | null
-          id?: string
-          imagen_url?: string | null
-          resumen: string
-          titulo: string
-          usuario_modifica?: string | null
-          usuario_registra?: string | null
-        }
+          contenido: string;
+          estado?: string;
+          fecha_maxima_publicacion?: string | null;
+          fecha_modificacion?: string | null;
+          fecha_publicacion?: string | null;
+          fecha_registro?: string | null;
+          id?: string;
+          imagen_url?: string | null;
+          orden: number;
+          resumen: string;
+          storage_path?: string | null;
+          titulo: string;
+          usuario_modifica?: string | null;
+          usuario_registra?: string | null;
+        };
         Update: {
-          contenido?: string
-          estado?: string
-          fecha_modificacion?: string | null
-          fecha_publicacion?: string | null
-          fecha_registro?: string | null
-          id?: string
-          imagen_url?: string | null
-          resumen?: string
-          titulo?: string
-          usuario_modifica?: string | null
-          usuario_registra?: string | null
-        }
-        Relationships: []
-      }
+          contenido?: string;
+          estado?: string;
+          fecha_maxima_publicacion?: string | null;
+          fecha_modificacion?: string | null;
+          fecha_publicacion?: string | null;
+          fecha_registro?: string | null;
+          id?: string;
+          imagen_url?: string | null;
+          orden?: number;
+          resumen?: string;
+          storage_path?: string | null;
+          titulo?: string;
+          usuario_modifica?: string | null;
+          usuario_registra?: string | null;
+        };
+        Relationships: [];
+      };
+      parametros: {
+        Row: {
+          activo: boolean;
+          clave: string;
+          descripcion: string | null;
+          fecha_modificacion: string | null;
+          id: string;
+          usuario_modifica: string | null;
+          valor: string | null;
+        };
+        Insert: {
+          activo?: boolean;
+          clave: string;
+          descripcion?: string | null;
+          fecha_modificacion?: string | null;
+          id?: string;
+          usuario_modifica?: string | null;
+          valor?: string | null;
+        };
+        Update: {
+          activo?: boolean;
+          clave?: string;
+          descripcion?: string | null;
+          fecha_modificacion?: string | null;
+          id?: string;
+          usuario_modifica?: string | null;
+          valor?: string | null;
+        };
+        Relationships: [];
+      };
       publicadores: {
         Row: {
-          apellido_casada: string | null
-          asistio_primera_capacitacion: string
-          asistio_segunda_capacitacion: string
-          codigo_congregacion: number | null
-          codigo_departamento: string | null
-          codigo_municipio: string | null
-          correo_electronico: string | null
-          direccion: string | null
-          entrenamiento_requerido: string | null
-          estado: string | null
-          estado_civil: string | null
-          estado_registro: string | null
-          existe_bd_anterior: string | null
-          fecha_actualizacion_datos: string | null
-          fecha_aprobacion: string | null
-          fecha_bautismo: string | null
-          fecha_cumple_requisitos: string | null
-          fecha_modificacion: string | null
-          fecha_nacimiento: string | null
-          fecha_primer_entrenamiento: string | null
-          fecha_primera_capacitacion: string | null
-          fecha_registro: string | null
-          fecha_segunda_capacitacion: string | null
-          fecha_segundo_entrenamiento: string | null
-          fecha_solicitud: string | null
-          id: string
-          login: string | null
-          lugar_primer_entrenamiento: string | null
-          lugar_primera_capacitacion: number | null
-          lugar_segunda_capacitacion: number | null
-          lugar_segundo_entrenamiento: string | null
-          mensaje_primer_entrenamiento: string | null
-          mensaje_segundo_entrenamiento: string | null
-          movil: string | null
-          nombre_conyuge: string | null
-          participo_antes: string | null
-          primer_apellido: string | null
-          primer_nombre: string | null
-          privilegio_min: string | null
-          privilegio_ser: string | null
-          segundo_apellido: string | null
-          segundo_nombre: string | null
-          sexo: string | null
-          usuario_actualiza_datos: string | null
-          usuario_modifica: string | null
-          usuario_registra: string | null
-        }
+          apellido_casada: string | null;
+          asistio_primera_capacitacion: string;
+          asistio_segunda_capacitacion: string;
+          codigo_congregacion: number | null;
+          codigo_departamento: string | null;
+          codigo_municipio: string | null;
+          correo_electronico: string | null;
+          direccion: string | null;
+          entrenamiento_requerido: string | null;
+          estado: string | null;
+          estado_civil: string | null;
+          estado_registro: string | null;
+          existe_bd_anterior: string | null;
+          fecha_actualizacion_datos: string | null;
+          fecha_aprobacion: string | null;
+          fecha_bautismo: string | null;
+          fecha_cumple_requisitos: string | null;
+          fecha_modificacion: string | null;
+          fecha_nacimiento: string | null;
+          fecha_primer_entrenamiento: string | null;
+          fecha_primera_capacitacion: string | null;
+          fecha_registro: string | null;
+          fecha_segunda_capacitacion: string | null;
+          fecha_segundo_entrenamiento: string | null;
+          fecha_solicitud: string | null;
+          id: string;
+          login: string | null;
+          lugar_primer_entrenamiento: string | null;
+          lugar_primera_capacitacion: number | null;
+          lugar_segunda_capacitacion: number | null;
+          lugar_segundo_entrenamiento: string | null;
+          mensaje_primer_entrenamiento: string | null;
+          mensaje_segundo_entrenamiento: string | null;
+          movil: string | null;
+          nombre_conyuge: string | null;
+          participo_antes: string | null;
+          primer_apellido: string | null;
+          primer_nombre: string | null;
+          privilegio_min: string | null;
+          privilegio_ser: string | null;
+          segundo_apellido: string | null;
+          segundo_nombre: string | null;
+          sexo: string | null;
+          usuario_actualiza_datos: string | null;
+          usuario_modifica: string | null;
+          usuario_registra: string | null;
+        };
         Insert: {
-          apellido_casada?: string | null
-          asistio_primera_capacitacion?: string
-          asistio_segunda_capacitacion?: string
-          codigo_congregacion?: number | null
-          codigo_departamento?: string | null
-          codigo_municipio?: string | null
-          correo_electronico?: string | null
-          direccion?: string | null
-          entrenamiento_requerido?: string | null
-          estado?: string | null
-          estado_civil?: string | null
-          estado_registro?: string | null
-          existe_bd_anterior?: string | null
-          fecha_actualizacion_datos?: string | null
-          fecha_aprobacion?: string | null
-          fecha_bautismo?: string | null
-          fecha_cumple_requisitos?: string | null
-          fecha_modificacion?: string | null
-          fecha_nacimiento?: string | null
-          fecha_primer_entrenamiento?: string | null
-          fecha_primera_capacitacion?: string | null
-          fecha_registro?: string | null
-          fecha_segunda_capacitacion?: string | null
-          fecha_segundo_entrenamiento?: string | null
-          fecha_solicitud?: string | null
-          id?: string
-          login?: string | null
-          lugar_primer_entrenamiento?: string | null
-          lugar_primera_capacitacion?: number | null
-          lugar_segunda_capacitacion?: number | null
-          lugar_segundo_entrenamiento?: string | null
-          mensaje_primer_entrenamiento?: string | null
-          mensaje_segundo_entrenamiento?: string | null
-          movil?: string | null
-          nombre_conyuge?: string | null
-          participo_antes?: string | null
-          primer_apellido?: string | null
-          primer_nombre?: string | null
-          privilegio_min?: string | null
-          privilegio_ser?: string | null
-          segundo_apellido?: string | null
-          segundo_nombre?: string | null
-          sexo?: string | null
-          usuario_actualiza_datos?: string | null
-          usuario_modifica?: string | null
-          usuario_registra?: string | null
-        }
+          apellido_casada?: string | null;
+          asistio_primera_capacitacion?: string;
+          asistio_segunda_capacitacion?: string;
+          codigo_congregacion?: number | null;
+          codigo_departamento?: string | null;
+          codigo_municipio?: string | null;
+          correo_electronico?: string | null;
+          direccion?: string | null;
+          entrenamiento_requerido?: string | null;
+          estado?: string | null;
+          estado_civil?: string | null;
+          estado_registro?: string | null;
+          existe_bd_anterior?: string | null;
+          fecha_actualizacion_datos?: string | null;
+          fecha_aprobacion?: string | null;
+          fecha_bautismo?: string | null;
+          fecha_cumple_requisitos?: string | null;
+          fecha_modificacion?: string | null;
+          fecha_nacimiento?: string | null;
+          fecha_primer_entrenamiento?: string | null;
+          fecha_primera_capacitacion?: string | null;
+          fecha_registro?: string | null;
+          fecha_segunda_capacitacion?: string | null;
+          fecha_segundo_entrenamiento?: string | null;
+          fecha_solicitud?: string | null;
+          id?: string;
+          login?: string | null;
+          lugar_primer_entrenamiento?: string | null;
+          lugar_primera_capacitacion?: number | null;
+          lugar_segunda_capacitacion?: number | null;
+          lugar_segundo_entrenamiento?: string | null;
+          mensaje_primer_entrenamiento?: string | null;
+          mensaje_segundo_entrenamiento?: string | null;
+          movil?: string | null;
+          nombre_conyuge?: string | null;
+          participo_antes?: string | null;
+          primer_apellido?: string | null;
+          primer_nombre?: string | null;
+          privilegio_min?: string | null;
+          privilegio_ser?: string | null;
+          segundo_apellido?: string | null;
+          segundo_nombre?: string | null;
+          sexo?: string | null;
+          usuario_actualiza_datos?: string | null;
+          usuario_modifica?: string | null;
+          usuario_registra?: string | null;
+        };
         Update: {
-          apellido_casada?: string | null
-          asistio_primera_capacitacion?: string
-          asistio_segunda_capacitacion?: string
-          codigo_congregacion?: number | null
-          codigo_departamento?: string | null
-          codigo_municipio?: string | null
-          correo_electronico?: string | null
-          direccion?: string | null
-          entrenamiento_requerido?: string | null
-          estado?: string | null
-          estado_civil?: string | null
-          estado_registro?: string | null
-          existe_bd_anterior?: string | null
-          fecha_actualizacion_datos?: string | null
-          fecha_aprobacion?: string | null
-          fecha_bautismo?: string | null
-          fecha_cumple_requisitos?: string | null
-          fecha_modificacion?: string | null
-          fecha_nacimiento?: string | null
-          fecha_primer_entrenamiento?: string | null
-          fecha_primera_capacitacion?: string | null
-          fecha_registro?: string | null
-          fecha_segunda_capacitacion?: string | null
-          fecha_segundo_entrenamiento?: string | null
-          fecha_solicitud?: string | null
-          id?: string
-          login?: string | null
-          lugar_primer_entrenamiento?: string | null
-          lugar_primera_capacitacion?: number | null
-          lugar_segunda_capacitacion?: number | null
-          lugar_segundo_entrenamiento?: string | null
-          mensaje_primer_entrenamiento?: string | null
-          mensaje_segundo_entrenamiento?: string | null
-          movil?: string | null
-          nombre_conyuge?: string | null
-          participo_antes?: string | null
-          primer_apellido?: string | null
-          primer_nombre?: string | null
-          privilegio_min?: string | null
-          privilegio_ser?: string | null
-          segundo_apellido?: string | null
-          segundo_nombre?: string | null
-          sexo?: string | null
-          usuario_actualiza_datos?: string | null
-          usuario_modifica?: string | null
-          usuario_registra?: string | null
-        }
+          apellido_casada?: string | null;
+          asistio_primera_capacitacion?: string;
+          asistio_segunda_capacitacion?: string;
+          codigo_congregacion?: number | null;
+          codigo_departamento?: string | null;
+          codigo_municipio?: string | null;
+          correo_electronico?: string | null;
+          direccion?: string | null;
+          entrenamiento_requerido?: string | null;
+          estado?: string | null;
+          estado_civil?: string | null;
+          estado_registro?: string | null;
+          existe_bd_anterior?: string | null;
+          fecha_actualizacion_datos?: string | null;
+          fecha_aprobacion?: string | null;
+          fecha_bautismo?: string | null;
+          fecha_cumple_requisitos?: string | null;
+          fecha_modificacion?: string | null;
+          fecha_nacimiento?: string | null;
+          fecha_primer_entrenamiento?: string | null;
+          fecha_primera_capacitacion?: string | null;
+          fecha_registro?: string | null;
+          fecha_segunda_capacitacion?: string | null;
+          fecha_segundo_entrenamiento?: string | null;
+          fecha_solicitud?: string | null;
+          id?: string;
+          login?: string | null;
+          lugar_primer_entrenamiento?: string | null;
+          lugar_primera_capacitacion?: number | null;
+          lugar_segunda_capacitacion?: number | null;
+          lugar_segundo_entrenamiento?: string | null;
+          mensaje_primer_entrenamiento?: string | null;
+          mensaje_segundo_entrenamiento?: string | null;
+          movil?: string | null;
+          nombre_conyuge?: string | null;
+          participo_antes?: string | null;
+          primer_apellido?: string | null;
+          primer_nombre?: string | null;
+          privilegio_min?: string | null;
+          privilegio_ser?: string | null;
+          segundo_apellido?: string | null;
+          segundo_nombre?: string | null;
+          sexo?: string | null;
+          usuario_actualiza_datos?: string | null;
+          usuario_modifica?: string | null;
+          usuario_registra?: string | null;
+        };
         Relationships: [
           {
-            foreignKeyName: "publicadores_codigo_congregacion_fkey"
-            columns: ["codigo_congregacion"]
-            isOneToOne: false
-            referencedRelation: "congregaciones"
-            referencedColumns: ["codigo_congregacion"]
+            foreignKeyName: 'publicadores_codigo_congregacion_fkey';
+            columns: ['codigo_congregacion'];
+            isOneToOne: false;
+            referencedRelation: 'congregaciones';
+            referencedColumns: ['codigo_congregacion'];
           },
           {
-            foreignKeyName: "publicadores_codigo_departamento_fkey"
-            columns: ["codigo_departamento"]
-            isOneToOne: false
-            referencedRelation: "departamentos"
-            referencedColumns: ["codigo_departamento"]
+            foreignKeyName: 'publicadores_codigo_departamento_fkey';
+            columns: ['codigo_departamento'];
+            isOneToOne: false;
+            referencedRelation: 'departamentos';
+            referencedColumns: ['codigo_departamento'];
           },
           {
-            foreignKeyName: "publicadores_codigo_municipio_fkey"
-            columns: ["codigo_municipio"]
-            isOneToOne: false
-            referencedRelation: "municipios"
-            referencedColumns: ["codigo_municipio"]
+            foreignKeyName: 'publicadores_codigo_municipio_fkey';
+            columns: ['codigo_municipio'];
+            isOneToOne: false;
+            referencedRelation: 'municipios';
+            referencedColumns: ['codigo_municipio'];
           },
-        ]
-      }
+        ];
+      };
       publicadores_retirados: {
         Row: {
-          apellido_casada: string | null
-          asistio_primera_capacitacion: string
-          asistio_segunda_capacitacion: string
-          codigo_congregacion: number | null
-          codigo_departamento: string | null
-          codigo_municipio: string | null
-          correo_electronico: string | null
-          direccion: string | null
-          entrenamiento_requerido: string | null
-          estado: string | null
-          estado_civil: string | null
-          estado_solicitud_retiro: string | null
-          existe_bd_anterior: string | null
-          fecha_actualizacion_datos: string | null
-          fecha_aprobacion: string | null
-          fecha_bautismo: string | null
-          fecha_cumple_requisitos: string | null
-          fecha_modificacion: string | null
-          fecha_nacimiento: string | null
-          fecha_primer_entrenamiento: string | null
-          fecha_primera_capacitacion: string | null
-          fecha_registro: string | null
-          fecha_retiro: string | null
-          fecha_segunda_capacitacion: string | null
-          fecha_segundo_entrenamiento: string | null
-          fecha_solicitud: string | null
-          fecha_validacion_retiro: string | null
-          id: string
-          justificacion: string
-          login: string | null
-          lugar_primer_entrenamiento: string | null
-          lugar_primera_capacitacion: number | null
-          lugar_segunda_capacitacion: number | null
-          lugar_segundo_entrenamiento: string | null
-          mensaje_primer_entrenamiento: string | null
-          mensaje_segundo_entrenamiento: string | null
-          movil: string | null
-          nombre_conyuge: string | null
-          observaciones_retiro: string | null
-          participo_antes: string | null
-          primer_apellido: string | null
-          primer_nombre: string | null
-          privilegio_min: string | null
-          privilegio_ser: string | null
-          segundo_apellido: string | null
-          segundo_nombre: string | null
-          sexo: string | null
-          usuario_actualiza_datos: string | null
-          usuario_modifica: string | null
-          usuario_registra: string | null
-          usuario_retira: string | null
-          valida_retiro: string | null
-        }
+          apellido_casada: string | null;
+          asistio_primera_capacitacion: string;
+          asistio_segunda_capacitacion: string;
+          codigo_congregacion: number | null;
+          codigo_departamento: string | null;
+          codigo_municipio: string | null;
+          correo_electronico: string | null;
+          direccion: string | null;
+          entrenamiento_requerido: string | null;
+          estado: string | null;
+          estado_civil: string | null;
+          estado_solicitud_retiro: string | null;
+          existe_bd_anterior: string | null;
+          fecha_actualizacion_datos: string | null;
+          fecha_aprobacion: string | null;
+          fecha_bautismo: string | null;
+          fecha_cumple_requisitos: string | null;
+          fecha_modificacion: string | null;
+          fecha_nacimiento: string | null;
+          fecha_primer_entrenamiento: string | null;
+          fecha_primera_capacitacion: string | null;
+          fecha_registro: string | null;
+          fecha_retiro: string | null;
+          fecha_segunda_capacitacion: string | null;
+          fecha_segundo_entrenamiento: string | null;
+          fecha_solicitud: string | null;
+          fecha_validacion_retiro: string | null;
+          id: string;
+          justificacion: string;
+          login: string | null;
+          lugar_primer_entrenamiento: string | null;
+          lugar_primera_capacitacion: number | null;
+          lugar_segunda_capacitacion: number | null;
+          lugar_segundo_entrenamiento: string | null;
+          mensaje_primer_entrenamiento: string | null;
+          mensaje_segundo_entrenamiento: string | null;
+          movil: string | null;
+          nombre_conyuge: string | null;
+          observaciones_retiro: string | null;
+          participo_antes: string | null;
+          primer_apellido: string | null;
+          primer_nombre: string | null;
+          privilegio_min: string | null;
+          privilegio_ser: string | null;
+          segundo_apellido: string | null;
+          segundo_nombre: string | null;
+          sexo: string | null;
+          usuario_actualiza_datos: string | null;
+          usuario_modifica: string | null;
+          usuario_registra: string | null;
+          usuario_retira: string | null;
+          valida_retiro: string | null;
+        };
         Insert: {
-          apellido_casada?: string | null
-          asistio_primera_capacitacion?: string
-          asistio_segunda_capacitacion?: string
-          codigo_congregacion?: number | null
-          codigo_departamento?: string | null
-          codigo_municipio?: string | null
-          correo_electronico?: string | null
-          direccion?: string | null
-          entrenamiento_requerido?: string | null
-          estado?: string | null
-          estado_civil?: string | null
-          estado_solicitud_retiro?: string | null
-          existe_bd_anterior?: string | null
-          fecha_actualizacion_datos?: string | null
-          fecha_aprobacion?: string | null
-          fecha_bautismo?: string | null
-          fecha_cumple_requisitos?: string | null
-          fecha_modificacion?: string | null
-          fecha_nacimiento?: string | null
-          fecha_primer_entrenamiento?: string | null
-          fecha_primera_capacitacion?: string | null
-          fecha_registro?: string | null
-          fecha_retiro?: string | null
-          fecha_segunda_capacitacion?: string | null
-          fecha_segundo_entrenamiento?: string | null
-          fecha_solicitud?: string | null
-          fecha_validacion_retiro?: string | null
-          id: string
-          justificacion: string
-          login?: string | null
-          lugar_primer_entrenamiento?: string | null
-          lugar_primera_capacitacion?: number | null
-          lugar_segunda_capacitacion?: number | null
-          lugar_segundo_entrenamiento?: string | null
-          mensaje_primer_entrenamiento?: string | null
-          mensaje_segundo_entrenamiento?: string | null
-          movil?: string | null
-          nombre_conyuge?: string | null
-          observaciones_retiro?: string | null
-          participo_antes?: string | null
-          primer_apellido?: string | null
-          primer_nombre?: string | null
-          privilegio_min?: string | null
-          privilegio_ser?: string | null
-          segundo_apellido?: string | null
-          segundo_nombre?: string | null
-          sexo?: string | null
-          usuario_actualiza_datos?: string | null
-          usuario_modifica?: string | null
-          usuario_registra?: string | null
-          usuario_retira?: string | null
-          valida_retiro?: string | null
-        }
+          apellido_casada?: string | null;
+          asistio_primera_capacitacion?: string;
+          asistio_segunda_capacitacion?: string;
+          codigo_congregacion?: number | null;
+          codigo_departamento?: string | null;
+          codigo_municipio?: string | null;
+          correo_electronico?: string | null;
+          direccion?: string | null;
+          entrenamiento_requerido?: string | null;
+          estado?: string | null;
+          estado_civil?: string | null;
+          estado_solicitud_retiro?: string | null;
+          existe_bd_anterior?: string | null;
+          fecha_actualizacion_datos?: string | null;
+          fecha_aprobacion?: string | null;
+          fecha_bautismo?: string | null;
+          fecha_cumple_requisitos?: string | null;
+          fecha_modificacion?: string | null;
+          fecha_nacimiento?: string | null;
+          fecha_primer_entrenamiento?: string | null;
+          fecha_primera_capacitacion?: string | null;
+          fecha_registro?: string | null;
+          fecha_retiro?: string | null;
+          fecha_segunda_capacitacion?: string | null;
+          fecha_segundo_entrenamiento?: string | null;
+          fecha_solicitud?: string | null;
+          fecha_validacion_retiro?: string | null;
+          id: string;
+          justificacion: string;
+          login?: string | null;
+          lugar_primer_entrenamiento?: string | null;
+          lugar_primera_capacitacion?: number | null;
+          lugar_segunda_capacitacion?: number | null;
+          lugar_segundo_entrenamiento?: string | null;
+          mensaje_primer_entrenamiento?: string | null;
+          mensaje_segundo_entrenamiento?: string | null;
+          movil?: string | null;
+          nombre_conyuge?: string | null;
+          observaciones_retiro?: string | null;
+          participo_antes?: string | null;
+          primer_apellido?: string | null;
+          primer_nombre?: string | null;
+          privilegio_min?: string | null;
+          privilegio_ser?: string | null;
+          segundo_apellido?: string | null;
+          segundo_nombre?: string | null;
+          sexo?: string | null;
+          usuario_actualiza_datos?: string | null;
+          usuario_modifica?: string | null;
+          usuario_registra?: string | null;
+          usuario_retira?: string | null;
+          valida_retiro?: string | null;
+        };
         Update: {
-          apellido_casada?: string | null
-          asistio_primera_capacitacion?: string
-          asistio_segunda_capacitacion?: string
-          codigo_congregacion?: number | null
-          codigo_departamento?: string | null
-          codigo_municipio?: string | null
-          correo_electronico?: string | null
-          direccion?: string | null
-          entrenamiento_requerido?: string | null
-          estado?: string | null
-          estado_civil?: string | null
-          estado_solicitud_retiro?: string | null
-          existe_bd_anterior?: string | null
-          fecha_actualizacion_datos?: string | null
-          fecha_aprobacion?: string | null
-          fecha_bautismo?: string | null
-          fecha_cumple_requisitos?: string | null
-          fecha_modificacion?: string | null
-          fecha_nacimiento?: string | null
-          fecha_primer_entrenamiento?: string | null
-          fecha_primera_capacitacion?: string | null
-          fecha_registro?: string | null
-          fecha_retiro?: string | null
-          fecha_segunda_capacitacion?: string | null
-          fecha_segundo_entrenamiento?: string | null
-          fecha_solicitud?: string | null
-          fecha_validacion_retiro?: string | null
-          id?: string
-          justificacion?: string
-          login?: string | null
-          lugar_primer_entrenamiento?: string | null
-          lugar_primera_capacitacion?: number | null
-          lugar_segunda_capacitacion?: number | null
-          lugar_segundo_entrenamiento?: string | null
-          mensaje_primer_entrenamiento?: string | null
-          mensaje_segundo_entrenamiento?: string | null
-          movil?: string | null
-          nombre_conyuge?: string | null
-          observaciones_retiro?: string | null
-          participo_antes?: string | null
-          primer_apellido?: string | null
-          primer_nombre?: string | null
-          privilegio_min?: string | null
-          privilegio_ser?: string | null
-          segundo_apellido?: string | null
-          segundo_nombre?: string | null
-          sexo?: string | null
-          usuario_actualiza_datos?: string | null
-          usuario_modifica?: string | null
-          usuario_registra?: string | null
-          usuario_retira?: string | null
-          valida_retiro?: string | null
-        }
-        Relationships: []
-      }
+          apellido_casada?: string | null;
+          asistio_primera_capacitacion?: string;
+          asistio_segunda_capacitacion?: string;
+          codigo_congregacion?: number | null;
+          codigo_departamento?: string | null;
+          codigo_municipio?: string | null;
+          correo_electronico?: string | null;
+          direccion?: string | null;
+          entrenamiento_requerido?: string | null;
+          estado?: string | null;
+          estado_civil?: string | null;
+          estado_solicitud_retiro?: string | null;
+          existe_bd_anterior?: string | null;
+          fecha_actualizacion_datos?: string | null;
+          fecha_aprobacion?: string | null;
+          fecha_bautismo?: string | null;
+          fecha_cumple_requisitos?: string | null;
+          fecha_modificacion?: string | null;
+          fecha_nacimiento?: string | null;
+          fecha_primer_entrenamiento?: string | null;
+          fecha_primera_capacitacion?: string | null;
+          fecha_registro?: string | null;
+          fecha_retiro?: string | null;
+          fecha_segunda_capacitacion?: string | null;
+          fecha_segundo_entrenamiento?: string | null;
+          fecha_solicitud?: string | null;
+          fecha_validacion_retiro?: string | null;
+          id?: string;
+          justificacion?: string;
+          login?: string | null;
+          lugar_primer_entrenamiento?: string | null;
+          lugar_primera_capacitacion?: number | null;
+          lugar_segunda_capacitacion?: number | null;
+          lugar_segundo_entrenamiento?: string | null;
+          mensaje_primer_entrenamiento?: string | null;
+          mensaje_segundo_entrenamiento?: string | null;
+          movil?: string | null;
+          nombre_conyuge?: string | null;
+          observaciones_retiro?: string | null;
+          participo_antes?: string | null;
+          primer_apellido?: string | null;
+          primer_nombre?: string | null;
+          privilegio_min?: string | null;
+          privilegio_ser?: string | null;
+          segundo_apellido?: string | null;
+          segundo_nombre?: string | null;
+          sexo?: string | null;
+          usuario_actualiza_datos?: string | null;
+          usuario_modifica?: string | null;
+          usuario_registra?: string | null;
+          usuario_retira?: string | null;
+          valida_retiro?: string | null;
+        };
+        Relationships: [];
+      };
       puntos: {
         Row: {
-          codigo_departamento: string
-          codigo_municipio: string
-          codigo_punto: number
-          direccion: string | null
-          encargado: string | null
-          estado: string
-          fecha_modificacion: string | null
-          fecha_registro: string | null
-          movil: string | null
-          nombre_punto: string
-          tipo_punto: string
-          usuario_modifica: string | null
-          usuario_registra: string | null
-        }
+          codigo_departamento: string;
+          codigo_municipio: string;
+          codigo_punto: number;
+          direccion: string | null;
+          encargado: string | null;
+          estado: string;
+          fecha_modificacion: string | null;
+          fecha_registro: string | null;
+          movil: string | null;
+          nombre_punto: string;
+          tipo_punto: string;
+          usuario_modifica: string | null;
+          usuario_registra: string | null;
+        };
         Insert: {
-          codigo_departamento: string
-          codigo_municipio: string
-          codigo_punto: number
-          direccion?: string | null
-          encargado?: string | null
-          estado?: string
-          fecha_modificacion?: string | null
-          fecha_registro?: string | null
-          movil?: string | null
-          nombre_punto: string
-          tipo_punto: string
-          usuario_modifica?: string | null
-          usuario_registra?: string | null
-        }
+          codigo_departamento: string;
+          codigo_municipio: string;
+          codigo_punto: number;
+          direccion?: string | null;
+          encargado?: string | null;
+          estado?: string;
+          fecha_modificacion?: string | null;
+          fecha_registro?: string | null;
+          movil?: string | null;
+          nombre_punto: string;
+          tipo_punto: string;
+          usuario_modifica?: string | null;
+          usuario_registra?: string | null;
+        };
         Update: {
-          codigo_departamento?: string
-          codigo_municipio?: string
-          codigo_punto?: number
-          direccion?: string | null
-          encargado?: string | null
-          estado?: string
-          fecha_modificacion?: string | null
-          fecha_registro?: string | null
-          movil?: string | null
-          nombre_punto?: string
-          tipo_punto?: string
-          usuario_modifica?: string | null
-          usuario_registra?: string | null
-        }
+          codigo_departamento?: string;
+          codigo_municipio?: string;
+          codigo_punto?: number;
+          direccion?: string | null;
+          encargado?: string | null;
+          estado?: string;
+          fecha_modificacion?: string | null;
+          fecha_registro?: string | null;
+          movil?: string | null;
+          nombre_punto?: string;
+          tipo_punto?: string;
+          usuario_modifica?: string | null;
+          usuario_registra?: string | null;
+        };
         Relationships: [
           {
-            foreignKeyName: "puntos_codigo_departamento_fkey"
-            columns: ["codigo_departamento"]
-            isOneToOne: false
-            referencedRelation: "departamentos"
-            referencedColumns: ["codigo_departamento"]
+            foreignKeyName: 'puntos_codigo_departamento_fkey';
+            columns: ['codigo_departamento'];
+            isOneToOne: false;
+            referencedRelation: 'departamentos';
+            referencedColumns: ['codigo_departamento'];
           },
           {
-            foreignKeyName: "puntos_codigo_municipio_fkey"
-            columns: ["codigo_municipio"]
-            isOneToOne: false
-            referencedRelation: "municipios"
-            referencedColumns: ["codigo_municipio"]
+            foreignKeyName: 'puntos_codigo_municipio_fkey';
+            columns: ['codigo_municipio'];
+            isOneToOne: false;
+            referencedRelation: 'municipios';
+            referencedColumns: ['codigo_municipio'];
           },
-        ]
-      }
+        ];
+      };
+      textos_legales: {
+        Row: {
+          activo: boolean;
+          contenido: string;
+          fecha_registro: string | null;
+          id: string;
+          tipo: string;
+          usuario_registra: string | null;
+          version: string;
+        };
+        Insert: {
+          activo?: boolean;
+          contenido: string;
+          fecha_registro?: string | null;
+          id?: string;
+          tipo: string;
+          usuario_registra?: string | null;
+          version: string;
+        };
+        Update: {
+          activo?: boolean;
+          contenido?: string;
+          fecha_registro?: string | null;
+          id?: string;
+          tipo?: string;
+          usuario_registra?: string | null;
+          version?: string;
+        };
+        Relationships: [];
+      };
       turnos: {
         Row: {
-          aprobado_por: string | null
-          codigo_punto: number
-          dia_nombre: string
-          dia_numero: number
-          estado_solicitud: string | null
-          fecha_aprobacion: string | null
-          fecha_modificacion: string | null
-          fecha_registro: string | null
-          hora_fin: string
-          hora_inicio: string
-          id: string
-          id_publicador: string | null
-          justificacion: string | null
-          justificacion_aprobacion: string | null
-          observaciones: string | null
-          situacion_identificada: string | null
-          usuario_modifica: string | null
-          usuario_registra: string | null
-        }
+          aprobado_por: string | null;
+          codigo_punto: number;
+          dia_nombre: string;
+          dia_numero: number;
+          estado_solicitud: string | null;
+          estado_turno: string | null;
+          fecha_aprobacion: string | null;
+          fecha_modificacion: string | null;
+          fecha_registro: string | null;
+          hora_fin: string;
+          hora_inicio: string;
+          id: string;
+          id_publicador: string | null;
+          justificacion: string | null;
+          justificacion_aprobacion: string | null;
+          observaciones: string | null;
+          pareja_movil: string | null;
+          pareja_nombre: string | null;
+          situacion_identificada: string | null;
+          usuario_modifica: string | null;
+          usuario_registra: string | null;
+        };
         Insert: {
-          aprobado_por?: string | null
-          codigo_punto: number
-          dia_nombre: string
-          dia_numero: number
-          estado_solicitud?: string | null
-          fecha_aprobacion?: string | null
-          fecha_modificacion?: string | null
-          fecha_registro?: string | null
-          hora_fin: string
-          hora_inicio: string
-          id?: string
-          id_publicador?: string | null
-          justificacion?: string | null
-          justificacion_aprobacion?: string | null
-          observaciones?: string | null
-          situacion_identificada?: string | null
-          usuario_modifica?: string | null
-          usuario_registra?: string | null
-        }
+          aprobado_por?: string | null;
+          codigo_punto: number;
+          dia_nombre: string;
+          dia_numero: number;
+          estado_solicitud?: string | null;
+          estado_turno?: string | null;
+          fecha_aprobacion?: string | null;
+          fecha_modificacion?: string | null;
+          fecha_registro?: string | null;
+          hora_fin: string;
+          hora_inicio: string;
+          id?: string;
+          id_publicador?: string | null;
+          justificacion?: string | null;
+          justificacion_aprobacion?: string | null;
+          observaciones?: string | null;
+          pareja_movil?: string | null;
+          pareja_nombre?: string | null;
+          situacion_identificada?: string | null;
+          usuario_modifica?: string | null;
+          usuario_registra?: string | null;
+        };
         Update: {
-          aprobado_por?: string | null
-          codigo_punto?: number
-          dia_nombre?: string
-          dia_numero?: number
-          estado_solicitud?: string | null
-          fecha_aprobacion?: string | null
-          fecha_modificacion?: string | null
-          fecha_registro?: string | null
-          hora_fin?: string
-          hora_inicio?: string
-          id?: string
-          id_publicador?: string | null
-          justificacion?: string | null
-          justificacion_aprobacion?: string | null
-          observaciones?: string | null
-          situacion_identificada?: string | null
-          usuario_modifica?: string | null
-          usuario_registra?: string | null
-        }
+          aprobado_por?: string | null;
+          codigo_punto?: number;
+          dia_nombre?: string;
+          dia_numero?: number;
+          estado_solicitud?: string | null;
+          estado_turno?: string | null;
+          fecha_aprobacion?: string | null;
+          fecha_modificacion?: string | null;
+          fecha_registro?: string | null;
+          hora_fin?: string;
+          hora_inicio?: string;
+          id?: string;
+          id_publicador?: string | null;
+          justificacion?: string | null;
+          justificacion_aprobacion?: string | null;
+          observaciones?: string | null;
+          pareja_movil?: string | null;
+          pareja_nombre?: string | null;
+          situacion_identificada?: string | null;
+          usuario_modifica?: string | null;
+          usuario_registra?: string | null;
+        };
         Relationships: [
           {
-            foreignKeyName: "turnos_codigo_punto_fkey"
-            columns: ["codigo_punto"]
-            isOneToOne: false
-            referencedRelation: "puntos"
-            referencedColumns: ["codigo_punto"]
+            foreignKeyName: 'turnos_codigo_punto_fkey';
+            columns: ['codigo_punto'];
+            isOneToOne: false;
+            referencedRelation: 'puntos';
+            referencedColumns: ['codigo_punto'];
           },
           {
-            foreignKeyName: "turnos_id_publicador_fkey"
-            columns: ["id_publicador"]
-            isOneToOne: false
-            referencedRelation: "publicadores"
-            referencedColumns: ["id"]
+            foreignKeyName: 'turnos_id_publicador_fkey';
+            columns: ['id_publicador'];
+            isOneToOne: false;
+            referencedRelation: 'publicadores';
+            referencedColumns: ['id'];
           },
-        ]
-      }
+        ];
+      };
+      turnos_apro_rechaz: {
+        Row: {
+          aprobado_por: string | null;
+          codigo_punto: number;
+          dia_nombre: string;
+          dia_numero: number;
+          estado_solicitud: string | null;
+          fecha_aprobacion: string | null;
+          fecha_modificacion: string | null;
+          fecha_registro: string | null;
+          hora_fin: string;
+          hora_inicio: string;
+          id: string;
+          id_publicador: string | null;
+          justificacion: string | null;
+          justificacion_aprobacion: string | null;
+          justificacion_solicitud: string | null;
+          observaciones: string | null;
+          pareja_movil: string | null;
+          pareja_nombre: string | null;
+          situacion_identificada: string | null;
+          usuario_modifica: string | null;
+          usuario_registra: string | null;
+        };
+        Insert: {
+          aprobado_por?: string | null;
+          codigo_punto: number;
+          dia_nombre: string;
+          dia_numero: number;
+          estado_solicitud?: string | null;
+          fecha_aprobacion?: string | null;
+          fecha_modificacion?: string | null;
+          fecha_registro?: string | null;
+          hora_fin: string;
+          hora_inicio: string;
+          id?: string;
+          id_publicador?: string | null;
+          justificacion?: string | null;
+          justificacion_aprobacion?: string | null;
+          justificacion_solicitud?: string | null;
+          observaciones?: string | null;
+          pareja_movil?: string | null;
+          pareja_nombre?: string | null;
+          situacion_identificada?: string | null;
+          usuario_modifica?: string | null;
+          usuario_registra?: string | null;
+        };
+        Update: {
+          aprobado_por?: string | null;
+          codigo_punto?: number;
+          dia_nombre?: string;
+          dia_numero?: number;
+          estado_solicitud?: string | null;
+          fecha_aprobacion?: string | null;
+          fecha_modificacion?: string | null;
+          fecha_registro?: string | null;
+          hora_fin?: string;
+          hora_inicio?: string;
+          id?: string;
+          id_publicador?: string | null;
+          justificacion?: string | null;
+          justificacion_aprobacion?: string | null;
+          justificacion_solicitud?: string | null;
+          observaciones?: string | null;
+          pareja_movil?: string | null;
+          pareja_nombre?: string | null;
+          situacion_identificada?: string | null;
+          usuario_modifica?: string | null;
+          usuario_registra?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'turnos_apro_rechaz_codigo_punto_fkey';
+            columns: ['codigo_punto'];
+            isOneToOne: false;
+            referencedRelation: 'puntos';
+            referencedColumns: ['codigo_punto'];
+          },
+          {
+            foreignKeyName: 'turnos_apro_rechaz_id_publicador_fkey';
+            columns: ['id_publicador'];
+            isOneToOne: false;
+            referencedRelation: 'publicadores';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       turnos_entregados: {
         Row: {
-          codigo_punto: number
-          dia_nombre: string
-          dia_numero: number
-          fecha_modificacion: string | null
-          fecha_registro: string | null
-          hora_fin: string
-          hora_inicio: string
-          id: string
-          id_publicador: string | null
-          motivo: string
-          observaciones: string | null
-          usuario_modifica: string | null
-          usuario_registra: string | null
-        }
+          codigo_punto: number;
+          dia_nombre: string;
+          dia_numero: number;
+          fecha_modificacion: string | null;
+          fecha_registro: string | null;
+          hora_fin: string;
+          hora_inicio: string;
+          id: string;
+          id_publicador: string | null;
+          motivo: string;
+          observaciones: string | null;
+          usuario_modifica: string | null;
+          usuario_registra: string | null;
+        };
         Insert: {
-          codigo_punto: number
-          dia_nombre: string
-          dia_numero: number
-          fecha_modificacion?: string | null
-          fecha_registro?: string | null
-          hora_fin: string
-          hora_inicio: string
-          id?: string
-          id_publicador?: string | null
-          motivo: string
-          observaciones?: string | null
-          usuario_modifica?: string | null
-          usuario_registra?: string | null
-        }
+          codigo_punto: number;
+          dia_nombre: string;
+          dia_numero: number;
+          fecha_modificacion?: string | null;
+          fecha_registro?: string | null;
+          hora_fin: string;
+          hora_inicio: string;
+          id?: string;
+          id_publicador?: string | null;
+          motivo: string;
+          observaciones?: string | null;
+          usuario_modifica?: string | null;
+          usuario_registra?: string | null;
+        };
         Update: {
-          codigo_punto?: number
-          dia_nombre?: string
-          dia_numero?: number
-          fecha_modificacion?: string | null
-          fecha_registro?: string | null
-          hora_fin?: string
-          hora_inicio?: string
-          id?: string
-          id_publicador?: string | null
-          motivo?: string
-          observaciones?: string | null
-          usuario_modifica?: string | null
-          usuario_registra?: string | null
-        }
+          codigo_punto?: number;
+          dia_nombre?: string;
+          dia_numero?: number;
+          fecha_modificacion?: string | null;
+          fecha_registro?: string | null;
+          hora_fin?: string;
+          hora_inicio?: string;
+          id?: string;
+          id_publicador?: string | null;
+          motivo?: string;
+          observaciones?: string | null;
+          usuario_modifica?: string | null;
+          usuario_registra?: string | null;
+        };
         Relationships: [
           {
-            foreignKeyName: "turnos_entregados_codigo_punto_fkey"
-            columns: ["codigo_punto"]
-            isOneToOne: false
-            referencedRelation: "puntos"
-            referencedColumns: ["codigo_punto"]
+            foreignKeyName: 'turnos_entregados_codigo_punto_fkey';
+            columns: ['codigo_punto'];
+            isOneToOne: false;
+            referencedRelation: 'puntos';
+            referencedColumns: ['codigo_punto'];
           },
           {
-            foreignKeyName: "turnos_entregados_id_publicador_fkey"
-            columns: ["id_publicador"]
-            isOneToOne: false
-            referencedRelation: "publicadores"
-            referencedColumns: ["id"]
+            foreignKeyName: 'turnos_entregados_id_publicador_fkey';
+            columns: ['id_publicador'];
+            isOneToOne: false;
+            referencedRelation: 'publicadores';
+            referencedColumns: ['id'];
           },
-        ]
-      }
+        ];
+      };
       usuarios: {
         Row: {
-          correo: string | null
-          login: string
-          movil: string | null
-          password_hash: string
-          rol: string | null
-        }
+          correo: string | null;
+          login: string;
+          movil: string | null;
+          password_hash: string;
+          rol: string | null;
+        };
         Insert: {
-          correo?: string | null
-          login: string
-          movil?: string | null
-          password_hash: string
-          rol?: string | null
-        }
+          correo?: string | null;
+          login: string;
+          movil?: string | null;
+          password_hash: string;
+          rol?: string | null;
+        };
         Update: {
-          correo?: string | null
-          login?: string
-          movil?: string | null
-          password_hash?: string
-          rol?: string | null
-        }
-        Relationships: []
-      }
-    }
+          correo?: string | null;
+          login?: string;
+          movil?: string | null;
+          password_hash?: string;
+          rol?: string | null;
+        };
+        Relationships: [];
+      };
+    };
     Views: {
-      [_ in never]: never
-    }
+      [_ in never]: never;
+    };
     Functions: {
-      [_ in never]: never
-    }
+      [_ in never]: never;
+    };
     Enums: {
-      [_ in never]: never
-    }
+      [_ in never]: never;
+    };
     CompositeTypes: {
-      [_ in never]: never
-    }
-  }
-}
+      [_ in never]: never;
+    };
+  };
+};
 
-type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+type DatabaseWithoutInternals = Omit<Database, '__InternalSupabase'>;
 
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+type DefaultSchema = DatabaseWithoutInternals[Extract<
+  keyof Database,
+  'public'
+>];
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
-    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
   }
-    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+  schema: keyof DatabaseWithoutInternals;
 }
-  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
-      Row: infer R
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])[TableName] extends {
+      Row: infer R;
     }
     ? R
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])
-    ? (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
-        Row: infer R
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema['Tables'] &
+        DefaultSchema['Views'])
+    ? (DefaultSchema['Tables'] &
+        DefaultSchema['Views'])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R;
       }
       ? R
       : never
-    : never
+    : never;
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    keyof DefaultSchema['Tables'] | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+  schema: keyof DatabaseWithoutInternals;
 }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Insert: infer I
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
+      Insert: infer I;
     }
     ? I
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Insert: infer I
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
+    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I;
       }
       ? I
       : never
-    : never
+    : never;
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    keyof DefaultSchema['Tables'] | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+  schema: keyof DatabaseWithoutInternals;
 }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Update: infer U
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
+      Update: infer U;
     }
     ? U
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Update: infer U
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
+    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U;
       }
       ? U
       : never
-    : never
+    : never;
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
-    | keyof DefaultSchema["Enums"]
-    | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+    keyof DefaultSchema['Enums'] | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums']
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+  schema: keyof DatabaseWithoutInternals;
 }
-  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
-    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
-    : never
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums'][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema['Enums']
+    ? DefaultSchema['Enums'][DefaultSchemaEnumNameOrOptions]
+    : never;
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-    | keyof DefaultSchema["CompositeTypes"]
+    | keyof DefaultSchema['CompositeTypes']
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
   }
-    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+  schema: keyof DatabaseWithoutInternals;
 }
-  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
-    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
-    : never
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema['CompositeTypes']
+    ? DefaultSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
+    : never;
 
 export const Constants = {
   public: {
     Enums: {},
   },
-} as const
+} as const;

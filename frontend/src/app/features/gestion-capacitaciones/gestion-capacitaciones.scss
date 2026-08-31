@@ -1,0 +1,16 @@
+.gestion-capacitaciones-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ppam-space-lg);
+}
+
+.gestion-capacitaciones-page__toolbar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.gestion-capacitaciones-page__grid {
+  background: var(--ppam-surface-container-lowest);
+  border-radius: var(--ppam-radius-card);
+  padding: var(--ppam-space-md);
+}

@@ -15,7 +15,9 @@
     <table class="ppam-table circuito-summary__table">
       <thead>
         <tr>
-          <th rowspan="2" class="circuito-summary__label-col">Circuito / Congregación / Publicador</th>
+          <th rowspan="2" class="circuito-summary__label-col">
+            Circuito / Congregación / Publicador
+          </th>
           <th rowspan="2">Total</th>
           <th colspan="3" class="circuito-summary__group-header">Entrenamiento requerido</th>
           <th colspan="3" class="circuito-summary__group-header">Privilegio mínimo</th>
@@ -44,12 +46,18 @@
               <button
                 type="button"
                 class="circuito-summary__toggle"
-                [attr.aria-label]="(isCircuitoExpanded(circuito.codigoCircuito) ? 'Contraer' : 'Expandir') + ' ' + circuito.nombreCircuito"
+                [attr.aria-label]="
+                  (isCircuitoExpanded(circuito.codigoCircuito) ? 'Contraer' : 'Expandir') +
+                  ' ' +
+                  circuito.nombreCircuito
+                "
                 [attr.aria-expanded]="isCircuitoExpanded(circuito.codigoCircuito)"
                 (click)="toggleCircuito(circuito.codigoCircuito)"
               >
                 <span class="material-symbols-outlined" aria-hidden="true">
-                  {{ isCircuitoExpanded(circuito.codigoCircuito) ? 'expand_more' : 'chevron_right' }}
+                  {{
+                    isCircuitoExpanded(circuito.codigoCircuito) ? 'expand_more' : 'chevron_right'
+                  }}
                 </span>
                 <span class="material-symbols-outlined" aria-hidden="true">account_tree</span>
                 {{ circuito.nombreCircuito }}
@@ -67,8 +75,8 @@
             <td>{{ circuito.privilegioSerPrecursorEspecial }}</td>
             <td>{{ circuito.privilegioSerMisionero }}</td>
             <td>{{ circuito.privilegioSerBetel }}</td>
-            <td>—</td>
-            <td>—</td>
+            <td>-</td>
+            <td>-</td>
           </tr>
 
           @if (isCircuitoExpanded(circuito.codigoCircuito)) {
@@ -78,12 +86,22 @@
                   <button
                     type="button"
                     class="circuito-summary__toggle circuito-summary__toggle--nested"
-                    [attr.aria-label]="(isCongregacionExpanded(congregacion.codigoCongregacion) ? 'Contraer' : 'Expandir') + ' ' + congregacion.nombreCongregacion"
+                    [attr.aria-label]="
+                      (isCongregacionExpanded(congregacion.codigoCongregacion)
+                        ? 'Contraer'
+                        : 'Expandir') +
+                      ' ' +
+                      congregacion.nombreCongregacion
+                    "
                     [attr.aria-expanded]="isCongregacionExpanded(congregacion.codigoCongregacion)"
                     (click)="toggleCongregacion(congregacion.codigoCongregacion)"
                   >
                     <span class="material-symbols-outlined" aria-hidden="true">
-                      {{ isCongregacionExpanded(congregacion.codigoCongregacion) ? 'expand_more' : 'chevron_right' }}
+                      {{
+                        isCongregacionExpanded(congregacion.codigoCongregacion)
+                          ? 'expand_more'
+                          : 'chevron_right'
+                      }}
                     </span>
                     <span class="material-symbols-outlined" aria-hidden="true">house</span>
                     {{ congregacion.nombreCongregacion }}
@@ -101,8 +119,8 @@
                 <td>{{ congregacion.privilegioSerPrecursorEspecial }}</td>
                 <td>{{ congregacion.privilegioSerMisionero }}</td>
                 <td>{{ congregacion.privilegioSerBetel }}</td>
-                <td>—</td>
-                <td>—</td>
+                <td>-</td>
+                <td>-</td>
               </tr>
 
               @if (isCongregacionExpanded(congregacion.codigoCongregacion)) {
@@ -149,8 +167,8 @@
             <td>{{ totals().privilegioSerPrecursorEspecial }}</td>
             <td>{{ totals().privilegioSerMisionero }}</td>
             <td>{{ totals().privilegioSerBetel }}</td>
-            <td>—</td>
-            <td>—</td>
+            <td>-</td>
+            <td>-</td>
           </tr>
         </tfoot>
       }

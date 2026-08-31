@@ -133,8 +133,8 @@
 
 .dialog-panel__toolbar {
   display: flex;
-  gap: var(--ppam-space-sm);
-  padding: var(--ppam-space-md) var(--ppam-space-lg);
+  gap: var(--ppam-space-md);
+  padding: var(--ppam-space-lg);
   border-bottom: 1px solid var(--ppam-border-quiet);
   flex-shrink: 0;
   flex-wrap: wrap;

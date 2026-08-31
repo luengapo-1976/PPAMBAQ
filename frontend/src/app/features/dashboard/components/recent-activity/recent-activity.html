@@ -9,9 +9,13 @@
           <strong>{{ item.nombre }}</strong>
           {{ item.accion === 'Registrado' ? 'se registró' : 'fue modificado' }}
         </span>
-        <span class="recent-activity__meta">{{ item.congregacion }} · {{ formatDateShort(item.fecha) }}</span>
+        <span class="recent-activity__meta"
+          >{{ item.congregacion }} · {{ formatDateShort(item.fecha) }}</span
+        >
       </span>
-      <app-badge [tone]="estadoConfig[item.estado].tone">{{ estadoConfig[item.estado].label }}</app-badge>
+      <app-badge [tone]="estadoConfig[item.estado].tone">{{
+        estadoConfig[item.estado].label
+      }}</app-badge>
     </li>
   } @empty {
     <li class="recent-activity__empty">No hay actividad reciente para el filtro actual.</li>

@@ -4,6 +4,10 @@
   </div>
 
   <section class="mensajes-page__grid">
+    <p class="table-count">
+      {{ mensajes().length }} mostrados de {{ mensajes().length }}
+      {{ mensajes().length === 1 ? 'registro total' : 'registros totales' }}
+    </p>
     <app-mensajes-table [rows]="mensajes()" (editRecord)="onEditRecord($event)" />
   </section>
 </div>

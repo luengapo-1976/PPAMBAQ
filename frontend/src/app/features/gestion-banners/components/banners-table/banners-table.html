@@ -1,0 +1,71 @@
+<div class="table-scroll">
+  <table class="ppam-table">
+    <thead>
+      <tr>
+        <th>Imagen</th>
+        <th>Dimensión</th>
+        <th>Orden</th>
+        <th>Visibilidad</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of rows(); track row.id; let first = $first; let last = $last) {
+        <tr>
+          <td>
+            <img class="ppam-table__thumb" [src]="row.imagen_url" alt="" />
+          </td>
+          <td>{{ row.ancho_px }} × {{ row.alto_px }} px</td>
+          <td>{{ row.orden }}</td>
+          <td>
+            <app-switch
+              [checked]="row.activo"
+              labelOn="Visible"
+              labelOff="Oculto"
+              (changed)="onToggleActivo(row, $event)"
+            />
+          </td>
+          <td>
+            <div class="ppam-table__actions">
+              <button
+                type="button"
+                class="ppam-table__edit-btn"
+                [attr.aria-label]="'Subir banner'"
+                title="Subir"
+                [disabled]="first"
+                (click)="moveUp.emit(row)"
+              >
+                <span class="material-symbols-outlined" aria-hidden="true">keyboard_arrow_up</span>
+              </button>
+              <button
+                type="button"
+                class="ppam-table__edit-btn"
+                [attr.aria-label]="'Bajar banner'"
+                title="Bajar"
+                [disabled]="last"
+                (click)="moveDown.emit(row)"
+              >
+                <span class="material-symbols-outlined" aria-hidden="true"
+                  >keyboard_arrow_down</span
+                >
+              </button>
+              <button
+                type="button"
+                class="ppam-table__edit-btn ppam-table__edit-btn--danger"
+                aria-label="Eliminar banner"
+                title="Eliminar"
+                (click)="onDelete(row)"
+              >
+                <span class="material-symbols-outlined" aria-hidden="true">delete</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="5" class="ppam-table__empty">Todavía no hay banners registrados.</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

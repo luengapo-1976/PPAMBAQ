@@ -1,0 +1,124 @@
+<app-dialog
+  [open]="open()"
+  [title]="dialogTitle()"
+  position="right"
+  rightWidth="50vw"
+  panelBackground="var(--ppam-surface)"
+  (closed)="onCancel()"
+>
+  <app-button
+    dialogToolbar
+    type="button"
+    icon="save"
+    [disabled]="form.invalid || saving() || uploading()"
+    (click)="onGuardar()"
+  >
+    {{ saving() ? 'Guardando…' : 'Guardar' }}
+  </app-button>
+  <app-button dialogToolbar type="button" variant="ghost" icon="close" (click)="onCancel()"
+    >Cancelar</app-button
+  >
+
+  <form class="capacitacion-form" [formGroup]="form" (ngSubmit)="onGuardar()">
+    <app-form-field label="Tipo de contenido" [required]="true">
+      <div class="capacitacion-form__tipo-group" role="radiogroup" aria-label="Tipo de contenido">
+        <button
+          type="button"
+          class="capacitacion-form__tipo-chip"
+          role="radio"
+          [attr.aria-checked]="form.controls.tipo.value === 'IMAGEN'"
+          [class.capacitacion-form__tipo-chip--active]="form.controls.tipo.value === 'IMAGEN'"
+          (click)="onSeleccionarTipo('IMAGEN')"
+        >
+          <span class="material-symbols-outlined" aria-hidden="true">image</span>
+          Imagen
+        </button>
+        <button
+          type="button"
+          class="capacitacion-form__tipo-chip"
+          role="radio"
+          [attr.aria-checked]="form.controls.tipo.value === 'VIDEO'"
+          [class.capacitacion-form__tipo-chip--active]="form.controls.tipo.value === 'VIDEO'"
+          (click)="onSeleccionarTipo('VIDEO')"
+        >
+          <span class="material-symbols-outlined" aria-hidden="true">smart_display</span>
+          Video
+        </button>
+      </div>
+    </app-form-field>
+
+    <app-form-field label="Título" [required]="true" [control]="form.controls.titulo">
+      <input type="text" formControlName="titulo" class="ppam-input" maxlength="200" />
+    </app-form-field>
+
+    <app-form-field
+      label="Resumen"
+      [required]="true"
+      [control]="form.controls.resumen"
+      hint="Breve descripción que se muestra junto al elemento (máx. 300 caracteres)."
+    >
+      <textarea formControlName="resumen" class="ppam-textarea" rows="3" maxlength="300"></textarea>
+    </app-form-field>
+
+    @if (form.controls.tipo.value === 'IMAGEN') {
+      <app-form-field label="Imagen">
+        <div class="capacitacion-form__imagen-control">
+          <div
+            class="capacitacion-form__imagen-name"
+            [class.capacitacion-form__imagen-name--empty]="!imagenFileName()"
+          >
+            {{ imagenFileName() || 'Sin imagen seleccionada' }}
+          </div>
+          @if (imagenFileName()) {
+            <button
+              type="button"
+              class="capacitacion-form__style-btn"
+              aria-label="Quitar imagen"
+              title="Quitar imagen"
+              (click)="onRemoveImagen()"
+            >
+              <span class="material-symbols-outlined" aria-hidden="true">close</span>
+            </button>
+          }
+          <app-button
+            type="button"
+            variant="secondary"
+            [disabled]="uploading()"
+            (click)="imagenInput.click()"
+          >
+            {{ uploading() ? 'Subiendo…' : 'Examinar' }}
+          </app-button>
+          <input
+            #imagenInput
+            type="file"
+            accept="image/*"
+            class="capacitacion-form__file-input"
+            (change)="onFileSelected($event)"
+          />
+        </div>
+      </app-form-field>
+    } @else {
+      <app-form-field
+        label="Enlace del video"
+        [required]="true"
+        [control]="form.controls.video_url"
+        hint="Pega el enlace de YouTube o Vimeo."
+      >
+        <input
+          type="url"
+          formControlName="video_url"
+          class="ppam-input"
+          placeholder="https://www.youtube.com/watch?v=…"
+        />
+      </app-form-field>
+    }
+
+    <app-form-field
+      label="Fecha máxima de publicación"
+      [control]="form.controls.fecha_maxima_publicacion"
+      hint="Si se deja vacía, no vence: queda visible hasta que lo desactives manualmente."
+    >
+      <input type="date" formControlName="fecha_maxima_publicacion" class="ppam-input" />
+    </app-form-field>
+  </form>
+</app-dialog>

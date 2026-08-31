@@ -1,0 +1,17 @@
+<div class="gestion-banners-page">
+  <div class="gestion-banners-page__toolbar">
+    <app-button icon="add" (click)="onNewRecord()">Nueva imagen</app-button>
+  </div>
+
+  <section class="gestion-banners-page__grid">
+    <app-banners-table
+      [rows]="banners()"
+      (toggleActivo)="onToggleActivo($event)"
+      (moveUp)="onMoveUp($event)"
+      (moveDown)="onMoveDown($event)"
+      (deleteRecord)="onDeleteRecord($event)"
+    />
+  </section>
+</div>
+
+<app-banner-form [open]="dialogOpen()" (closed)="onDialogClosed()" (saved)="onSaved()" />

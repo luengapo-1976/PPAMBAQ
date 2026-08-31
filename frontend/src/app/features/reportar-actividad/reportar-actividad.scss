@@ -17,7 +17,7 @@
 
 .reportar-actividad__legend {
   margin: 0;
-  color: var(--ppam-on-surface-variant);
+  color: var(--ppam-primary-container);
 }
 
 .reportar-actividad__empty {
@@ -127,6 +127,30 @@
   margin-top: var(--ppam-space-xs);
 }
 
+.estado-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  align-self: flex-start;
+  height: 28px;
+  padding-inline: var(--ppam-space-sm);
+  border-radius: var(--ppam-radius-full);
+  font-size: var(--ppam-label-size);
+  font-weight: 600;
+  letter-spacing: var(--ppam-label-tracking);
+}
+
+.estado-badge .material-symbols-outlined {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.estado-badge--pendiente {
+  background: var(--ppam-semantic-warning-container);
+  color: var(--ppam-semantic-warning);
+}
+
 .reportar-actividad__volver {
   display: inline-flex;
   align-items: center;
@@ -183,7 +207,7 @@
   font-size: var(--ppam-label-size);
   font-weight: 600;
   letter-spacing: var(--ppam-label-tracking);
-  color: var(--ppam-on-surface-variant);
+  color: var(--ppam-primary-container);
 }
 
 .historial-card__valor {
@@ -236,7 +260,7 @@
   gap: 4px;
   font-size: var(--ppam-small-size);
   font-weight: 600;
-  color: var(--ppam-on-surface-variant);
+  color: var(--ppam-primary-container);
 }
 
 .reportar-actividad__field + .reportar-actividad__field,

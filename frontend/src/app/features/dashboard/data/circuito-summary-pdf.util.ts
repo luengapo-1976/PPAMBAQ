@@ -53,7 +53,7 @@ export async function exportCircuitoSummaryToPdf(
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(16);
   doc.setFont('helvetica', 'bold');
-  doc.text('PPAM — Resumen por circuito', 32, 28);
+  doc.text('PPAM - Resumen por circuito', 32, 28);
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
   const generatedAt = new Date().toLocaleString('es-CO', { dateStyle: 'long', timeStyle: 'short' });
@@ -122,7 +122,11 @@ export async function exportCircuitoSummaryToPdf(
     doc.setPage(i);
     doc.setFontSize(8);
     doc.setTextColor(140, 140, 140);
-    doc.text('Predicación Pública de Área Metropolitana Barranquilla (PPAM BAQ)', 32, pageHeight - 16);
+    doc.text(
+      'Predicación Pública de Área Metropolitana Barranquilla (PPAM BAQ)',
+      32,
+      pageHeight - 16,
+    );
     doc.text(`Página ${i} de ${pageCount}`, pageWidth - 32, pageHeight - 16, { align: 'right' });
   }
 

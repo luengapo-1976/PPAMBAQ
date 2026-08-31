@@ -8,3 +8,11 @@
   <app-participante-tabbar />
   <app-snackbar-host />
 </div>
+
+<app-punto-calendario-dialog
+  [open]="encargadoPunto.open()"
+  [puntos]="encargadoPunto.puntos()"
+  [departamentos]="encargadoPunto.departamentosCatalogo()"
+  [municipios]="encargadoPunto.municipiosCatalogo()"
+  (closed)="onCalendarioEncargadoClosed()"
+/>

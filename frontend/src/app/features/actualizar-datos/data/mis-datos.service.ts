@@ -24,6 +24,8 @@ export class MisDatosService {
   }
 
   solicitarBaja(justificacion: string): Observable<SolicitarBajaResultado> {
-    return this.api.post<SolicitarBajaResultado>('publicadores/me/solicitar-baja', { justificacion });
+    return this.api.post<SolicitarBajaResultado>('publicadores/me/solicitar-baja', {
+      justificacion,
+    });
   }
 }

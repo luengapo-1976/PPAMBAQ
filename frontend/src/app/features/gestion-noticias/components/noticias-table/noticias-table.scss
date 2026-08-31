@@ -24,8 +24,13 @@
 
 .ppam-table thead th {
   background: var(--ppam-surface-container-low);
-  color: var(--ppam-on-surface-variant);
+  color: var(--ppam-primary-container);
   font-weight: 600;
+}
+
+.ppam-table__actions {
+  display: flex;
+  gap: var(--ppam-space-xs);
 }
 
 .ppam-table__edit-btn {
@@ -41,8 +46,17 @@
   cursor: pointer;
 }
 
-.ppam-table__edit-btn:hover {
+.ppam-table__edit-btn:hover:not(:disabled) {
   background: var(--ppam-surface-container);
+}
+
+.ppam-table__edit-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.ppam-table__edit-btn--danger {
+  color: var(--ppam-error);
 }
 
 .ppam-table__empty {

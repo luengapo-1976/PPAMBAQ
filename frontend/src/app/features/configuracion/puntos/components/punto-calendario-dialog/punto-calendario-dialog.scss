@@ -1,0 +1,320 @@
+.punto-calendario__selector {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 320px;
+  max-width: 100%;
+  margin-bottom: var(--ppam-space-md);
+  font-size: var(--ppam-small-size);
+  font-weight: 600;
+  color: var(--ppam-primary-container);
+}
+
+.punto-calendario__info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ppam-space-xs);
+  padding: var(--ppam-space-md);
+  margin-bottom: var(--ppam-space-lg);
+  background: var(--ppam-form-bg);
+  border-radius: var(--ppam-radius-card);
+}
+
+.punto-calendario__info-row {
+  display: flex;
+  align-items: center;
+  gap: var(--ppam-space-sm);
+  color: var(--ppam-on-surface);
+  font-size: var(--ppam-small-size);
+}
+
+.punto-calendario__info-row .material-symbols-outlined {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: var(--ppam-primary-container);
+  flex-shrink: 0;
+}
+
+.punto-calendario__skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ppam-space-sm);
+}
+
+.skeleton-block {
+  height: 64px;
+  border-radius: var(--ppam-radius-card);
+  background: linear-gradient(
+    100deg,
+    var(--ppam-surface-container) 30%,
+    var(--ppam-surface-container-high) 50%,
+    var(--ppam-surface-container) 70%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.punto-calendario__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ppam-space-sm);
+  padding: var(--ppam-space-xl);
+  text-align: center;
+  color: var(--ppam-on-surface-variant);
+  background: var(--ppam-surface-container-lowest);
+  border: 1px solid var(--ppam-border-quiet);
+  border-radius: var(--ppam-radius-card);
+}
+
+.punto-calendario__empty .material-symbols-outlined {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+  color: var(--ppam-outline);
+}
+
+.punto-calendario__empty p {
+  margin: 0;
+}
+
+.punto-calendario__scroll {
+  overflow-x: auto;
+  border: 1px solid var(--ppam-outline-variant);
+  border-radius: var(--ppam-radius-card);
+}
+
+.punto-calendario__grid {
+  display: grid;
+  grid-template-columns: 180px repeat(7, minmax(190px, 1fr));
+  min-width: 1530px;
+}
+
+.punto-calendario__corner {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--ppam-space-sm);
+  background: var(--ppam-primary-container);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: var(--ppam-small-size);
+  letter-spacing: var(--ppam-label-tracking);
+  text-align: center;
+  border-bottom: 1px solid var(--ppam-border-quiet);
+}
+
+.punto-calendario__dia-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--ppam-space-sm);
+  background: var(--ppam-primary-container);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: var(--ppam-small-size);
+  letter-spacing: var(--ppam-label-tracking);
+  text-align: center;
+  border-left: 1px solid rgba(255, 255, 255, 0.16);
+  border-bottom: 1px solid var(--ppam-border-quiet);
+}
+
+.punto-calendario__hora {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--ppam-space-sm);
+  background: var(--ppam-surface-container-low);
+  color: var(--ppam-on-surface);
+  font-weight: 600;
+  font-size: var(--ppam-small-size);
+  border-top: 2px solid var(--ppam-outline-variant);
+  white-space: nowrap;
+}
+
+.punto-calendario__celda {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  padding: var(--ppam-space-sm);
+  background: var(--ppam-surface-container-lowest);
+  border-top: 2px solid var(--ppam-outline-variant);
+  border-left: 1px solid var(--ppam-outline-variant);
+}
+
+.punto-calendario__celda-vacia {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  color: var(--ppam-outline);
+}
+
+.celda-slot {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 6px var(--ppam-space-sm);
+  border-radius: var(--ppam-radius-control);
+  background: color-mix(in srgb, var(--ppam-semantic-success) 10%, white);
+  color: var(--ppam-semantic-success);
+  font-size: var(--ppam-label-size);
+  font-weight: 600;
+}
+
+.celda-slot .material-symbols-outlined {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.celda-slot--ocupado {
+  background: var(--ppam-surface-container);
+  color: var(--ppam-on-surface-variant);
+}
+
+.celda-slot--ocupado .material-symbols-outlined {
+  color: var(--ppam-primary-container);
+}
+
+.celda-slot--inactivo {
+  opacity: 0.55;
+}
+
+.celda-slot__switch {
+  align-self: flex-start;
+}
+
+.punto-calendario__nuevo-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: var(--ppam-space-md);
+  font-size: var(--ppam-small-size);
+  font-weight: 600;
+  color: var(--ppam-primary-container);
+}
+
+.punto-calendario__nuevo-error {
+  margin: 0 0 var(--ppam-space-md);
+  color: var(--ppam-semantic-error);
+  font-size: var(--ppam-small-size);
+}
+
+.celda-slot__info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  font-weight: 400;
+}
+
+.celda-slot__info strong {
+  color: var(--ppam-on-surface);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+/* ===== Vista móvil: selector de día + agenda vertical ===== */
+
+.punto-calendario__mobile {
+  display: none;
+}
+
+.punto-calendario__dia-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ppam-space-xs);
+  margin-bottom: var(--ppam-space-md);
+}
+
+.dia-chip {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--ppam-touch-target-min);
+  padding-inline: var(--ppam-space-md);
+  border: 1px solid var(--ppam-border-quiet);
+  border-radius: var(--ppam-radius-full);
+  background: var(--ppam-surface-container-lowest);
+  color: var(--ppam-on-surface-variant);
+  font-family: inherit;
+  font-size: var(--ppam-small-size);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background var(--ppam-motion-fast),
+    color var(--ppam-motion-fast),
+    border-color var(--ppam-motion-fast);
+}
+
+.dia-chip:hover {
+  background: var(--ppam-surface-container);
+}
+
+.dia-chip--active {
+  background: var(--ppam-primary-container);
+  border-color: var(--ppam-primary-container);
+  color: #ffffff;
+}
+
+.punto-calendario__agenda {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ppam-space-sm);
+}
+
+.agenda-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ppam-space-xs);
+  padding: var(--ppam-space-md);
+  background: var(--ppam-surface-container-lowest);
+  border: 1px solid var(--ppam-outline-variant);
+  border-radius: var(--ppam-radius-card);
+}
+
+.agenda-item__hora {
+  font-weight: 600;
+  font-size: var(--ppam-small-size);
+  color: var(--ppam-on-surface);
+}
+
+.agenda-item__celda {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Se declara al final a propósito: con igual especificidad, la regla que aparece
+   después en el código gana la cascada, sin importar el media query — así se
+   garantiza que gane sobre "display: none" de .punto-calendario__mobile de arriba. */
+@media (max-width: 599px) {
+  .punto-calendario__scroll--grid {
+    display: none;
+  }
+
+  .punto-calendario__mobile {
+    display: block;
+  }
+}

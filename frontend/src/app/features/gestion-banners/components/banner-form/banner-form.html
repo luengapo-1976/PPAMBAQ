@@ -1,0 +1,57 @@
+<app-dialog
+  [open]="open()"
+  title="Nueva imagen de banner"
+  position="right"
+  rightWidth="50vw"
+  panelBackground="var(--ppam-surface)"
+  (closed)="onCancel()"
+>
+  <app-button
+    dialogToolbar
+    type="button"
+    icon="save"
+    [disabled]="!previewUrl() || saving() || uploading()"
+    (click)="onGuardar()"
+  >
+    {{ saving() ? 'Guardando…' : 'Guardar' }}
+  </app-button>
+  <app-button dialogToolbar type="button" variant="ghost" icon="close" (click)="onCancel()"
+    >Cancelar</app-button
+  >
+
+  <div class="banner-form">
+    <p class="banner-form__hint">
+      Dimensión recomendada:
+      <strong>{{ anchoRequerido }} × {{ altoRequerido }} px</strong> (proporción ~2.63:1). Se acepta
+      cualquier imagen: se ajustará automáticamente recortando el sobrante de arriba/abajo o de los
+      costados, sin deformarla.
+    </p>
+
+    @if (previewUrl()) {
+      <div class="banner-form__preview">
+        <img [src]="previewUrl()" alt="Previsualización del banner" />
+        <button
+          type="button"
+          class="banner-form__remove-btn"
+          aria-label="Quitar imagen"
+          title="Quitar imagen"
+          (click)="onQuitarImagen()"
+        >
+          <span class="material-symbols-outlined" aria-hidden="true">close</span>
+        </button>
+      </div>
+    } @else {
+      <label class="banner-form__dropzone">
+        <span class="material-symbols-outlined" aria-hidden="true">image</span>
+        <span>{{ uploading() ? 'Subiendo…' : 'Selecciona una imagen' }}</span>
+        <input
+          type="file"
+          accept="image/*"
+          class="banner-form__file-input"
+          [disabled]="uploading()"
+          (change)="onFileSelected($event)"
+        />
+      </label>
+    }
+  </div>
+</app-dialog>

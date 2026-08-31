@@ -25,7 +25,7 @@ export async function exportEntrenamientoChecklistToExcel(
   const sheet = workbook.addWorksheet('Lista de chequeo');
   sheet.columns = [{ width: 6 }, { width: 32 }, { width: 16 }, { width: 26 }, { width: 12 }, { width: 14 }];
 
-  sheet.addRow([`Lista de chequeo — ${tipo}`]).font = { bold: true, size: 14 };
+  sheet.addRow([`Lista de chequeo - ${tipo}`]).font = { bold: true, size: 14 };
   const generadoEl = new Date().toLocaleString('es-CO', { dateStyle: 'long', timeStyle: 'short' });
   sheet.addRow([`Generado el ${generadoEl}`]).font = { italic: true, color: { argb: 'FF5A5A5A' } };
   sheet.addRow([]);
@@ -37,12 +37,12 @@ export async function exportEntrenamientoChecklistToExcel(
     const nombreDepartamento = punto
       ? departamentosPorCodigo.get(punto.codigo_departamento)?.nombre_departamento
       : undefined;
-    const direccion = [punto?.direccion, nombreMunicipio, nombreDepartamento].filter(Boolean).join(', ') || '—';
+    const direccion = [punto?.direccion, nombreMunicipio, nombreDepartamento].filter(Boolean).join(', ') || '-';
 
     sheet.addRow([`Fecha de entrenamiento: ${formatDateShort(grupo.fecha)}`]).font = { bold: true, size: 12 };
     sheet.addRow([`Lugar: ${nombrePunto}`]);
     sheet.addRow([`Dirección: ${direccion}`]);
-    sheet.addRow([`Encargado del entrenamiento: ${punto?.encargado || '—'} - Móvil: ${punto?.movil || '—'}`]);
+    sheet.addRow([`Encargado del entrenamiento: ${punto?.encargado || '-'} - Móvil: ${punto?.movil || '-'}`]);
 
     const headerRow = sheet.addRow(HEADER_ROW);
     headerRow.eachCell((cell) => {
@@ -54,7 +54,7 @@ export async function exportEntrenamientoChecklistToExcel(
       nombreCompleto(a).localeCompare(nombreCompleto(b)),
     );
     publicadoresOrdenados.forEach((p, index) => {
-      sheet.addRow([index + 1, nombreCompleto(p), p.movil, p.nombre_congregacion ?? '—', p.codigo_circuito ?? '—', '']);
+      sheet.addRow([index + 1, nombreCompleto(p), p.movil, p.nombre_congregacion ?? '-', p.codigo_circuito ?? '-', '']);
     });
 
     sheet.addRow([]);

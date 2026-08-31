@@ -6,18 +6,34 @@ import { RoleSwitch, RoleSwitchValue } from '../../shared/ui/role-switch/role-sw
 import { Avatar } from '../../shared/ui/avatar/avatar';
 import { Button } from '../../shared/ui/button/button';
 import { Dialog } from '../../shared/ui/dialog/dialog';
+import { Carousel } from '../../shared/ui/carousel/carousel';
 import { SnackbarService } from '../../shared/ui/snackbar/snackbar.service';
 import { ChangePasswordDialog } from '../../layout/header/components/change-password-dialog/change-password-dialog';
+import { EncargadoPuntoService } from '../../layout/data/encargado-punto.service';
 import { NoticiasService } from '../gestion-noticias/data/noticias.service';
 import { Noticia } from '../gestion-noticias/data/models';
+import { BannersService } from '../gestion-banners/data/banners.service';
+import { Banner } from '../gestion-banners/data/models';
+import { CapacitacionesService } from '../gestion-capacitaciones/data/capacitaciones.service';
+import { Capacitacion } from '../gestion-capacitaciones/data/models';
 import { formatDateShort } from '../../shared/utils/format.util';
+import { getYoutubeThumbnail } from '../../shared/utils/video-embed.util';
 import { PARTICIPANTE_MENU_ITEMS } from './data/menu-items';
 
 const MAX_NOTICIAS_INICIO = 6;
 
 @Component({
   selector: 'app-inicio',
-  imports: [RouterLink, FormsModule, RoleSwitch, Avatar, Button, Dialog, ChangePasswordDialog],
+  imports: [
+    RouterLink,
+    FormsModule,
+    RoleSwitch,
+    Avatar,
+    Button,
+    Dialog,
+    Carousel,
+    ChangePasswordDialog,
+  ],
   templateUrl: './inicio.html',
   styleUrl: './inicio.scss',
 })
@@ -25,13 +41,20 @@ export class Inicio {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly noticiasService = inject(NoticiasService);
+  private readonly bannersService = inject(BannersService);
+  private readonly capacitacionesService = inject(CapacitacionesService);
   private readonly snackbar = inject(SnackbarService);
   private readonly elementRef = inject(ElementRef<HTMLElement>);
+  protected readonly encargadoPunto = inject(EncargadoPuntoService);
 
   protected readonly formatDateShort = formatDateShort;
+  protected readonly getYoutubeThumbnail = getYoutubeThumbnail;
 
   protected readonly nombre = computed(
-    () => this.authService.currentSession()?.publicador?.nombre_completo || this.authService.currentSession()?.login || 'Publicador',
+    () =>
+      this.authService.currentSession()?.publicador?.nombre_completo ||
+      this.authService.currentSession()?.login ||
+      'Publicador',
   );
   /** Solo para el saludo ("Hola, ..."): el avatar sigue usando nombre() completo,
    * ya que necesita nombre + apellido para calcular las dos iniciales. */
@@ -47,6 +70,15 @@ export class Inicio {
   protected readonly changePasswordOpen = signal(false);
 
   protected readonly noticias = signal<Noticia[]>([]);
+  protected readonly banners = signal<Banner[]>([]);
+  protected readonly bannerSlides = computed(() =>
+    this.banners().map((banner) => ({
+      imagenUrl: banner.imagen_url,
+      alt: 'Publicadores de la PPAM',
+    })),
+  );
+
+  protected readonly capacitaciones = signal<Capacitacion[]>([]);
 
   protected readonly contactoOpen = signal(false);
   protected readonly contactoMensaje = signal('');
@@ -54,6 +86,12 @@ export class Inicio {
 
   constructor() {
     this.cargarNoticias();
+    this.cargarBanners();
+    this.cargarCapacitaciones();
+  }
+
+  protected onAbrirCalendarioEncargado(): void {
+    this.encargadoPunto.abrir();
   }
 
   protected onSwitchVista(vista: RoleSwitchValue): void {
@@ -118,6 +156,20 @@ export class Inicio {
     this.noticiasService.listPublicadas().subscribe({
       next: (data) => this.noticias.set(data.slice(0, MAX_NOTICIAS_INICIO)),
       error: () => this.noticias.set([]),
+    });
+  }
+
+  private cargarBanners(): void {
+    this.bannersService.listVisibles().subscribe({
+      next: (data) => this.banners.set(data),
+      error: () => this.banners.set([]),
+    });
+  }
+
+  private cargarCapacitaciones(): void {
+    this.capacitacionesService.listVisibles().subscribe({
+      next: (data) => this.capacitaciones.set(data),
+      error: () => this.capacitaciones.set([]),
     });
   }
 }

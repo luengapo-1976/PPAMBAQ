@@ -1,0 +1,24 @@
+<div class="gestion-capacitaciones-page">
+  <div class="gestion-capacitaciones-page__toolbar">
+    <app-button icon="add" (click)="onNewRecord()">Nuevo elemento</app-button>
+  </div>
+
+  <section class="gestion-capacitaciones-page__grid">
+    <app-capacitaciones-table
+      [rows]="capacitaciones()"
+      (editRecord)="onEditRecord($event)"
+      (toggleActivo)="onToggleActivo($event)"
+      (moveUp)="onMoveUp($event)"
+      (moveDown)="onMoveDown($event)"
+      (deleteRecord)="onDeleteRecord($event)"
+    />
+  </section>
+</div>
+
+<app-capacitacion-form
+  [open]="dialogOpen()"
+  [mode]="dialogMode()"
+  [record]="editingRecord()"
+  (closed)="onDialogClosed()"
+  (saved)="onSaved()"
+/>

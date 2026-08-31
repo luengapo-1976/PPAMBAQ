@@ -1,7 +1,6 @@
 <app-participante-desktop-header />
 
 <div class="solicitar-turno">
-
   @if (tieneMisTurnos()) {
     <section class="mis-turnos" aria-label="Tus turnos asignados">
       <h2 class="mis-turnos__titulo" [class.mis-turnos__titulo--excedido]="excedeLimite()">
@@ -21,6 +20,12 @@
               <span class="material-symbols-outlined" aria-hidden="true">schedule</span>
               <span>{{ formatHora(turno.horaInicio) }} – {{ formatHora(turno.horaFin) }}</span>
             </div>
+            @if (turno.estadoSolicitud === 'PENDIENTE') {
+              <span class="estado-badge estado-badge--pendiente">
+                <span class="material-symbols-outlined" aria-hidden="true">hourglass_top</span>
+                Pendiente de aprobación
+              </span>
+            }
           </article>
         }
       </div>
@@ -37,7 +42,6 @@
       [ngModel]="selectedCodigoPunto()"
       (ngModelChange)="onSeleccionarPunto($event)"
     />
-
   </div>
 
   @if (puntoSeleccionado(); as punto) {
@@ -55,7 +59,11 @@
         aria-controls="punto-info-contacto"
         (click)="onToggleContacto()"
       >
-        <span class="material-symbols-outlined punto-info__disclosure-icon" [class.punto-info__disclosure-icon--open]="contactoExpandido()" aria-hidden="true">
+        <span
+          class="material-symbols-outlined punto-info__disclosure-icon"
+          [class.punto-info__disclosure-icon--open]="contactoExpandido()"
+          aria-hidden="true"
+        >
           chevron_right
         </span>
         <span>{{ contactoExpandido() ? 'Ocultar contacto' : 'Ver contacto del punto' }}</span>
@@ -116,8 +124,10 @@
       } @else {
         @if (gruposPorDiaVisibles().length > 0) {
           <p class="turnos-resumen">
-            {{ resumenTurnos().turnos }} {{ resumenTurnos().turnos === 1 ? 'horario' : 'horarios' }} ·
-            {{ resumenTurnos().disponibles }} {{ resumenTurnos().disponibles === 1 ? 'cupo disponible' : 'cupos disponibles' }}
+            {{ resumenTurnos().turnos }}
+            {{ resumenTurnos().turnos === 1 ? 'horario' : 'horarios' }} ·
+            {{ resumenTurnos().disponibles }}
+            {{ resumenTurnos().disponibles === 1 ? 'cupo disponible' : 'cupos disponibles' }}
           </p>
         }
         @for (grupo of gruposPorDiaVisibles(); track grupo.diaNumero) {
@@ -134,23 +144,53 @@
                 >
                   <header class="par-card__header">
                     <span class="material-symbols-outlined" aria-hidden="true">schedule</span>
-                    <span class="par-card__hora">{{ formatHora(par.horaInicio) }} – {{ formatHora(par.horaFin) }}</span>
-                    <span class="par-card__cupos">{{ par.disponibles }} de {{ par.turnos.length }} cupos disponibles</span>
+                    <span class="par-card__hora"
+                      >{{ formatHora(par.horaInicio) }} – {{ formatHora(par.horaFin) }}</span
+                    >
+                    <span class="par-card__cupos"
+                      >{{ par.disponibles }} de {{ par.turnos.length }} cupos disponibles</span
+                    >
                   </header>
                   <div class="par-card__slots">
                     @for (turno of par.turnos; track turno.id) {
                       <div class="slot" [class.slot--ocupado]="turno.disponibilidad === 'ocupado'">
                         @if (turno.disponibilidad === 'ocupado') {
-                          <span class="estado-badge estado-badge--ocupado">
-                            <span class="material-symbols-outlined" aria-hidden="true">
-                              {{ turno.sexo_ocupante === 'F' ? 'woman' : 'man' }}
+                          @if (turno.nombreOcupante) {
+                            <div class="slot__ocupante">
+                              <span class="estado-badge estado-badge--ocupado">
+                                <span class="material-symbols-outlined" aria-hidden="true">
+                                  {{ turno.sexo_ocupante === 'F' ? 'woman' : 'man' }}
+                                </span>
+                                {{ turno.nombreOcupante }}
+                              </span>
+                              <p class="slot__ocupante-detalle">
+                                <span class="material-symbols-outlined" aria-hidden="true"
+                                  >call</span
+                                >
+                                {{ turno.movilOcupante || '-' }}
+                              </p>
+                              <p class="slot__ocupante-detalle">
+                                <span class="material-symbols-outlined" aria-hidden="true"
+                                  >church</span
+                                >
+                                {{ turno.congregacionOcupante || '-' }}
+                              </p>
+                            </div>
+                          } @else {
+                            <span class="estado-badge estado-badge--ocupado">
+                              <span class="material-symbols-outlined" aria-hidden="true">
+                                {{ turno.sexo_ocupante === 'F' ? 'woman' : 'man' }}
+                              </span>
+                              Turno ocupado por
+                              {{ turno.sexo_ocupante === 'F' ? 'una hermana' : 'un hermano' }}
                             </span>
-                            Turno ocupado
-                          </span>
+                          }
                         } @else {
                           <div class="slot__disponible">
                             <span class="estado-badge estado-badge--disponible">
-                              <span class="material-symbols-outlined" aria-hidden="true">event_available</span>
+                              <span class="material-symbols-outlined" aria-hidden="true"
+                                >event_available</span
+                              >
                               {{ etiquetaDisponibilidad(turno) }}
                             </span>
                             <app-button
@@ -163,9 +203,13 @@
                           </div>
                           @if (limiteAlcanzado()) {
                             <p class="slot__limite">
-                              <span class="material-symbols-outlined" aria-hidden="true">block</span>
-                              Límite alcanzado. Libera {{ turnosALiberar() }} turno{{ turnosALiberar() === 1 ? '' : 's' }} si
-                              quieres solicitar este.
+                              <span class="material-symbols-outlined" aria-hidden="true"
+                                >block</span
+                              >
+                              Límite alcanzado. Libera {{ turnosALiberar() }} turno{{
+                                turnosALiberar() === 1 ? '' : 's'
+                              }}
+                              si quieres solicitar este.
                             </p>
                           }
                         }
@@ -187,8 +231,17 @@
   }
 </div>
 
-<app-dialog [open]="dialogState() !== 'closed'" [title]="dialogTitulo()" (closed)="onDialogClosed()">
-  <app-button dialogToolbar type="button" [disabled]="primaryDisabled()" (click)="onPrimaryAction()">
+<app-dialog
+  [open]="dialogState() !== 'closed'"
+  [title]="dialogTitulo()"
+  (closed)="onDialogClosed()"
+>
+  <app-button
+    dialogToolbar
+    type="button"
+    [disabled]="primaryDisabled()"
+    (click)="onPrimaryAction()"
+  >
     {{ primaryLabel() }}
   </app-button>
   <app-button

@@ -6,7 +6,13 @@
   panelBackground="var(--ppam-surface)"
   (closed)="onCancel()"
 >
-  <app-button dialogToolbar type="button" icon="save" [disabled]="form.invalid || saving()" (click)="onSave()">
+  <app-button
+    dialogToolbar
+    type="button"
+    icon="save"
+    [disabled]="form.invalid || saving()"
+    (click)="onSave()"
+  >
     Guardar
   </app-button>
   <app-button dialogToolbar type="button" variant="secondary" icon="close" (click)="onCancel()">
@@ -25,7 +31,11 @@
       <input type="text" formControlName="nombre_municipio" class="ppam-input" maxlength="100" />
     </app-form-field>
 
-    <app-form-field label="Departamento" [required]="true" [control]="form.controls.codigo_departamento">
+    <app-form-field
+      label="Departamento"
+      [required]="true"
+      [control]="form.controls.codigo_departamento"
+    >
       <app-search-select
         formControlName="codigo_departamento"
         [options]="departamentoOptions()"

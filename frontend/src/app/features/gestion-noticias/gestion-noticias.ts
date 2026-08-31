@@ -5,6 +5,7 @@ import { Button } from '../../shared/ui/button/button';
 import { SnackbarService } from '../../shared/ui/snackbar/snackbar.service';
 import { NoticiasService } from './data/noticias.service';
 import { Noticia } from './data/models';
+import { ApiError } from '../../core/error.interceptor';
 
 @Component({
   selector: 'app-gestion-noticias',
@@ -46,6 +47,41 @@ export class GestionNoticias {
     this.dialogOpen.set(false);
     this.editingRecord.set(null);
     this.loadNoticias();
+  }
+
+  protected onToggleEstado(event: { noticia: Noticia; publicada: boolean }): void {
+    this.noticiasService
+      .setEstado(event.noticia.id, event.publicada ? 'PUBLICADA' : 'BORRADOR')
+      .subscribe({
+        next: () => this.loadNoticias(),
+        error: (err: ApiError) =>
+          this.snackbar.error(err?.message ?? 'No se pudo actualizar la visibilidad.'),
+      });
+  }
+
+  protected onMoveUp(noticia: Noticia): void {
+    this.noticiasService.mover(noticia.id, 'arriba').subscribe({
+      next: () => this.loadNoticias(),
+      error: (err: ApiError) => this.snackbar.error(err?.message ?? 'No se pudo mover la noticia.'),
+    });
+  }
+
+  protected onMoveDown(noticia: Noticia): void {
+    this.noticiasService.mover(noticia.id, 'abajo').subscribe({
+      next: () => this.loadNoticias(),
+      error: (err: ApiError) => this.snackbar.error(err?.message ?? 'No se pudo mover la noticia.'),
+    });
+  }
+
+  protected onDeleteRecord(noticia: Noticia): void {
+    this.noticiasService.delete(noticia.id).subscribe({
+      next: () => {
+        this.snackbar.success('Noticia eliminada correctamente.');
+        this.loadNoticias();
+      },
+      error: (err: ApiError) =>
+        this.snackbar.error(err?.message ?? 'No se pudo eliminar la noticia.'),
+    });
   }
 
   private loadNoticias(): void {

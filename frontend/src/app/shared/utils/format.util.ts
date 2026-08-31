@@ -1,10 +1,10 @@
 export function formatDateShort(dateStr: string | null | undefined): string {
   if (!dateStr) {
-    return '—';
+    return '-';
   }
   const date = new Date(dateStr);
   if (Number.isNaN(date.getTime())) {
-    return '—';
+    return '-';
   }
   /** Se leen los componentes en UTC: las fechas de la API vienen como 'YYYY-MM-DD'
    * (sin hora), que Date interpreta como medianoche UTC; usar getters locales
@@ -19,7 +19,7 @@ export function formatDateShort(dateStr: string | null | undefined): string {
 export function formatHoraAmPm(time: string | null | undefined): string {
   const match = /^(\d{1,2}):(\d{2})/.exec(time ?? '');
   if (!match) {
-    return '—';
+    return '-';
   }
   const hours = Number(match[1]);
   const minutes = match[2];
@@ -37,3 +37,20 @@ export function todayIsoDateBogota(): string {
 
 export const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export const MOVIL_PATTERN = /^\d{1,10}$/;
+
+export type TurnoDisponibilidad =
+  'ocupado' | 'disponible' | 'disponible_hermano' | 'disponible_hermana';
+
+/** Misma lógica que ya usan "Solicitar turno" y "Asignar turno" para describir un cupo
+ * libre: si el otro cupo del mismo horario ya lo ocupa un sexo, se indica para cuál se
+ * espera la solicitud; si ambos están libres, queda genérico. */
+export function etiquetaDisponibilidad(disponibilidad: TurnoDisponibilidad): string {
+  switch (disponibilidad) {
+    case 'disponible_hermano':
+      return 'Disponible para un hermano';
+    case 'disponible_hermana':
+      return 'Disponible para una hermana';
+    default:
+      return 'Disponible';
+  }
+}

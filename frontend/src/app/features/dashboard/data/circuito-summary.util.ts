@@ -108,7 +108,9 @@ export function buildCircuitoSummary(
   congregaciones: Congregacion[],
 ): CircuitoSummaryRow[] {
   const circuitoNombres = new Map(circuitos.map((c) => [c.codigo_circuito, c.nombre_viajante]));
-  const congregacionNombres = new Map(congregaciones.map((c) => [c.codigo_congregacion, c.nombre_congregacion]));
+  const congregacionNombres = new Map(
+    congregaciones.map((c) => [c.codigo_congregacion, c.nombre_congregacion]),
+  );
 
   const circuitoRows = new Map<string, CircuitoSummaryRow>();
 
@@ -121,7 +123,9 @@ export function buildCircuitoSummary(
         nombreCircuito:
           codigoCircuito === SIN_CIRCUITO
             ? 'Sin circuito'
-            : (circuitoNombres.get(codigoCircuito) ? `${codigoCircuito} - ${circuitoNombres.get(codigoCircuito)}` : codigoCircuito),
+            : circuitoNombres.get(codigoCircuito)
+              ? `${codigoCircuito} - ${circuitoNombres.get(codigoCircuito)}`
+              : codigoCircuito,
         congregaciones: [],
         ...emptyCounts(),
       };
@@ -129,12 +133,16 @@ export function buildCircuitoSummary(
     }
 
     const codigoCongregacion = row.codigo_congregacion ?? SIN_CONGREGACION;
-    let congregacionRow = circuitoRow.congregaciones.find((c) => c.codigoCongregacion === codigoCongregacion);
+    let congregacionRow = circuitoRow.congregaciones.find(
+      (c) => c.codigoCongregacion === codigoCongregacion,
+    );
     if (!congregacionRow) {
       congregacionRow = {
         codigoCongregacion,
         nombreCongregacion:
-          congregacionNombres.get(codigoCongregacion) ?? row.nombre_congregacion ?? 'Sin congregación',
+          congregacionNombres.get(codigoCongregacion) ??
+          row.nombre_congregacion ??
+          'Sin congregación',
         publicadores: [],
         ...emptyCounts(),
       };
@@ -153,7 +161,9 @@ export function buildCircuitoSummary(
 
   const result = [...circuitoRows.values()];
   for (const circuitoRow of result) {
-    circuitoRow.congregaciones.sort((a, b) => a.nombreCongregacion.localeCompare(b.nombreCongregacion));
+    circuitoRow.congregaciones.sort((a, b) =>
+      a.nombreCongregacion.localeCompare(b.nombreCongregacion),
+    );
     for (const congregacionRow of circuitoRow.congregaciones) {
       congregacionRow.publicadores.sort((a, b) => a.nombre.localeCompare(b.nombre));
     }

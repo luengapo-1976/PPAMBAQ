@@ -11,21 +11,41 @@ import { SnackbarService } from '../../shared/ui/snackbar/snackbar.service';
 import { ApiError } from '../../core/error.interceptor';
 import { AuthService } from '../../core/auth.service';
 import { LookupsService } from '../solicitudes/data/lookups.service';
-import { Congregacion, Departamento, Municipio, Publicador, PublicadorUpdatePayload } from '../solicitudes/data/models';
-import { EMAIL_PATTERN, MOVIL_PATTERN, toDateInputValue, toTitleCase, yearsSince } from '../solicitudes/data/publicador.utils';
+import {
+  Congregacion,
+  Departamento,
+  Municipio,
+  Publicador,
+  PublicadorUpdatePayload,
+} from '../solicitudes/data/models';
+import {
+  EMAIL_PATTERN,
+  MOVIL_PATTERN,
+  toDateInputValue,
+  toTitleCase,
+  yearsSince,
+} from '../solicitudes/data/publicador.utils';
 import { MisDatosService } from './data/mis-datos.service';
 import { ParticipanteDesktopHeader } from '../../layout/participante-desktop-header/participante-desktop-header';
 
 type BajaPaso = 'cerrado' | 'advertencia' | 'justificacion' | 'confirmacion';
 
-const ESTADO_CIVIL_OPTIONS: SelectOption[] = ['Casado', 'Soltero', 'Divorciado', 'Separado', 'Viudo'].map((value) => ({
+const ESTADO_CIVIL_OPTIONS: SelectOption[] = [
+  'Casado',
+  'Soltero',
+  'Divorciado',
+  'Separado',
+  'Viudo',
+].map((value) => ({
   value,
   label: value,
 }));
-const PRIVILEGIO_MIN_OPTIONS: SelectOption[] = ['Ninguno', 'Anciano', 'Siervo ministerial'].map((value) => ({
-  value,
-  label: value,
-}));
+const PRIVILEGIO_MIN_OPTIONS: SelectOption[] = ['Ninguno', 'Anciano', 'Siervo ministerial'].map(
+  (value) => ({
+    value,
+    label: value,
+  }),
+);
 const PRIVILEGIO_SER_OPTIONS: SelectOption[] = [
   'Publicador',
   'Precursor regular',
@@ -45,7 +65,16 @@ const NOMBRE_CONYUGE_ESTADOS_CIVILES = ['Casado', 'Separado'];
 
 @Component({
   selector: 'app-actualizar-datos',
-  imports: [ReactiveFormsModule, FormsModule, Dialog, Button, Select, SearchSelect, FormField, ParticipanteDesktopHeader],
+  imports: [
+    ReactiveFormsModule,
+    FormsModule,
+    Dialog,
+    Button,
+    Select,
+    SearchSelect,
+    FormField,
+    ParticipanteDesktopHeader,
+  ],
   templateUrl: './actualizar-datos.html',
   styleUrl: './actualizar-datos.scss',
 })
@@ -65,6 +94,11 @@ export class ActualizarDatos {
 
   protected readonly loading = signal(true);
   protected readonly saving = signal(false);
+  protected readonly datosDesactualizados = this.authService.requiereActualizacionDatos;
+  /** Solo se activa cuando el guardado resuelve una actualización obligatoria: al
+   * cerrar el diálogo de confirmación, en vez de quedarse en la página, se lleva al
+   * publicador a Inicio (ya recuperó acceso normal al resto del menú). */
+  private irAInicioAlCerrar = false;
   protected readonly resultadoAbierto = signal(false);
   protected readonly dialogMensaje = signal('');
 
@@ -101,7 +135,9 @@ export class ActualizarDatos {
   );
 
   protected readonly bajaPrimaryDisabled = computed(
-    () => this.bajaPaso() === 'justificacion' && (!this.bajaJustificacion().trim() || this.bajaEnviando()),
+    () =>
+      this.bajaPaso() === 'justificacion' &&
+      (!this.bajaJustificacion().trim() || this.bajaEnviando()),
   );
 
   protected readonly bajaMuestraCancelar = computed(
@@ -134,19 +170,36 @@ export class ActualizarDatos {
     participo_antes: [''],
   });
 
-  private readonly selectedDepartamento = toSignal(this.form.controls.codigo_departamento.valueChanges, {
+  private readonly selectedDepartamento = toSignal(
+    this.form.controls.codigo_departamento.valueChanges,
+    {
+      initialValue: '',
+    },
+  );
+  private readonly selectedCongregacionCodigo = toSignal(
+    this.form.controls.codigo_congregacion.valueChanges,
+    {
+      initialValue: '',
+    },
+  );
+  private readonly selectedSexo = toSignal(this.form.controls.sexo.valueChanges, {
     initialValue: '',
   });
-  private readonly selectedCongregacionCodigo = toSignal(this.form.controls.codigo_congregacion.valueChanges, {
+  private readonly selectedEstadoCivil = toSignal(this.form.controls.estado_civil.valueChanges, {
     initialValue: '',
   });
-  private readonly selectedSexo = toSignal(this.form.controls.sexo.valueChanges, { initialValue: '' });
-  private readonly selectedEstadoCivil = toSignal(this.form.controls.estado_civil.valueChanges, { initialValue: '' });
-  private readonly fechaNacimiento = toSignal(this.form.controls.fecha_nacimiento.valueChanges, { initialValue: '' });
-  private readonly fechaBautismo = toSignal(this.form.controls.fecha_bautismo.valueChanges, { initialValue: '' });
+  private readonly fechaNacimiento = toSignal(this.form.controls.fecha_nacimiento.valueChanges, {
+    initialValue: '',
+  });
+  private readonly fechaBautismo = toSignal(this.form.controls.fecha_bautismo.valueChanges, {
+    initialValue: '',
+  });
 
   protected readonly departamentoOptions = computed<SearchSelectOption[]>(() =>
-    this.departamentos().map((d) => ({ value: d.codigo_departamento, label: d.nombre_departamento })),
+    this.departamentos().map((d) => ({
+      value: d.codigo_departamento,
+      label: d.nombre_departamento,
+    })),
   );
 
   protected readonly municipioOptions = computed<SearchSelectOption[]>(() => {
@@ -157,20 +210,27 @@ export class ActualizarDatos {
   });
 
   protected readonly congregacionOptions = computed<SearchSelectOption[]>(() =>
-    this.congregaciones().map((c) => ({ value: String(c.codigo_congregacion), label: c.nombre_congregacion })),
+    this.congregaciones().map((c) => ({
+      value: String(c.codigo_congregacion),
+      label: c.nombre_congregacion,
+    })),
   );
 
   protected readonly circuitoDisplay = computed(() => {
     const codigo = this.selectedCongregacionCodigo();
-    const congregacion = this.congregaciones().find((c) => String(c.codigo_congregacion) === String(codigo));
-    return congregacion?.codigo_circuito ?? '—';
+    const congregacion = this.congregaciones().find(
+      (c) => String(c.codigo_congregacion) === String(codigo),
+    );
+    return congregacion?.codigo_circuito ?? '-';
   });
 
   protected readonly edadDisplay = computed(() => yearsSince(this.fechaNacimiento()));
   protected readonly aniosBautismoDisplay = computed(() => yearsSince(this.fechaBautismo()));
 
   protected readonly showNombreConyuge = computed(
-    () => this.selectedSexo() === 'F' && NOMBRE_CONYUGE_ESTADOS_CIVILES.includes(this.selectedEstadoCivil() ?? ''),
+    () =>
+      this.selectedSexo() === 'F' &&
+      NOMBRE_CONYUGE_ESTADOS_CIVILES.includes(this.selectedEstadoCivil() ?? ''),
   );
 
   constructor() {
@@ -178,16 +238,18 @@ export class ActualizarDatos {
     this.lookupsService.getMunicipios().subscribe((data) => this.municipios.set(data));
     this.lookupsService.getCongregaciones().subscribe((data) => this.congregaciones.set(data));
 
-    this.form.controls.codigo_departamento.valueChanges.pipe(takeUntilDestroyed()).subscribe((depto) => {
-      const municipioControl = this.form.controls.codigo_municipio;
-      const current = municipioControl.value;
-      const stillValid = this.municipios().some(
-        (m) => m.codigo_municipio === current && m.codigo_departamento === depto,
-      );
-      if (current && !stillValid) {
-        municipioControl.setValue('');
-      }
-    });
+    this.form.controls.codigo_departamento.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe((depto) => {
+        const municipioControl = this.form.controls.codigo_municipio;
+        const current = municipioControl.value;
+        const stillValid = this.municipios().some(
+          (m) => m.codigo_municipio === current && m.codigo_departamento === depto,
+        );
+        if (current && !stillValid) {
+          municipioControl.setValue('');
+        }
+      });
 
     this.cargarMisDatos();
   }
@@ -218,7 +280,8 @@ export class ActualizarDatos {
       codigo_municipio: record.codigo_municipio,
       correo_electronico: record.correo_electronico,
       movil: record.movil,
-      codigo_congregacion: record.codigo_congregacion != null ? String(record.codigo_congregacion) : '',
+      codigo_congregacion:
+        record.codigo_congregacion != null ? String(record.codigo_congregacion) : '',
       fecha_nacimiento: toDateInputValue(record.fecha_nacimiento),
       sexo: record.sexo,
       fecha_bautismo: toDateInputValue(record.fecha_bautismo),
@@ -232,7 +295,14 @@ export class ActualizarDatos {
   }
 
   protected onBlurCapitalize(
-    controlName: 'primer_apellido' | 'segundo_apellido' | 'primer_nombre' | 'segundo_nombre' | 'apellido_casada' | 'nombre_conyuge' | 'direccion',
+    controlName:
+      | 'primer_apellido'
+      | 'segundo_apellido'
+      | 'primer_nombre'
+      | 'segundo_nombre'
+      | 'apellido_casada'
+      | 'nombre_conyuge'
+      | 'direccion',
   ): void {
     const control = this.form.controls[controlName];
     if (typeof control.value === 'string' && control.value.length > 0) {
@@ -247,7 +317,8 @@ export class ActualizarDatos {
     }
 
     const raw = this.form.getRawValue();
-    const toNullable = (value: string | null | undefined): string | null => (value && value.length > 0 ? value : null);
+    const toNullable = (value: string | null | undefined): string | null =>
+      value && value.length > 0 ? value : null;
 
     const payload: PublicadorUpdatePayload = {
       primer_apellido: toNullable(raw.primer_apellido),
@@ -271,10 +342,13 @@ export class ActualizarDatos {
       participo_antes: toNullable(raw.participo_antes) as Publicador['participo_antes'] | null,
     };
 
+    const eraActualizacionForzada = this.datosDesactualizados();
     this.saving.set(true);
     this.misDatosService.actualizar(payload).subscribe({
       next: (resultado) => {
         this.saving.set(false);
+        this.authService.marcarDatosActualizados();
+        this.irAInicioAlCerrar = eraActualizacionForzada;
         this.dialogMensaje.set(resultado.mensaje);
         this.resultadoAbierto.set(true);
       },
@@ -287,6 +361,11 @@ export class ActualizarDatos {
 
   protected onCerrarResultado(): void {
     this.resultadoAbierto.set(false);
+    if (this.irAInicioAlCerrar) {
+      this.irAInicioAlCerrar = false;
+      this.router.navigateByUrl('/inicio');
+      return;
+    }
     this.cargarMisDatos();
   }
 
@@ -339,7 +418,9 @@ export class ActualizarDatos {
       },
       error: (err: ApiError) => {
         this.bajaEnviando.set(false);
-        this.snackbar.error(err?.message ?? 'No se pudo registrar tu solicitud de baja. Intenta nuevamente.');
+        this.snackbar.error(
+          err?.message ?? 'No se pudo registrar tu solicitud de baja. Intenta nuevamente.',
+        );
       },
     });
   }

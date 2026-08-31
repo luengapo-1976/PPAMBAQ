@@ -1,0 +1,97 @@
+:host {
+  display: block;
+  min-height: 100dvh;
+}
+
+.aviso {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--ppam-space-lg);
+  background: var(--ppam-surface);
+  box-sizing: border-box;
+}
+
+.aviso__card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ppam-space-md);
+  width: 100%;
+  max-width: 640px;
+  padding: var(--ppam-space-2xl) var(--ppam-space-xl);
+  background: var(--ppam-surface-container-lowest);
+  border-radius: var(--ppam-radius-card);
+  box-shadow: var(--ppam-elevation-1);
+  text-align: center;
+}
+
+.aviso__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--ppam-primary-container) 16%, white);
+  color: var(--ppam-primary-container);
+  font-size: 32px;
+}
+
+.aviso__titulo {
+  font-size: var(--ppam-h2-size);
+  font-weight: var(--ppam-h2-weight);
+  line-height: var(--ppam-h2-line);
+  color: var(--ppam-on-surface);
+}
+
+.aviso__skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ppam-space-sm);
+  width: 100%;
+}
+
+.skeleton-block {
+  height: 20px;
+  border-radius: var(--ppam-radius-control);
+  background: linear-gradient(
+    100deg,
+    var(--ppam-surface-container) 30%,
+    var(--ppam-surface-container-high) 50%,
+    var(--ppam-surface-container) 70%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.aviso__texto {
+  width: 100%;
+  max-height: 46vh;
+  overflow-y: auto;
+  text-align: left;
+  color: var(--ppam-on-surface-variant);
+  border: 1px solid var(--ppam-border-quiet);
+  border-radius: var(--ppam-radius-control);
+  padding: var(--ppam-space-md);
+  box-sizing: border-box;
+}
+
+.aviso__texto p {
+  margin: 0 0 var(--ppam-space-md);
+  white-space: pre-line;
+}
+
+.aviso__texto p:last-child {
+  margin-bottom: 0;
+}

@@ -5,6 +5,11 @@ import { UsuariosRepository } from '../usuarios/usuarios.repository';
 import { PublicadoresRepository, PublicadorAuthProfile } from '../publicadores/publicadores.repository';
 import { PasswordService } from '../common/security/password.service';
 import { MailService } from '../common/mail/mail.service';
+import { ParametrosService } from '../parametros/parametros.service';
+import {
+  AceptacionesLegalesService,
+  TIPO_TRATAMIENTO_DATOS,
+} from '../aceptaciones-legales/aceptaciones-legales.service';
 import { LoginDto } from './dto/login.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
@@ -60,6 +65,8 @@ export class AuthService {
     private readonly passwordService: PasswordService,
     private readonly jwtService: JwtService,
     private readonly mailService: MailService,
+    private readonly parametrosService: ParametrosService,
+    private readonly aceptacionesLegalesService: AceptacionesLegalesService,
   ) {}
 
   async login(dto: LoginDto) {
@@ -82,11 +89,23 @@ export class AuthService {
         publicadorId: publicador?.id ?? null,
       });
 
+      const requiereActualizacionDatos = publicador
+        ? await this.parametrosService.requiereActualizacionDatos(
+            publicador.fecha_actualizacion_datos,
+          )
+        : false;
+      const requiereAceptacionLegal = await this.aceptacionesLegalesService.requiereAceptacion(
+        publicador?.id ?? null,
+        TIPO_TRATAMIENTO_DATOS,
+      );
+
       return {
         access_token: accessToken,
         login: usuario.login,
         rol: usuario.rol,
         publicador: publicador ? toPerfil(publicador) : null,
+        requiereActualizacionDatos,
+        requiereAceptacionLegal,
       };
     }
 
@@ -105,11 +124,21 @@ export class AuthService {
       publicadorId: publicador.id,
     });
 
+    const requiereActualizacionDatos = await this.parametrosService.requiereActualizacionDatos(
+      publicador.fecha_actualizacion_datos,
+    );
+    const requiereAceptacionLegal = await this.aceptacionesLegalesService.requiereAceptacion(
+      publicador.id,
+      TIPO_TRATAMIENTO_DATOS,
+    );
+
     return {
       access_token: accessToken,
       login: publicador.login ?? login,
       rol: null,
       publicador: toPerfil(publicador),
+      requiereActualizacionDatos,
+      requiereAceptacionLegal,
     };
   }
 
@@ -124,7 +153,7 @@ export class AuthService {
         // así evitamos dejar al usuario sin poder entrar si el envío falla.
         await this.mailService.sendMail({
           to: dto.correo,
-          subject: 'PPAM BAQ — Nueva contraseña temporal',
+          subject: 'PPAM BAQ - Nueva contraseña temporal',
           text:
             `Hola,\n\nRecibimos una solicitud para recuperar tu acceso a PPAM BAQ.\n\n` +
             `Tu usuario es: ${usuario.login}\n` +

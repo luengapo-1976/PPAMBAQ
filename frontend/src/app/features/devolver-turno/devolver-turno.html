@@ -2,8 +2,8 @@
 
 <div class="devolver-turno">
   <p class="devolver-turno__legend">
-    {{ primerNombre() }}, a continuación se presentan los turnos que tienes asignados actualmente. Da clic en el
-    botón "Devolver turno" del horario que quieres liberar.
+    {{ primerNombre() }}, a continuación se presentan los turnos que tienes asignados actualmente.
+    Da clic en el botón "Devolver turno" del horario que quieres liberar.
   </p>
 
   @if (loading()) {
@@ -30,6 +30,12 @@
             <span class="material-symbols-outlined" aria-hidden="true">schedule</span>
             <span>{{ formatHora(turno.horaInicio) }} – {{ formatHora(turno.horaFin) }}</span>
           </div>
+          @if (turno.estadoSolicitud === 'PENDIENTE') {
+            <span class="estado-badge estado-badge--pendiente">
+              <span class="material-symbols-outlined" aria-hidden="true">hourglass_top</span>
+              Pendiente de aprobación
+            </span>
+          }
           <app-button type="button" (click)="onAbrirDevolucion(turno)">Devolver turno</app-button>
         </article>
       }
@@ -37,8 +43,17 @@
   }
 </div>
 
-<app-dialog [open]="dialogState() !== 'closed'" [title]="dialogTitulo()" (closed)="onDialogClosed()">
-  <app-button dialogToolbar type="button" [disabled]="primaryDisabled()" (click)="onPrimaryAction()">
+<app-dialog
+  [open]="dialogState() !== 'closed'"
+  [title]="dialogTitulo()"
+  (closed)="onDialogClosed()"
+>
+  <app-button
+    dialogToolbar
+    type="button"
+    [disabled]="primaryDisabled()"
+    (click)="onPrimaryAction()"
+  >
     {{ primaryLabel() }}
   </app-button>
   <app-button

@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { PuntosService } from './puntos.service';
 import { CreatePuntoDto } from './dto/create-punto.dto';
 import { UpdatePuntoDto } from './dto/update-punto.dto';
@@ -12,6 +20,11 @@ export class PuntosController {
   @Get()
   findAll() {
     return this.puntosService.findAll();
+  }
+
+  @Get('mis-puntos')
+  findMisPuntos(@CurrentUser() user: AuthenticatedUser) {
+    return this.puntosService.findMisPuntos(user);
   }
 
   @Post()

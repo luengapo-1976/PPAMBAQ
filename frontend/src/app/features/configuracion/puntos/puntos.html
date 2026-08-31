@@ -1,13 +1,24 @@
 <div class="config-page">
+  <label class="puntos-page__filter">
+    <span>Tipo de punto</span>
+    <app-select
+      [options]="tipoPuntoFilterOptions"
+      [ngModel]="tipoFiltro()"
+      (ngModelChange)="tipoFiltro.set($event)"
+    />
+  </label>
   <app-config-table
-    [rows]="puntos()"
+    [rows]="puntosFiltrados()"
     [columns]="columns()"
     [rowId]="rowId"
     searchPlaceholder="Buscar por código, nombre, dirección, encargado o móvil…"
     newRecordLabel="Nuevo registro"
     emptyMessage="No hay puntos que coincidan con el filtro actual."
+    extraActionIcon="calendar_month"
+    extraActionLabel="Ver calendario del punto"
     (newRecord)="onNewRecord()"
     (editRecord)="onEditRecord($event)"
+    (extraAction)="onVerCalendario($event)"
   />
 </div>
 
@@ -20,4 +31,13 @@
   [municipios]="municipios()"
   (closed)="onDialogClosed()"
   (saved)="onSaved()"
+/>
+
+<app-punto-calendario-dialog
+  [open]="calendarioOpen()"
+  [puntos]="calendarioPunto() ? [calendarioPunto()!] : []"
+  [departamentos]="departamentos()"
+  [municipios]="municipios()"
+  [editable]="true"
+  (closed)="onCalendarioClosed()"
 />

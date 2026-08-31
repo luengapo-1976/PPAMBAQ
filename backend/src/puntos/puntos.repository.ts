@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service';
 import { TablesInsert, TablesUpdate } from '../supabase/database.types';
 
@@ -14,7 +18,28 @@ export class PuntosRepository {
       .order('nombre_punto', { ascending: true });
 
     if (error) {
-      throw new InternalServerErrorException('No se pudo obtener el listado de puntos.');
+      throw new InternalServerErrorException(
+        'No se pudo obtener el listado de puntos.',
+      );
+    }
+
+    return data;
+  }
+
+  /** Puntos donde el móvil registrado como encargado coincide con el móvil dado —
+   * usado para que un publicador vea el calendario del/los punto(s) a su cargo. */
+  async findByMovil(movil: string) {
+    const { data, error } = await this.supabaseService
+      .getClient()
+      .from('puntos')
+      .select('*')
+      .eq('movil', movil)
+      .order('nombre_punto', { ascending: true });
+
+    if (error) {
+      throw new InternalServerErrorException(
+        'No se pudo consultar los puntos a cargo.',
+      );
     }
 
     return data;

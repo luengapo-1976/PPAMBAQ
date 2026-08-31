@@ -8,6 +8,17 @@
       @if (showRoleSwitch()) {
         <app-role-switch [active]="vistaActiva()" (changed)="onSwitchVista($event)" />
       }
+      @if (encargadoPunto.esEncargado()) {
+        <button
+          type="button"
+          class="inicio__topbar-icon-btn"
+          aria-label="Ver el calendario de mi punto"
+          title="Ver el calendario de mi punto"
+          (click)="onAbrirCalendarioEncargado()"
+        >
+          <span class="material-symbols-outlined" aria-hidden="true">calendar_month</span>
+        </button>
+      }
       <div class="inicio__account">
         <button
           type="button"
@@ -23,13 +34,23 @@
         @if (menuOpen()) {
           <ul class="inicio__account-menu" role="menu">
             <li role="none">
-              <button type="button" role="menuitem" class="inicio__account-menu-item" (click)="onChangePassword()">
+              <button
+                type="button"
+                role="menuitem"
+                class="inicio__account-menu-item"
+                (click)="onChangePassword()"
+              >
                 <span class="material-symbols-outlined" aria-hidden="true">lock_reset</span>
                 <span>Cambiar contraseña</span>
               </button>
             </li>
             <li role="none">
-              <button type="button" role="menuitem" class="inicio__account-menu-item" (click)="onLogout()">
+              <button
+                type="button"
+                role="menuitem"
+                class="inicio__account-menu-item"
+                (click)="onLogout()"
+              >
                 <span class="material-symbols-outlined" aria-hidden="true">logout</span>
                 <span>Cerrar sesión</span>
               </button>
@@ -41,7 +62,15 @@
   </div>
 </header>
 
-<img class="inicio__hero" src="images/Imagen actual.png" alt="Publicadores de la PPAM compartiendo en un punto de predicación" />
+@if (banners().length > 0) {
+  <app-carousel class="inicio__hero" [slides]="bannerSlides()" />
+} @else {
+  <img
+    class="inicio__hero"
+    src="images/Imagen actual.png"
+    alt="Publicadores de la PPAM compartiendo en un punto de predicación"
+  />
+}
 
 <div class="inicio">
   <section class="inicio__greeting">
@@ -52,7 +81,9 @@
   <nav class="inicio__menu" aria-label="Menú principal">
     @for (item of mainItems; track item.id) {
       <a class="menu-item" [routerLink]="item.route">
-        <span class="menu-item__icon material-symbols-outlined" aria-hidden="true">{{ item.icon }}</span>
+        <span class="menu-item__icon material-symbols-outlined" aria-hidden="true">{{
+          item.icon
+        }}</span>
         <span class="menu-item__eyebrow">{{ item.eyebrow }}</span>
         <span class="menu-item__description">{{ item.description }}</span>
         <span class="menu-item__cta">{{ item.cta }}</span>
@@ -75,10 +106,46 @@
             }
             <div class="noticia-card__body">
               @if (noticia.fecha_publicacion) {
-                <span class="noticia-card__date">{{ formatDateShort(noticia.fecha_publicacion) }}</span>
+                <span class="noticia-card__date">{{
+                  formatDateShort(noticia.fecha_publicacion)
+                }}</span>
               }
               <h3 class="noticia-card__title">{{ noticia.titulo }}</h3>
               <p class="noticia-card__resumen">{{ noticia.resumen }}</p>
+            </div>
+          </a>
+        }
+      </div>
+    </section>
+  }
+
+  @if (capacitaciones().length > 0) {
+    <section class="inicio__capacitaciones" aria-label="Entrenamiento y recomendaciones">
+      <h2 class="inicio__capacitaciones-title">Entrenamiento y recomendaciones</h2>
+      <div class="inicio__capacitaciones-grid">
+        @for (item of capacitaciones(); track item.id) {
+          <a class="capacitacion-card" [routerLink]="['/capacitaciones', item.id]">
+            @if (item.tipo === 'IMAGEN' && item.imagen_url) {
+              <img class="capacitacion-card__image" [src]="item.imagen_url" [alt]="item.titulo" />
+            } @else if (item.tipo === 'VIDEO' && getYoutubeThumbnail(item.video_url)) {
+              <img
+                class="capacitacion-card__image"
+                [src]="getYoutubeThumbnail(item.video_url)"
+                [alt]="item.titulo"
+              />
+            } @else {
+              <div class="capacitacion-card__image capacitacion-card__image--placeholder">
+                <span class="material-symbols-outlined" aria-hidden="true">smart_display</span>
+              </div>
+            }
+            @if (item.tipo === 'VIDEO') {
+              <span class="capacitacion-card__play material-symbols-outlined" aria-hidden="true"
+                >play_circle</span
+              >
+            }
+            <div class="capacitacion-card__body">
+              <h3 class="capacitacion-card__title">{{ item.titulo }}</h3>
+              <p class="capacitacion-card__resumen">{{ item.resumen }}</p>
             </div>
           </a>
         }
@@ -94,17 +161,29 @@
   </div>
   <div class="inicio__cta-bar">
     <span>© 2026 PPAM BAQ.</span>
-    <button type="button" class="inicio__cta-top" aria-label="Volver arriba" (click)="onScrollToTop()">
+    <button
+      type="button"
+      class="inicio__cta-top"
+      aria-label="Volver arriba"
+      (click)="onScrollToTop()"
+    >
       <span class="material-symbols-outlined" aria-hidden="true">arrow_upward</span>
     </button>
   </div>
 </footer>
 
 <app-dialog [open]="contactoOpen()" title="Escríbenos" (closed)="onCerrarContacto()">
-  <app-button dialogToolbar type="button" [disabled]="!contactoMensaje().trim() || contactoEnviando()" (click)="onEnviarContacto()">
+  <app-button
+    dialogToolbar
+    type="button"
+    [disabled]="!contactoMensaje().trim() || contactoEnviando()"
+    (click)="onEnviarContacto()"
+  >
     {{ contactoEnviando() ? 'Enviando…' : 'Enviar' }}
   </app-button>
-  <app-button dialogToolbar type="button" variant="secondary" (click)="onCerrarContacto()">Cancelar</app-button>
+  <app-button dialogToolbar type="button" variant="secondary" (click)="onCerrarContacto()"
+    >Cancelar</app-button
+  >
 
   <label class="inicio__contacto-field">
     <span>Cuéntanos qué necesitas</span>
@@ -119,4 +198,7 @@
   </label>
 </app-dialog>
 
-<app-change-password-dialog [open]="changePasswordOpen()" (closed)="changePasswordOpen.set(false)" />
+<app-change-password-dialog
+  [open]="changePasswordOpen()"
+  (closed)="changePasswordOpen.set(false)"
+/>

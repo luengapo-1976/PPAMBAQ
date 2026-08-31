@@ -1,0 +1,13 @@
+<button
+  type="button"
+  class="ppam-switch"
+  role="switch"
+  [attr.aria-checked]="checked()"
+  [disabled]="disabled()"
+  (click)="onToggle()"
+>
+  <span class="ppam-switch__track" [class.ppam-switch__track--checked]="checked()">
+    <span class="ppam-switch__thumb"></span>
+  </span>
+  <span class="ppam-switch__label">{{ checked() ? labelOn() : labelOff() }}</span>
+</button>

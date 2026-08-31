@@ -1,0 +1,72 @@
+:host {
+  display: block;
+  position: relative;
+}
+
+.zoom-image {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  touch-action: none;
+  border-radius: 0;
+  background: var(--ppam-surface-container);
+  cursor: zoom-in;
+}
+
+.zoom-image--zoomed {
+  cursor: grab;
+}
+
+/* El ancho siempre manda (llena la pantalla completa); el alto sigue la
+   proporción real de la imagen, así nunca queda con márgenes laterales,
+   sea la imagen panorámica o una infografía muy alta y angosta. */
+.zoom-image__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  transition: transform 120ms ease;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Fijos a la ventana (no a la imagen): con imágenes muy altas, unos controles
+   anclados al final de la imagen quedarían fuera de pantalla al hacer scroll. */
+.zoom-image__controls {
+  position: fixed;
+  bottom: calc(var(--ppam-space-sm) + env(safe-area-inset-bottom, 0px));
+  right: var(--ppam-space-sm);
+  z-index: 5;
+  display: flex;
+  gap: var(--ppam-space-xs);
+}
+
+.zoom-image__control-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: var(--ppam-radius-full);
+  background: rgba(0, 0, 0, 0.55);
+  color: #ffffff;
+  cursor: pointer;
+  transition: background var(--ppam-motion-fast);
+}
+
+.zoom-image__control-btn:hover {
+  background: rgba(0, 0, 0, 0.75);
+}
+
+/* En escritorio ya se hace zoom con la rueda del mouse o doble clic, así que
+   los botones +/- sobran — se dejan solo para la versión de dispositivo móvil. */
+@media (min-width: 600px) {
+  .zoom-image__controls {
+    display: none;
+  }
+
+  .zoom-image,
+  .zoom-image--zoomed {
+    cursor: default;
+  }
+}

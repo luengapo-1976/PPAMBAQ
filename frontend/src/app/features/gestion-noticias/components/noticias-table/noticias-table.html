@@ -4,33 +4,82 @@
       <tr>
         <th>Acciones</th>
         <th>Título</th>
-        <th>Estado</th>
         <th>Fecha de publicación</th>
+        <th>Fecha máxima</th>
+        <th>Visibilidad</th>
       </tr>
     </thead>
     <tbody>
-      @for (row of rows(); track row.id) {
+      @for (row of rows(); track row.id; let first = $first; let last = $last) {
         <tr>
           <td>
-            <button
-              type="button"
-              class="ppam-table__edit-btn"
-              [attr.aria-label]="'Editar noticia ' + row.titulo"
-              title="Editar registro"
-              (click)="editRecord.emit(row)"
-            >
-              <span class="material-symbols-outlined" aria-hidden="true">edit</span>
-            </button>
+            <div class="ppam-table__actions">
+              <button
+                type="button"
+                class="ppam-table__edit-btn"
+                [attr.aria-label]="'Editar noticia ' + row.titulo"
+                title="Editar registro"
+                (click)="editRecord.emit(row)"
+              >
+                <span class="material-symbols-outlined" aria-hidden="true">edit</span>
+              </button>
+              <button
+                type="button"
+                class="ppam-table__edit-btn"
+                aria-label="Subir"
+                title="Subir"
+                [disabled]="first"
+                (click)="moveUp.emit(row)"
+              >
+                <span class="material-symbols-outlined" aria-hidden="true">keyboard_arrow_up</span>
+              </button>
+              <button
+                type="button"
+                class="ppam-table__edit-btn"
+                aria-label="Bajar"
+                title="Bajar"
+                [disabled]="last"
+                (click)="moveDown.emit(row)"
+              >
+                <span class="material-symbols-outlined" aria-hidden="true"
+                  >keyboard_arrow_down</span
+                >
+              </button>
+              <button
+                type="button"
+                class="ppam-table__edit-btn ppam-table__edit-btn--danger"
+                aria-label="Eliminar"
+                title="Eliminar"
+                (click)="onDelete(row)"
+              >
+                <span class="material-symbols-outlined" aria-hidden="true">delete</span>
+              </button>
+            </div>
           </td>
           <td>{{ row.titulo }}</td>
+          <td>{{ row.fecha_publicacion ? formatDateShort(row.fecha_publicacion) : '-' }}</td>
           <td>
-            <app-badge [tone]="row.estado === 'PUBLICADA' ? 'success' : 'neutral'">{{ row.estado }}</app-badge>
+            @if (row.fecha_maxima_publicacion) {
+              {{ formatDateShort(row.fecha_maxima_publicacion) }}
+              @if (estaVencida(row)) {
+                <app-badge tone="warning">Vencida</app-badge>
+              }
+            } @else {
+              Sin vencimiento
+            }
           </td>
-          <td>{{ row.fecha_publicacion ? formatDateShort(row.fecha_publicacion) : '—' }}</td>
+          <td>
+            <app-switch
+              [checked]="row.estado === 'PUBLICADA'"
+              labelOn="Publicada"
+              labelOff="Borrador"
+              (changed)="onToggleEstado(row, $event)"
+            />
+          </td>
         </tr>
       } @empty {
         <tr>
-          <td colspan="4" class="ppam-table__empty">Todavía no hay noticias registradas.</td>
+          <td colspan="5" class="ppam-table__empty">Todavía no hay noticias registradas.</td>
         </tr>
       }
     </tbody>

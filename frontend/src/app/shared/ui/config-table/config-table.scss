@@ -42,6 +42,12 @@
   flex-wrap: wrap;
 }
 
+.table-count {
+  margin: 0 0 var(--ppam-space-sm);
+  font-size: var(--ppam-small-size);
+  color: var(--ppam-on-surface-variant);
+}
+
 .table-scroll {
   overflow-x: auto;
   border: 1px solid var(--ppam-border-quiet);
@@ -65,7 +71,7 @@
 
 .ppam-table thead th {
   background: var(--ppam-surface-container-low);
-  color: var(--ppam-on-surface-variant);
+  color: var(--ppam-primary-container);
   font-weight: 600;
   position: sticky;
   top: 0;
@@ -88,6 +94,11 @@
   font-size: 16px;
   width: 16px;
   height: 16px;
+}
+
+.ppam-table__actions {
+  display: flex;
+  gap: var(--ppam-space-xs);
 }
 
 .ppam-table__edit-btn {

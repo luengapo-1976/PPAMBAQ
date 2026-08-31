@@ -49,7 +49,10 @@ export class Login {
   protected readonly forgotFeedback = signal<string | null>(null);
 
   protected readonly forgotForm = this.fb.group({
-    correo: ['', [Validators.required, Validators.pattern(EMAIL_PATTERN), Validators.maxLength(100)]],
+    correo: [
+      '',
+      [Validators.required, Validators.pattern(EMAIL_PATTERN), Validators.maxLength(100)],
+    ],
   });
 
   protected togglePasswordVisible(): void {
@@ -69,7 +72,20 @@ export class Login {
     this.authService.login(login!, password!).subscribe({
       next: () => {
         this.submitting.set(false);
-        const returnUrl = this.activatedRoute.snapshot.queryParamMap.get('returnUrl') ?? this.authService.defaultRoute();
+        /** El aviso legal tiene prioridad: usar la app implica procesar datos
+         * personales, así que ese consentimiento debe resolverse antes que cualquier
+         * otra pantalla, incluido el aviso de actualización de datos. */
+        if (this.authService.requiereAceptacionLegal()) {
+          this.router.navigateByUrl('/aviso-tratamiento-datos');
+          return;
+        }
+        if (this.authService.requiereActualizacionDatos()) {
+          this.router.navigateByUrl('/aviso-actualizacion-datos');
+          return;
+        }
+        const returnUrl =
+          this.activatedRoute.snapshot.queryParamMap.get('returnUrl') ??
+          this.authService.defaultRoute();
         this.router.navigateByUrl(returnUrl);
       },
       error: (err: ApiError) => {
@@ -107,7 +123,9 @@ export class Login {
       },
       error: (err: ApiError) => {
         this.forgotSubmitting.set(false);
-        this.forgotFeedback.set(err?.message ?? 'No se pudo procesar la solicitud. Intenta nuevamente.');
+        this.forgotFeedback.set(
+          err?.message ?? 'No se pudo procesar la solicitud. Intenta nuevamente.',
+        );
       },
     });
   }

@@ -8,8 +8,7 @@
   flex-direction: column;
   height: 100%;
   background: var(--ppam-sidebar-bg);
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: hidden;
 }
 
 .sidebar__brand {
@@ -25,8 +24,17 @@
 .sidebar__brand-text {
   font-size: var(--ppam-card-title-size);
   font-weight: 700;
-  color: var(--ppam-sidebar-bg);
+  color: var(--ppam-primary-container);
   white-space: nowrap;
+}
+
+.sidebar__scroll {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .sidebar__brand-logo {
@@ -100,11 +108,40 @@
   min-height: 36px;
   padding-inline: var(--ppam-space-sm);
   margin-top: var(--ppam-space-sm);
-  color: #f2ce00;
+  border: 0;
+  border-radius: var(--ppam-radius-control);
+  background: transparent;
+  color: var(--ppam-inverse-primary);
+  font-family: inherit;
   font-size: var(--ppam-label-size);
   font-weight: 600;
   letter-spacing: var(--ppam-label-tracking);
   text-transform: uppercase;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+  transition:
+    background var(--ppam-motion-fast),
+    color var(--ppam-motion-fast);
+}
+
+.sidebar__section-title:hover {
+  background: var(--ppam-surface);
+  color: var(--ppam-sidebar-bg);
+}
+
+.sidebar__section-title .sidebar__label {
+  flex: 1;
+}
+
+.sidebar__chevron {
+  font-size: 18px;
+  flex-shrink: 0;
+  transition: transform var(--ppam-motion-fast);
+}
+
+.sidebar__chevron--open {
+  transform: rotate(180deg);
 }
 
 .sidebar--collapsed .sidebar__link,

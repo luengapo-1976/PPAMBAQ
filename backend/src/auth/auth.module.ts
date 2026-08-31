@@ -7,11 +7,15 @@ import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { UsuariosModule } from '../usuarios/usuarios.module';
 import { PublicadoresModule } from '../publicadores/publicadores.module';
+import { ParametrosModule } from '../parametros/parametros.module';
+import { AceptacionesLegalesModule } from '../aceptaciones-legales/aceptaciones-legales.module';
 
 @Module({
   imports: [
     UsuariosModule,
     PublicadoresModule,
+    ParametrosModule,
+    AceptacionesLegalesModule,
     PassportModule,
     JwtModule.registerAsync({
       inject: [ConfigService],

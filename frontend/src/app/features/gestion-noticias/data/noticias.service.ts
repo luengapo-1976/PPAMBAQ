@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiService } from '../../../core/api.service';
-import { ImagenUploadResult, Noticia, NoticiaPayload } from './models';
+import { DireccionMover, ImagenUploadResult, Noticia, NoticiaPayload } from './models';
 
 @Injectable({ providedIn: 'root' })
 export class NoticiasService {
@@ -27,11 +27,21 @@ export class NoticiasService {
     return this.api.patch<Noticia>(`noticias/${id}`, payload);
   }
 
-  /** Reutiliza el endpoint de adjuntos ya existente (bucket "adjuntos" en
-   * Supabase Storage) en vez de montar infraestructura de upload nueva. */
+  setEstado(id: string, estado: 'BORRADOR' | 'PUBLICADA'): Observable<Noticia> {
+    return this.api.patch<Noticia>(`noticias/${id}`, { estado });
+  }
+
+  mover(id: string, direccion: DireccionMover): Observable<void> {
+    return this.api.patch<void>(`noticias/${id}/mover`, { direccion });
+  }
+
+  delete(id: string): Observable<void> {
+    return this.api.delete<void>(`noticias/${id}`);
+  }
+
   uploadImagen(file: File): Observable<ImagenUploadResult> {
     const formData = new FormData();
     formData.append('file', file, file.name);
-    return this.api.postFormData<ImagenUploadResult>('mensajes/adjuntos', formData);
+    return this.api.postFormData<ImagenUploadResult>('noticias/imagenes', formData);
   }
 }

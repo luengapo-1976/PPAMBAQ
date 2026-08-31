@@ -1,0 +1,91 @@
+.config-page {
+  background: var(--ppam-surface-container-lowest);
+  border-radius: var(--ppam-radius-card);
+  padding: var(--ppam-space-md);
+}
+
+.parametros-page__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ppam-space-md);
+  max-width: 560px;
+  padding: var(--ppam-space-lg);
+  background: var(--ppam-form-bg);
+  border-radius: var(--ppam-radius-card);
+}
+
+.parametros-page__titulo {
+  font-size: var(--ppam-card-title-size);
+  font-weight: var(--ppam-card-title-weight);
+  color: var(--ppam-primary-container);
+}
+
+.parametros-page__hint {
+  margin: calc(-1 * var(--ppam-space-sm)) 0 0;
+  color: var(--ppam-on-surface-variant);
+  font-size: var(--ppam-small-size);
+}
+
+.parametros-page__control {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--ppam-space-lg);
+}
+
+.parametros-page__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 260px;
+  font-size: var(--ppam-small-size);
+  font-weight: 600;
+  color: var(--ppam-primary-container);
+}
+
+.ppam-input {
+  width: 100%;
+  height: 44px;
+  padding-inline: var(--ppam-space-sm);
+  border-radius: var(--ppam-radius-control);
+  border: 1px solid var(--ppam-border-quiet);
+  background: var(--ppam-surface-container-lowest);
+  color: var(--ppam-on-surface);
+  font-family: inherit;
+  font-size: var(--ppam-body-size);
+  box-sizing: border-box;
+}
+
+.ppam-input:focus-visible {
+  outline: 2px solid var(--ppam-primary-container);
+  outline-offset: 1px;
+  border-color: var(--ppam-primary-container);
+}
+
+.skeleton-block {
+  height: 200px;
+  border-radius: var(--ppam-radius-card);
+  background: linear-gradient(
+    100deg,
+    var(--ppam-surface-container) 30%,
+    var(--ppam-surface-container-high) 50%,
+    var(--ppam-surface-container) 70%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@media (max-width: 599px) {
+  .parametros-page__field {
+    width: 100%;
+  }
+}

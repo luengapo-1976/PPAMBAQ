@@ -1,0 +1,45 @@
+<div class="config-page">
+  @if (loading()) {
+    <div class="skeleton-block"></div>
+  } @else {
+    <section class="parametros-page__card">
+      <h2 class="parametros-page__titulo">Actualización obligatoria de datos</h2>
+      <p class="parametros-page__hint">
+        Define cada cuántos meses se le debe pedir a cada publicador que revise y confirme sus datos
+        personales al iniciar sesión. El control solo se puede activar una vez elijas un número de
+        meses.
+      </p>
+
+      <div class="parametros-page__control">
+        <label class="parametros-page__field">
+          <span>Meses para requerir actualización</span>
+          <input
+            type="number"
+            min="1"
+            step="1"
+            class="ppam-input"
+            [ngModel]="meses()"
+            (ngModelChange)="onMesesChange($event)"
+          />
+        </label>
+
+        <app-switch
+          [checked]="activo()"
+          [disabled]="!mesesValido()"
+          labelOn="Activado"
+          labelOff="Desactivado"
+          (changed)="onActivoChange($event)"
+        />
+      </div>
+
+      <app-button
+        type="button"
+        icon="save"
+        [disabled]="!mesesValido() || saving()"
+        (click)="onGuardar()"
+      >
+        {{ saving() ? 'Guardando…' : 'Guardar' }}
+      </app-button>
+    </section>
+  }
+</div>

@@ -14,6 +14,11 @@
   </div>
 </div>
 
+<p class="table-count">
+  {{ sortedRows().length }} mostrados de {{ rows().length }}
+  {{ rows().length === 1 ? 'registro total' : 'registros totales' }}
+</p>
+
 <div class="table-scroll">
   <table class="ppam-table">
     <thead>
@@ -37,15 +42,30 @@
       @for (row of sortedRows(); track rowId()(row)) {
         <tr>
           <td>
-            <button
-              type="button"
-              class="ppam-table__edit-btn"
-              aria-label="Editar registro"
-              title="Editar registro"
-              (click)="editRecord.emit(row)"
-            >
-              <span class="material-symbols-outlined" aria-hidden="true">edit</span>
-            </button>
+            <div class="ppam-table__actions">
+              <button
+                type="button"
+                class="ppam-table__edit-btn"
+                aria-label="Editar registro"
+                title="Editar registro"
+                (click)="editRecord.emit(row)"
+              >
+                <span class="material-symbols-outlined" aria-hidden="true">edit</span>
+              </button>
+              @if (extraActionIcon()) {
+                <button
+                  type="button"
+                  class="ppam-table__edit-btn"
+                  [attr.aria-label]="extraActionLabel()"
+                  [title]="extraActionLabel()"
+                  (click)="extraAction.emit(row)"
+                >
+                  <span class="material-symbols-outlined" aria-hidden="true">{{
+                    extraActionIcon()
+                  }}</span>
+                </button>
+              }
+            </div>
           </td>
           @for (column of columns(); track column.key) {
             <td>{{ column.value(row) }}</td>
@@ -53,7 +73,9 @@
         </tr>
       } @empty {
         <tr>
-          <td [attr.colspan]="columns().length + 1" class="ppam-table__empty">{{ emptyMessage() }}</td>
+          <td [attr.colspan]="columns().length + 1" class="ppam-table__empty">
+            {{ emptyMessage() }}
+          </td>
         </tr>
       }
     </tbody>

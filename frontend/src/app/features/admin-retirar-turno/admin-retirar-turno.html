@@ -1,0 +1,126 @@
+<div class="admin-retirar-turno">
+  <p class="admin-retirar-turno__legend">
+    Busca al publicador por nombre o móvil para ver los turnos que tiene asignados y retirar alguno.
+  </p>
+
+  <app-search-select
+    [options]="publicadorOptions()"
+    placeholder="Buscar publicador por nombre o móvil…"
+    emptyMessage="No se encontraron publicadores"
+    [ngModel]="selectedPublicadorId()"
+    (ngModelChange)="onSeleccionarPublicador($event)"
+  />
+
+  @if (!selectedPublicadorId()) {
+    <div class="admin-retirar-turno__empty">
+      <span class="material-symbols-outlined" aria-hidden="true">person_search</span>
+      <p>Busca un publicador para ver sus turnos asignados.</p>
+    </div>
+  } @else if (loading()) {
+    <div class="admin-retirar-turno__grid">
+      @for (i of [1, 2, 3]; track i) {
+        <div class="skeleton-block"></div>
+      }
+    </div>
+  } @else if (misTurnos().length === 0) {
+    <div class="admin-retirar-turno__empty">
+      <span class="material-symbols-outlined" aria-hidden="true">event_busy</span>
+      <p>{{ nombreCompleto(selectedPublicador()!) }} no tiene turnos asignados actualmente.</p>
+    </div>
+  } @else {
+    <div class="admin-retirar-turno__grid">
+      @for (turno of misTurnos(); track turno.id) {
+        <article class="turno-card">
+          <h2 class="turno-card__punto">{{ turno.nombrePunto }}</h2>
+          <div class="turno-card__row">
+            <span class="material-symbols-outlined" aria-hidden="true">calendar_today</span>
+            <span>{{ turno.diaNombre }}</span>
+          </div>
+          <div class="turno-card__row">
+            <span class="material-symbols-outlined" aria-hidden="true">schedule</span>
+            <span>{{ formatHora(turno.horaInicio) }} – {{ formatHora(turno.horaFin) }}</span>
+          </div>
+          @if (turno.estadoSolicitud === 'PENDIENTE') {
+            <span class="estado-badge estado-badge--pendiente">
+              <span class="material-symbols-outlined" aria-hidden="true">hourglass_top</span>
+              Pendiente de aprobación
+            </span>
+          }
+          <app-button type="button" (click)="onAbrirDevolucion(turno)">Retirar turno</app-button>
+        </article>
+      }
+    </div>
+  }
+</div>
+
+<app-dialog
+  [open]="dialogState() !== 'closed'"
+  [title]="dialogTitulo()"
+  (closed)="onDialogClosed()"
+>
+  <app-button
+    dialogToolbar
+    type="button"
+    [disabled]="primaryDisabled()"
+    (click)="onPrimaryAction()"
+  >
+    {{ primaryLabel() }}
+  </app-button>
+  <app-button
+    dialogToolbar
+    type="button"
+    variant="secondary"
+    [style.display]="dialogState() === 'form' ? null : 'none'"
+    (click)="onCancelarDialog()"
+  >
+    Cancelar
+  </app-button>
+
+  @if (dialogState() === 'form') {
+    @if (turnoSeleccionado(); as turno) {
+      <p class="admin-retirar-turno__dialog-punto">
+        <strong>{{ turno.nombrePunto }}</strong> · {{ turno.diaNombre }} ·
+        {{ formatHora(turno.horaInicio) }} – {{ formatHora(turno.horaFin) }}
+      </p>
+    }
+
+    <label class="admin-retirar-turno__field">
+      <span>Motivo de la devolución</span>
+      <app-select
+        [options]="motivoOptions"
+        placeholder="Selecciona un motivo"
+        [ngModel]="motivo()"
+        (ngModelChange)="onMotivoChange($event)"
+      />
+    </label>
+
+    @if (motivo() === 'Otro') {
+      <label class="admin-retirar-turno__field">
+        <span>Especifica cuál</span>
+        <input
+          type="text"
+          class="ppam-input"
+          maxlength="200"
+          [ngModel]="motivoOtro()"
+          (ngModelChange)="motivoOtro.set($event)"
+        />
+      </label>
+    }
+
+    <label class="admin-retirar-turno__field">
+      <span>Observaciones (opcional)</span>
+      <textarea
+        class="ppam-textarea"
+        rows="3"
+        maxlength="500"
+        [ngModel]="observaciones()"
+        (ngModelChange)="observaciones.set($event)"
+      ></textarea>
+    </label>
+  } @else {
+    <div class="admin-retirar-turno__dialog-confirmacion">
+      <span class="material-symbols-outlined" aria-hidden="true">task_alt</span>
+    </div>
+    <p class="admin-retirar-turno__dialog-texto">{{ dialogMensaje() }}</p>
+  }
+</app-dialog>

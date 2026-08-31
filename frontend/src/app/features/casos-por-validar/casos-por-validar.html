@@ -1,7 +1,7 @@
 <div class="casos-page">
   @if (loading()) {
     <div class="casos-page__kpis">
-      @for (i of [1, 2, 3, 4]; track i) {
+      @for (i of [1, 2, 3, 4, 5]; track i) {
         <div class="skeleton-block skeleton-block--kpi"></div>
       }
     </div>
@@ -21,6 +21,13 @@
         [count]="turnosAprobados().length"
         [selected]="tipo() === 'turnos' && estado() === 'aprobados'"
         (toggle)="onSelectCard('turnos', 'aprobados')"
+      />
+      <app-stat-card
+        icon="cancel"
+        label="Turnos rechazados (histórico)"
+        [count]="turnosRechazados().length"
+        [selected]="tipo() === 'turnos' && estado() === 'rechazados'"
+        (toggle)="onSelectCard('turnos', 'rechazados')"
       />
       <app-stat-card
         icon="person_remove"
@@ -48,9 +55,10 @@
               <th>Día</th>
               <th>Hora</th>
               <th>Publicador</th>
+              <th>Móvil</th>
               <th>Fecha de solicitud</th>
-              @if (estado() === 'aprobados') {
-                <th>Aprobado por</th>
+              @if (mostrarColumnaDecision()) {
+                <th>{{ etiquetaDecisionPor() }}</th>
               }
             </tr>
           </thead>
@@ -61,19 +69,26 @@
                 <td>{{ row.diaNombre }}</td>
                 <td>{{ formatHoraAmPm(row.horaInicio) }} – {{ formatHoraAmPm(row.horaFin) }}</td>
                 <td>{{ row.nombrePublicador }}</td>
+                <td>{{ row.movil || '-' }}</td>
                 <td>{{ formatDateShort(row.fechaSolicitud) }}</td>
-                @if (estado() === 'aprobados') {
+                @if (mostrarColumnaDecision()) {
                   <td>{{ row.aprobadoPor }}</td>
                 }
               </tr>
             } @empty {
               <tr>
-                <td [attr.colspan]="estado() === 'aprobados' ? 6 : 5" class="ppam-table__empty">
-                  {{
-                    estado() === 'pendientes'
-                      ? 'No hay turnos pendientes por validar.'
-                      : 'Aún no se ha aprobado ningún turno por este medio.'
-                  }}
+                <td [attr.colspan]="mostrarColumnaDecision() ? 7 : 6" class="ppam-table__empty">
+                  @switch (estado()) {
+                    @case ('pendientes') {
+                      No hay turnos pendientes por validar.
+                    }
+                    @case ('rechazados') {
+                      Aún no se ha rechazado ningún turno por este medio.
+                    }
+                    @default {
+                      Aún no se ha aprobado ningún turno por este medio.
+                    }
+                  }
                 </td>
               </tr>
             }
@@ -130,30 +145,43 @@
             </div>
             <div class="caso-card__row">
               <span class="material-symbols-outlined" aria-hidden="true">calendar_today</span>
-              <span>{{ row.diaNombre }} · {{ formatHoraAmPm(row.horaInicio) }} – {{ formatHoraAmPm(row.horaFin) }}</span>
+              <span
+                >{{ row.diaNombre }} · {{ formatHoraAmPm(row.horaInicio) }} –
+                {{ formatHoraAmPm(row.horaFin) }}</span
+              >
             </div>
             <div class="caso-card__row">
               <span class="material-symbols-outlined" aria-hidden="true">person</span>
               <span>{{ row.nombrePublicador }}</span>
             </div>
             <div class="caso-card__row caso-card__row--muted">
+              <span class="material-symbols-outlined" aria-hidden="true">call</span>
+              <span>{{ row.movil || '-' }}</span>
+            </div>
+            <div class="caso-card__row caso-card__row--muted">
               <span class="material-symbols-outlined" aria-hidden="true">event</span>
               <span>Solicitado el {{ formatDateShort(row.fechaSolicitud) }}</span>
             </div>
-            @if (estado() === 'aprobados') {
+            @if (mostrarColumnaDecision()) {
               <div class="caso-card__row caso-card__row--muted">
                 <span class="material-symbols-outlined" aria-hidden="true">verified</span>
-                <span>Aprobado por {{ row.aprobadoPor }}</span>
+                <span>{{ etiquetaDecisionPor() }} {{ row.aprobadoPor }}</span>
               </div>
             }
           </article>
         } @empty {
           <p class="caso-card__empty">
-            {{
-              estado() === 'pendientes'
-                ? 'No hay turnos pendientes por validar.'
-                : 'Aún no se ha aprobado ningún turno por este medio.'
-            }}
+            @switch (estado()) {
+              @case ('pendientes') {
+                No hay turnos pendientes por validar.
+              }
+              @case ('rechazados') {
+                Aún no se ha rechazado ningún turno por este medio.
+              }
+              @default {
+                Aún no se ha aprobado ningún turno por este medio.
+              }
+            }
           </p>
         }
       } @else {
@@ -169,7 +197,7 @@
             </div>
             <div class="caso-card__row">
               <span class="material-symbols-outlined" aria-hidden="true">call</span>
-              <span>{{ row.movil || '—' }}</span>
+              <span>{{ row.movil || '-' }}</span>
             </div>
             <div class="caso-card__row caso-card__row--muted">
               <span class="material-symbols-outlined" aria-hidden="true">event</span>
@@ -196,28 +224,48 @@
   }
 </div>
 
-<app-dialog [open]="dialogPaso() !== 'cerrado'" [title]="dialogTitulo()" (closed)="onDialogClosed()">
-  <app-button
-    dialogToolbar
-    type="button"
-    [style.display]="dialogMuestraPrimario() ? null : 'none'"
-    [disabled]="dialogPrimaryDisabled()"
-    (click)="onDialogPrimaryAction()"
-  >
-    {{ dialogPrimaryLabel() }}
-  </app-button>
-  <app-button dialogToolbar type="button" variant="secondary" (click)="onDialogSecondaryAction()">
-    {{ dialogSecondaryLabel() }}
-  </app-button>
+<app-dialog
+  [open]="dialogPaso() !== 'cerrado'"
+  [title]="dialogTitulo()"
+  (closed)="onDialogClosed()"
+>
+  @if (dialogPaso() === 'detalle' && estado() === 'pendientes') {
+    <ng-container dialogToolbar>
+      @if (tipo() === 'turnos') {
+        <app-button type="button" (click)="onAbrirDecisionTurno('aprobar')"
+          >Aprobar solicitud</app-button
+        >
+        <app-button type="button" variant="danger" (click)="onAbrirDecisionTurno('rechazar')">
+          Rechazar solicitud
+        </app-button>
+      } @else {
+        <app-button type="button" (click)="onAbrirAprobacionRetiro()">Aprobar solicitud</app-button>
+      }
+      <app-button type="button" variant="secondary" (click)="onCerrarDialog()">Cerrar</app-button>
+    </ng-container>
+  } @else if (dialogPaso() === 'justificacion') {
+    <ng-container dialogToolbar>
+      <app-button type="button" [disabled]="dialogPrimaryDisabled()" (click)="onEnviarDecision()">
+        {{ dialogPrimaryLabel() }}
+      </app-button>
+      <app-button type="button" variant="secondary" (click)="onCancelarAprobacion()"
+        >Cancelar</app-button
+      >
+    </ng-container>
+  } @else {
+    <app-button dialogToolbar type="button" variant="secondary" (click)="onCerrarDialog()"
+      >Cerrar</app-button
+    >
+  }
 
   @if (dialogPaso() === 'justificacion') {
     <label class="casos-page__field">
-      <span>{{ tipo() === 'turnos' ? 'Justificación de aprobación' : 'Observaciones de aprobación' }}</span>
+      <span>{{ justificacionLabel() }}</span>
       <textarea
         class="ppam-textarea"
         rows="4"
         maxlength="1000"
-        placeholder="Escribe el motivo de la aprobación…"
+        [placeholder]="justificacionPlaceholder()"
         [ngModel]="justificacionAprobacion()"
         (ngModelChange)="justificacionAprobacion.set($event)"
       ></textarea>
@@ -230,35 +278,64 @@
       </div>
       <div>
         <dt>Día y hora</dt>
-        <dd>{{ turno.diaNombre }} · {{ formatHoraAmPm(turno.horaInicio) }} – {{ formatHoraAmPm(turno.horaFin) }}</dd>
+        <dd>
+          {{ turno.diaNombre }} · {{ formatHoraAmPm(turno.horaInicio) }} –
+          {{ formatHoraAmPm(turno.horaFin) }}
+        </dd>
       </div>
       <div>
         <dt>Situación identificada</dt>
-        <dd>{{ turno.situacionIdentificada || '—' }}</dd>
+        <dd>{{ turno.situacionIdentificada || '-' }}</dd>
+      </div>
+      @if (turno.parejaNombre) {
+        <div>
+          <dt>
+            {{
+              estado() === 'pendientes'
+                ? 'Publicador que tiene asignado el turno'
+                : 'Publicador que tenía asignado el turno al momento de la solicitud'
+            }}
+          </dt>
+          <dd>{{ turno.parejaNombre }}</dd>
+        </div>
+        <div>
+          <dt>Móvil de quien tiene el turno</dt>
+          <dd>{{ turno.parejaMovil || '-' }}</dd>
+        </div>
+      }
+      <div>
+        <dt>Justificación de {{ turno.primerNombrePublicador }}</dt>
+        <dd>{{ turno.justificacion || '-' }}</dd>
       </div>
       <div>
-        <dt>Publicador</dt>
+        <dt>Solicitado por</dt>
         <dd>{{ turno.nombrePublicador }}</dd>
       </div>
       <div>
-        <dt>Edad</dt>
-        <dd>{{ yearsSince(turno.fechaNacimiento) ?? '—' }}</dd>
+        <dt>Móvil</dt>
+        <dd>{{ turno.movil || '-' }}</dd>
       </div>
+      @if (turno.nombreConyuge) {
+        <div>
+          <dt>Nombre del cónyuge</dt>
+          <dd>{{ turno.nombreConyuge }}</dd>
+        </div>
+      }
       <div>
         <dt>Fecha de solicitud</dt>
         <dd>{{ formatDateShort(turno.fechaSolicitud) }}</dd>
       </div>
-      @if (estado() === 'aprobados') {
+      @if (mostrarColumnaDecision()) {
         <div>
-          <dt>Aprobado por</dt>
-          <dd>{{ turno.aprobadoPor || '—' }}</dd>
+          <dt>{{ etiquetaDecisionPor() }}</dt>
+          <dd>{{ turno.aprobadoPor || '-' }}</dd>
         </div>
         <div>
-          <dt>Justificación de aprobación</dt>
-          <dd>{{ turno.justificacionAprobacion || '—' }}</dd>
+          <dt>Justificación de respuesta</dt>
+          <dd>{{ turno.justificacionAprobacion || '-' }}</dd>
         </div>
         <div>
-          <dt>Fecha de aprobación</dt>
+          <dt>{{ etiquetaFechaDecision() }}</dt>
           <dd>{{ formatDateShort(turno.fechaAprobacion) }}</dd>
         </div>
       }
@@ -271,19 +348,19 @@
       </div>
       <div>
         <dt>Edad</dt>
-        <dd>{{ yearsSince(retiro.fecha_nacimiento) ?? '—' }}</dd>
+        <dd>{{ yearsSince(retiro.fecha_nacimiento) ?? '-' }}</dd>
       </div>
       <div>
         <dt>Años de bautismo</dt>
-        <dd>{{ yearsSince(retiro.fecha_bautismo) ?? '—' }}</dd>
+        <dd>{{ yearsSince(retiro.fecha_bautismo) ?? '-' }}</dd>
       </div>
       <div>
         <dt>Privilegio de servicio</dt>
-        <dd>{{ retiro.privilegio_ser || '—' }}</dd>
+        <dd>{{ retiro.privilegio_ser || '-' }}</dd>
       </div>
       <div>
         <dt>Móvil</dt>
-        <dd>{{ retiro.movil || '—' }}</dd>
+        <dd>{{ retiro.movil || '-' }}</dd>
       </div>
       <div>
         <dt>Congregación</dt>
@@ -300,11 +377,11 @@
       @if (estado() === 'aprobados') {
         <div>
           <dt>Aprobado por</dt>
-          <dd>{{ retiro.valida_retiro || '—' }}</dd>
+          <dd>{{ retiro.valida_retiro || '-' }}</dd>
         </div>
         <div>
           <dt>Observaciones</dt>
-          <dd>{{ retiro.observaciones_retiro || '—' }}</dd>
+          <dd>{{ retiro.observaciones_retiro || '-' }}</dd>
         </div>
         <div>
           <dt>Fecha de validación</dt>

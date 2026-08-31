@@ -60,7 +60,11 @@
   </section>
 </main>
 
-<app-dialog [open]="forgotPasswordOpen()" title="Recordar contraseña" (closed)="onCancelForgotPassword()">
+<app-dialog
+  [open]="forgotPasswordOpen()"
+  title="Recordar contraseña"
+  (closed)="onCancelForgotPassword()"
+>
   <app-button
     dialogToolbar
     type="button"
@@ -70,13 +74,19 @@
   >
     Enviar
   </app-button>
-  <app-button dialogToolbar type="button" variant="secondary" icon="close" (click)="onCancelForgotPassword()">
+  <app-button
+    dialogToolbar
+    type="button"
+    variant="secondary"
+    icon="close"
+    (click)="onCancelForgotPassword()"
+  >
     Cancelar
   </app-button>
 
   <p class="login__forgot-hint">
-    Ingresa el correo electrónico registrado y, si coincide con una cuenta existente, te enviaremos una contraseña
-    temporal.
+    Ingresa el correo electrónico registrado y, si coincide con una cuenta existente, te enviaremos
+    una contraseña temporal.
   </p>
 
   @if (forgotFeedback()) {
@@ -84,8 +94,18 @@
   }
 
   <form class="login__forgot-form" [formGroup]="forgotForm" (ngSubmit)="onSubmitForgotPassword()">
-    <app-form-field label="Correo electrónico" [required]="true" [control]="forgotForm.controls.correo">
-      <input type="email" formControlName="correo" class="ppam-input" maxlength="100" autocomplete="email" />
+    <app-form-field
+      label="Correo electrónico"
+      [required]="true"
+      [control]="forgotForm.controls.correo"
+    >
+      <input
+        type="email"
+        formControlName="correo"
+        class="ppam-input"
+        maxlength="100"
+        autocomplete="email"
+      />
     </app-form-field>
   </form>
 </app-dialog>

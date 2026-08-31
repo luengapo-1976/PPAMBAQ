@@ -13,21 +13,48 @@ export const MENSAJE_TOKENS: MensajeToken[] = [
   { token: 'congregacion', descripcion: 'Nombre de la congregación del publicador.' },
   { token: 'correo_electronico', descripcion: 'Correo electrónico del publicador.' },
   { token: 'direccion', descripcion: 'Dirección de residencia del publicador.' },
-  { token: 'direccion_primera_capacitacion', descripcion: 'Dirección del punto asignado a la primera capacitación.' },
-  { token: 'direccion_segunda_capacitacion', descripcion: 'Dirección del punto asignado a la segunda capacitación.' },
-  { token: 'encargado_primera_capacitacion', descripcion: 'Encargado del punto asignado a la primera capacitación.' },
-  { token: 'encargado_segunda_capacitacion', descripcion: 'Encargado del punto asignado a la segunda capacitación.' },
-  { token: 'entrenamiento_requerido', descripcion: 'Etapa de entrenamiento en la que se encuentra el publicador.' },
+  {
+    token: 'direccion_primera_capacitacion',
+    descripcion: 'Dirección del punto asignado a la primera capacitación.',
+  },
+  {
+    token: 'direccion_segunda_capacitacion',
+    descripcion: 'Dirección del punto asignado a la segunda capacitación.',
+  },
+  {
+    token: 'encargado_primera_capacitacion',
+    descripcion: 'Encargado del punto asignado a la primera capacitación.',
+  },
+  {
+    token: 'encargado_segunda_capacitacion',
+    descripcion: 'Encargado del punto asignado a la segunda capacitación.',
+  },
+  {
+    token: 'entrenamiento_requerido',
+    descripcion: 'Etapa de entrenamiento en la que se encuentra el publicador.',
+  },
   { token: 'estado', descripcion: 'Estado actual de la solicitud.' },
   { token: 'estado_civil', descripcion: 'Estado civil del publicador.' },
   { token: 'fecha_bautismo', descripcion: 'Fecha de bautismo del publicador.' },
   { token: 'fecha_nacimiento', descripcion: 'Fecha de nacimiento del publicador.' },
-  { token: 'fecha_primera_capacitacion', descripcion: 'Fecha asignada para la primera capacitación.' },
-  { token: 'fecha_segunda_capacitacion', descripcion: 'Fecha asignada para la segunda capacitación.' },
+  {
+    token: 'fecha_primera_capacitacion',
+    descripcion: 'Fecha asignada para la primera capacitación.',
+  },
+  {
+    token: 'fecha_segunda_capacitacion',
+    descripcion: 'Fecha asignada para la segunda capacitación.',
+  },
   { token: 'fecha_solicitud', descripcion: 'Fecha en que se registró la solicitud.' },
   { token: 'login', descripcion: 'Usuario del publicador para ingresar al sistema.' },
-  { token: 'lugar_primera_capacitacion', descripcion: 'Nombre del punto asignado a la primera capacitación.' },
-  { token: 'lugar_segunda_capacitacion', descripcion: 'Nombre del punto asignado a la segunda capacitación.' },
+  {
+    token: 'lugar_primera_capacitacion',
+    descripcion: 'Nombre del punto asignado a la primera capacitación.',
+  },
+  {
+    token: 'lugar_segunda_capacitacion',
+    descripcion: 'Nombre del punto asignado a la segunda capacitación.',
+  },
   { token: 'movil', descripcion: 'Número de móvil del publicador.' },
   {
     token: 'movil_encargado_primera_capacitacion',
@@ -37,7 +64,11 @@ export const MENSAJE_TOKENS: MensajeToken[] = [
     token: 'movil_encargado_segunda_capacitacion',
     descripcion: 'Móvil del encargado del punto de la segunda capacitación.',
   },
-  { token: 'nombre_completo', descripcion: 'Primer nombre, segundo nombre, primer apellido y segundo apellido, separados por espacio.' },
+  {
+    token: 'nombre_completo',
+    descripcion:
+      'Primer nombre, segundo nombre, primer apellido y segundo apellido, separados por espacio.',
+  },
   { token: 'nombre_conyuge', descripcion: 'Nombre del cónyuge del publicador, si aplica.' },
   { token: 'primer_apellido', descripcion: 'Primer apellido del publicador.' },
   { token: 'primer_nombre', descripcion: 'Primer nombre del publicador.' },

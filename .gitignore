@@ -14,8 +14,16 @@ coverage/
 
 # Archivos temporales de Office / sistema
 ~$*
+~WRL*.tmp
 .DS_Store
 Thumbs.db
+
+# Logs de servidores de desarrollo locales
+*.log
+
+# Herramientas y configuración local de Claude Code (incluye worktrees temporales
+# de subagentes, que no deben subirse al repo principal)
+.claude/
 
 # Muestras con datos personales reales (no deben subirse a un repo público)
 frontend/src/assests/adjuntos/S-73_S Amparo Maida Editado.pdf

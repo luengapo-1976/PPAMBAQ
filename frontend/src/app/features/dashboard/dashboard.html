@@ -24,9 +24,17 @@
       <app-stat-card icon="groups" label="Total de solicitudes" [count]="kpis().total" />
       <app-stat-card icon="hourglass_top" label="Pendientes" [count]="kpis().pendientes" />
       <app-stat-card icon="verified" label="Cumple requisitos" [count]="kpis().aprobados" />
-      <app-stat-card icon="school" label="Pendientes de entrenamiento" [count]="kpis().pendientesEntrenamiento" />
+      <app-stat-card
+        icon="school"
+        label="Pendientes de entrenamiento"
+        [count]="kpis().pendientesEntrenamiento"
+      />
       <app-stat-card icon="calendar_month" label="Nuevas este mes" [count]="kpis().nuevasEsteMes" />
-      <app-stat-card icon="church" label="Congregaciones activas" [count]="kpis().congregacionesActivas" />
+      <app-stat-card
+        icon="church"
+        label="Congregaciones activas"
+        [count]="kpis().congregacionesActivas"
+      />
     </section>
 
     <section class="dashboard-page__charts">
@@ -47,7 +55,11 @@
       <div class="dashboard-card dashboard-card--wide">
         <h2 class="dashboard-card__title">Solicitudes por congregación (top 8)</h2>
         <div class="dashboard-card__chart">
-          <app-chart-canvas type="bar" [data]="topCongregacionesChartData()" [options]="horizontalBarOptions" />
+          <app-chart-canvas
+            type="bar"
+            [data]="topCongregacionesChartData()"
+            [options]="horizontalBarOptions"
+          />
         </div>
       </div>
 

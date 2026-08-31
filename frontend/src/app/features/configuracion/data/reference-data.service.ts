@@ -78,6 +78,11 @@ export class ReferenceDataService {
     return this.api.get<Punto[]>('puntos');
   }
 
+  /** Puntos a cargo del publicador autenticado (por coincidencia de móvil). */
+  misPuntos(): Observable<Punto[]> {
+    return this.api.get<Punto[]>('puntos/mis-puntos');
+  }
+
   createPunto(payload: PuntoCreatePayload): Observable<Punto> {
     return this.api.post<Punto>('puntos', payload);
   }

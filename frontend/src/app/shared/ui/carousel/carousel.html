@@ -1,0 +1,58 @@
+@if (slides().length > 0) {
+  <div
+    class="carousel"
+    role="group"
+    aria-roledescription="carrusel"
+    aria-label="Banners"
+    tabindex="0"
+    (mouseenter)="onMouseEnter()"
+    (mouseleave)="onMouseLeave()"
+    (keydown.arrowleft)="prev()"
+    (keydown.arrowright)="next()"
+  >
+    <div class="carousel__viewport">
+      @for (slide of slides(); track slide.imagenUrl; let i = $index) {
+        <img
+          class="carousel__slide"
+          [class.carousel__slide--active]="i === activeIndex()"
+          [src]="slide.imagenUrl"
+          [alt]="slide.alt || ''"
+          [attr.aria-hidden]="i === activeIndex() ? null : 'true'"
+        />
+      }
+    </div>
+
+    @if (slides().length > 1) {
+      <button
+        type="button"
+        class="carousel__control carousel__control--prev"
+        aria-label="Banner anterior"
+        (click)="prev()"
+      >
+        <span class="material-symbols-outlined" aria-hidden="true">chevron_left</span>
+      </button>
+      <button
+        type="button"
+        class="carousel__control carousel__control--next"
+        aria-label="Banner siguiente"
+        (click)="next()"
+      >
+        <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
+      </button>
+
+      <div class="carousel__dots" role="tablist" aria-label="Selecciona un banner">
+        @for (slide of slides(); track slide.imagenUrl; let i = $index) {
+          <button
+            type="button"
+            class="carousel__dot"
+            [class.carousel__dot--active]="i === activeIndex()"
+            role="tab"
+            [attr.aria-selected]="i === activeIndex()"
+            [attr.aria-label]="'Ir al banner ' + (i + 1)"
+            (click)="goTo(i)"
+          ></button>
+        }
+      </div>
+    }
+  </div>
+}

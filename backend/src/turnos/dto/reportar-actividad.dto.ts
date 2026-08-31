@@ -1,4 +1,11 @@
-import { IsDateString, IsIn, IsOptional, IsString, MaxLength, ValidateIf } from 'class-validator';
+import {
+  IsDateString,
+  IsIn,
+  IsOptional,
+  IsString,
+  MaxLength,
+  ValidateIf,
+} from 'class-validator';
 
 export type RespuestaSiNo = 'SI' | 'NO';
 
@@ -16,7 +23,10 @@ export class ReportarActividadDto {
   inicioConversacion?: RespuestaSiNo;
 
   /** Solo se pide si además se inició una conversación. */
-  @ValidateIf((dto: ReportarActividadDto) => dto.cumplioTurno === 'SI' && dto.inicioConversacion === 'SI')
+  @ValidateIf(
+    (dto: ReportarActividadDto) =>
+      dto.cumplioTurno === 'SI' && dto.inicioConversacion === 'SI',
+  )
   @IsIn(['SI', 'NO'])
   arreglosCurso?: RespuestaSiNo;
 
@@ -24,4 +34,11 @@ export class ReportarActividadDto {
   @IsString()
   @MaxLength(500)
   observaciones?: string;
+
+  /** Solo la usa el flujo administrativo ("Informe de turno"): de qué publicador
+   * es el turno sobre el que se reporta. Si no viene, se usa el publicador del
+   * usuario logueado (flujo normal de participante). */
+  @IsOptional()
+  @IsString()
+  id_publicador?: string;
 }

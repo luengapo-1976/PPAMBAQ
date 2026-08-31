@@ -10,7 +10,7 @@
 
 .casos-page__kpis {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: var(--ppam-space-md);
 }
 
@@ -66,7 +66,7 @@
 
 .ppam-table thead th {
   background: var(--ppam-surface-container-low);
-  color: var(--ppam-on-surface-variant);
+  color: var(--ppam-primary-container);
   font-weight: 600;
   position: sticky;
   top: 0;
@@ -148,9 +148,10 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+  margin-top: var(--ppam-space-xl);
   font-size: var(--ppam-small-size);
   font-weight: 600;
-  color: var(--ppam-on-surface-variant);
+  color: var(--ppam-primary-container);
 }
 
 .ppam-textarea {
@@ -175,14 +176,14 @@
 .casos-page__detalle {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: var(--ppam-space-md);
-  margin: 0;
+  gap: var(--ppam-space-md) var(--ppam-space-lg);
+  margin: var(--ppam-space-xl) 0 0;
 }
 
 .casos-page__detalle dt {
   font-size: var(--ppam-small-size);
   font-weight: 600;
-  color: var(--ppam-on-surface-variant);
+  color: var(--ppam-primary-container);
 }
 
 .casos-page__detalle dd {

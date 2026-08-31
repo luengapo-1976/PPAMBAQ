@@ -7,9 +7,9 @@ import { Usuario } from '../data/models';
 
 const COLUMNS: ConfigTableColumn<Usuario>[] = [
   { key: 'login', label: 'Login', value: (row) => row.login },
-  { key: 'rol', label: 'Rol', value: (row) => row.rol ?? '—' },
-  { key: 'correo', label: 'Correo electrónico', value: (row) => row.correo ?? '—' },
-  { key: 'movil', label: 'Móvil', value: (row) => row.movil ?? '—' },
+  { key: 'rol', label: 'Rol', value: (row) => row.rol ?? '-' },
+  { key: 'correo', label: 'Correo electrónico', value: (row) => row.correo ?? '-' },
+  { key: 'movil', label: 'Móvil', value: (row) => row.movil ?? '-' },
 ];
 
 @Component({

@@ -1,0 +1,27 @@
+<ol class="timeline">
+  @for (item of items(); track $index) {
+    <li class="timeline__item timeline__item--{{ item.variant }}">
+      <span class="timeline__marker">
+        <span class="material-symbols-outlined">{{ item.icon }}</span>
+      </span>
+      <div class="timeline__content">
+        @if (item.fecha) {
+          <span class="timeline__date">{{ item.fecha }}</span>
+        }
+        <div class="timeline__header">
+          <span class="timeline__chip">{{ item.titulo }}</span>
+        </div>
+        @if (item.detalles?.length) {
+          <dl class="timeline__detalles">
+            @for (detalle of item.detalles; track detalle.label) {
+              <div class="timeline__detalle">
+                <dt>{{ detalle.label }}:</dt>
+                <dd>{{ detalle.value }}</dd>
+              </div>
+            }
+          </dl>
+        }
+      </div>
+    </li>
+  }
+</ol>

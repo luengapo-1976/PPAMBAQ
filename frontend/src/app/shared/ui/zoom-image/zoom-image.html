@@ -1,0 +1,52 @@
+<div
+  #viewport
+  class="zoom-image"
+  [class.zoom-image--zoomed]="zoomed()"
+  (wheel)="onWheel($event)"
+  (dblclick)="onDoubleClick()"
+  (pointerdown)="onPointerDown($event)"
+  (pointermove)="onPointerMove($event)"
+  (pointerup)="onPointerUp($event)"
+  (pointercancel)="onPointerUp($event)"
+  (pointerleave)="onPointerUp($event)"
+>
+  <img
+    class="zoom-image__img"
+    [src]="src()"
+    [alt]="alt()"
+    [style.transform]="transform()"
+    draggable="false"
+  />
+</div>
+
+<div class="zoom-image__controls">
+  <button
+    type="button"
+    class="zoom-image__control-btn"
+    aria-label="Alejar"
+    title="Alejar"
+    (click)="zoomOut()"
+  >
+    <span class="material-symbols-outlined" aria-hidden="true">remove</span>
+  </button>
+  <button
+    type="button"
+    class="zoom-image__control-btn"
+    aria-label="Acercar"
+    title="Acercar"
+    (click)="zoomIn()"
+  >
+    <span class="material-symbols-outlined" aria-hidden="true">add</span>
+  </button>
+  @if (zoomed()) {
+    <button
+      type="button"
+      class="zoom-image__control-btn"
+      aria-label="Restablecer zoom"
+      title="Restablecer zoom"
+      (click)="reset()"
+    >
+      <span class="material-symbols-outlined" aria-hidden="true">restart_alt</span>
+    </button>
+  }
+</div>

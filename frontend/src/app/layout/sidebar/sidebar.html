@@ -6,62 +6,80 @@
     }
   </div>
 
-  <ul class="sidebar__list">
-    @for (item of mainItems(); track item.label) {
-      @if (item.children) {
-        <li class="sidebar__section-title" [attr.title]="collapsed() ? item.label : null">
-          @if (!collapsed()) {
-            <span>{{ item.label }}</span>
+  <div class="sidebar__scroll">
+    <ul class="sidebar__list">
+      @for (item of mainItems(); track item.label) {
+        @if (item.children) {
+          <li>
+            <button
+              type="button"
+              class="sidebar__section-title"
+              [attr.title]="collapsed() ? item.label : null"
+              [attr.aria-expanded]="isGroupExpanded(item.label)"
+              (click)="toggleGroup(item.label)"
+            >
+              @if (!collapsed()) {
+                <span class="sidebar__label">{{ item.label }}</span>
+                <span
+                  class="material-symbols-outlined sidebar__chevron"
+                  [class.sidebar__chevron--open]="isGroupExpanded(item.label)"
+                  aria-hidden="true"
+                  >expand_more</span
+                >
+              }
+            </button>
+          </li>
+          @if (collapsed() || isGroupExpanded(item.label)) {
+            @for (child of item.children; track child.label) {
+              <li class="sidebar__item">
+                <a
+                  class="sidebar__link"
+                  [routerLink]="child.route"
+                  routerLinkActive="sidebar__link--active"
+                  [attr.title]="collapsed() ? child.label : null"
+                >
+                  <span class="material-symbols-outlined" aria-hidden="true">{{ child.icon }}</span>
+                  @if (!collapsed()) {
+                    <span class="sidebar__label">{{ child.label }}</span>
+                  }
+                </a>
+              </li>
+            }
           }
-        </li>
-        @for (child of item.children; track child.label) {
+        } @else {
           <li class="sidebar__item">
             <a
               class="sidebar__link"
-              [routerLink]="child.route"
+              [routerLink]="item.route"
               routerLinkActive="sidebar__link--active"
-              [attr.title]="collapsed() ? child.label : null"
+              [attr.title]="collapsed() ? item.label : null"
             >
-              <span class="material-symbols-outlined" aria-hidden="true">{{ child.icon }}</span>
+              <span class="material-symbols-outlined" aria-hidden="true">{{ item.icon }}</span>
               @if (!collapsed()) {
-                <span class="sidebar__label">{{ child.label }}</span>
+                <span class="sidebar__label">{{ item.label }}</span>
               }
             </a>
           </li>
         }
-      } @else {
+      }
+    </ul>
+
+    <ul class="sidebar__list sidebar__list--footer">
+      @for (item of actionItems; track item.label) {
         <li class="sidebar__item">
-          <a
+          <button
+            type="button"
             class="sidebar__link"
-            [routerLink]="item.route"
-            routerLinkActive="sidebar__link--active"
             [attr.title]="collapsed() ? item.label : null"
+            (click)="onItemClick(item)"
           >
             <span class="material-symbols-outlined" aria-hidden="true">{{ item.icon }}</span>
             @if (!collapsed()) {
               <span class="sidebar__label">{{ item.label }}</span>
             }
-          </a>
+          </button>
         </li>
       }
-    }
-  </ul>
-
-  <ul class="sidebar__list sidebar__list--footer">
-    @for (item of actionItems; track item.label) {
-      <li class="sidebar__item">
-        <button
-          type="button"
-          class="sidebar__link"
-          [attr.title]="collapsed() ? item.label : null"
-          (click)="onItemClick(item)"
-        >
-          <span class="material-symbols-outlined" aria-hidden="true">{{ item.icon }}</span>
-          @if (!collapsed()) {
-            <span class="sidebar__label">{{ item.label }}</span>
-          }
-        </button>
-      </li>
-    }
-  </ul>
+    </ul>
+  </div>
 </nav>

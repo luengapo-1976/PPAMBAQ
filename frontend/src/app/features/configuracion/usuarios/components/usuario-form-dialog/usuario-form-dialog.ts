@@ -33,7 +33,9 @@ export class UsuarioFormDialog {
   protected readonly saving = signal(false);
   protected readonly rolOptions = ROL_OPTIONS;
 
-  protected readonly dialogTitle = computed(() => (this.mode() === 'create' ? 'Nuevo usuario' : 'Editar usuario'));
+  protected readonly dialogTitle = computed(() =>
+    this.mode() === 'create' ? 'Nuevo usuario' : 'Editar usuario',
+  );
   protected readonly passwordHint = computed(() =>
     this.mode() === 'edit' ? 'Déjala en blanco para no cambiar la contraseña actual.' : null,
   );
@@ -42,7 +44,10 @@ export class UsuarioFormDialog {
     login: ['', [Validators.required, Validators.maxLength(20)]],
     rol: ['', Validators.required],
     password: ['', [Validators.minLength(6), Validators.maxLength(100)]],
-    correo: ['', [Validators.required, Validators.pattern(EMAIL_PATTERN), Validators.maxLength(100)]],
+    correo: [
+      '',
+      [Validators.required, Validators.pattern(EMAIL_PATTERN), Validators.maxLength(100)],
+    ],
     movil: ['', [Validators.required, Validators.pattern(/^\d{1,10}$/)]],
   });
 
@@ -104,7 +109,9 @@ export class UsuarioFormDialog {
       next: () => {
         this.saving.set(false);
         this.snackbar.success(
-          this.mode() === 'edit' ? 'Usuario actualizado correctamente.' : 'Usuario registrado correctamente.',
+          this.mode() === 'edit'
+            ? 'Usuario actualizado correctamente.'
+            : 'Usuario registrado correctamente.',
         );
         this.form.reset();
         this.saved.emit();
@@ -120,7 +127,11 @@ export class UsuarioFormDialog {
   private applyCreateDefaults(): void {
     this.form.reset();
     this.form.controls.login.enable({ emitEvent: false });
-    this.form.controls.password.setValidators([Validators.required, Validators.minLength(6), Validators.maxLength(100)]);
+    this.form.controls.password.setValidators([
+      Validators.required,
+      Validators.minLength(6),
+      Validators.maxLength(100),
+    ]);
     this.form.controls.password.updateValueAndValidity({ emitEvent: false });
   }
 

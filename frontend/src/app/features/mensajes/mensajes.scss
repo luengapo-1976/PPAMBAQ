@@ -14,3 +14,9 @@
   border-radius: var(--ppam-radius-card);
   padding: var(--ppam-space-md);
 }
+
+.table-count {
+  margin: 0 0 var(--ppam-space-sm);
+  font-size: var(--ppam-small-size);
+  color: var(--ppam-on-surface-variant);
+}

@@ -89,7 +89,9 @@ export class DepartamentoFormDialog {
       next: () => {
         this.saving.set(false);
         this.snackbar.success(
-          this.mode() === 'edit' ? 'Departamento actualizado correctamente.' : 'Departamento registrado correctamente.',
+          this.mode() === 'edit'
+            ? 'Departamento actualizado correctamente.'
+            : 'Departamento registrado correctamente.',
         );
         this.form.reset();
         this.saved.emit();

@@ -19,6 +19,11 @@ import { UsuariosModule } from './usuarios/usuarios.module';
 import { PuntosModule } from './puntos/puntos.module';
 import { TurnosModule } from './turnos/turnos.module';
 import { NoticiasModule } from './noticias/noticias.module';
+import { BannersModule } from './banners/banners.module';
+import { CapacitacionesModule } from './capacitaciones/capacitaciones.module';
+import { ParametrosModule } from './parametros/parametros.module';
+import { TextosLegalesModule } from './textos-legales/textos-legales.module';
+import { AceptacionesLegalesModule } from './aceptaciones-legales/aceptaciones-legales.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 
@@ -44,6 +49,11 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
     PuntosModule,
     TurnosModule,
     NoticiasModule,
+    BannersModule,
+    CapacitacionesModule,
+    ParametrosModule,
+    TextosLegalesModule,
+    AceptacionesLegalesModule,
   ],
   controllers: [AppController],
   providers: [

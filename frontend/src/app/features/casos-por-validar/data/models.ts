@@ -6,11 +6,17 @@ export interface TurnoValidacionResumen {
   horaFin: string;
   situacionIdentificada: string | null;
   nombrePublicador: string;
+  primerNombrePublicador: string;
+  movil: string | null;
   fechaNacimiento: string | null;
+  justificacion: string | null;
+  nombreConyuge: string | null;
   fechaSolicitud: string | null;
   aprobadoPor: string | null;
   justificacionAprobacion: string | null;
   fechaAprobacion: string | null;
+  parejaNombre: string | null;
+  parejaMovil: string | null;
 }
 
 export interface RetiroResumen {

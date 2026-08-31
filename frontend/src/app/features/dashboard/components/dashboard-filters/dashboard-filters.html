@@ -60,7 +60,12 @@
   </label>
 
   @if (hasActiveFilters()) {
-    <app-button class="dashboard-filters__clear" variant="ghost" icon="filter_alt_off" (click)="onClear()">
+    <app-button
+      class="dashboard-filters__clear"
+      variant="ghost"
+      icon="filter_alt_off"
+      (click)="onClear()"
+    >
       Limpiar filtros
     </app-button>
   }

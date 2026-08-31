@@ -8,12 +8,19 @@ import { ApiError } from '../../core/error.interceptor';
 import { AuthService } from '../../core/auth.service';
 import { formatHoraAmPm } from '../../shared/utils/format.util';
 import { TurnosService } from '../solicitar-turno/data/turnos.service';
-import { MOTIVOS_DEVOLUCION, MiTurnoResumen, MotivoDevolucion } from '../solicitar-turno/data/models';
+import {
+  MOTIVOS_DEVOLUCION,
+  MiTurnoResumen,
+  MotivoDevolucion,
+} from '../solicitar-turno/data/models';
 import { ParticipanteDesktopHeader } from '../../layout/participante-desktop-header/participante-desktop-header';
 
 type DialogState = 'closed' | 'form' | 'resultado';
 
-const MOTIVO_OPTIONS: SelectOption[] = MOTIVOS_DEVOLUCION.map((motivo) => ({ value: motivo, label: motivo }));
+const MOTIVO_OPTIONS: SelectOption[] = MOTIVOS_DEVOLUCION.map((motivo) => ({
+  value: motivo,
+  label: motivo,
+}));
 
 @Component({
   selector: 'app-devolver-turno',
@@ -142,7 +149,9 @@ export class DevolverTurno {
         },
         error: (err: ApiError) => {
           this.enviando.set(false);
-          this.snackbar.error(err?.message ?? 'No se pudo procesar la devolución del turno. Intenta nuevamente.');
+          this.snackbar.error(
+            err?.message ?? 'No se pudo procesar la devolución del turno. Intenta nuevamente.',
+          );
         },
       });
   }

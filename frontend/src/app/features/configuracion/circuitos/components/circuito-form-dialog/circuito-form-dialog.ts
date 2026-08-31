@@ -29,13 +29,18 @@ export class CircuitoFormDialog {
 
   protected readonly saving = signal(false);
 
-  protected readonly dialogTitle = computed(() => (this.mode() === 'create' ? 'Nuevo circuito' : 'Editar circuito'));
+  protected readonly dialogTitle = computed(() =>
+    this.mode() === 'create' ? 'Nuevo circuito' : 'Editar circuito',
+  );
 
   protected readonly form = this.fb.group({
     codigo_circuito: ['', [Validators.required, Validators.maxLength(10)]],
     nombre_viajante: ['', [Validators.required, Validators.maxLength(100)]],
     movil: ['', [Validators.required, Validators.pattern(MOVIL_PATTERN)]],
-    correo_electronico: ['', [Validators.required, Validators.pattern(EMAIL_PATTERN), Validators.maxLength(100)]],
+    correo_electronico: [
+      '',
+      [Validators.required, Validators.pattern(EMAIL_PATTERN), Validators.maxLength(100)],
+    ],
   });
 
   constructor() {
@@ -94,7 +99,9 @@ export class CircuitoFormDialog {
       next: () => {
         this.saving.set(false);
         this.snackbar.success(
-          this.mode() === 'edit' ? 'Circuito actualizado correctamente.' : 'Circuito registrado correctamente.',
+          this.mode() === 'edit'
+            ? 'Circuito actualizado correctamente.'
+            : 'Circuito registrado correctamente.',
         );
         this.form.reset();
         this.saved.emit();

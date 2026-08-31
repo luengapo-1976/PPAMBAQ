@@ -16,10 +16,7 @@
 .ppam-tabbar {
   display: flex;
   padding: 6px 4px calc(env(safe-area-inset-bottom, 0px) + 6px);
-  background: color-mix(in srgb, var(--ppam-surface-container-lowest) 82%, transparent);
-  backdrop-filter: blur(20px) saturate(1.6);
-  -webkit-backdrop-filter: blur(20px) saturate(1.6);
-  border-top: 1px solid var(--ppam-border-quiet);
+  background: var(--ppam-primary-container);
 }
 
 /* Cada tab ocupa una porción igual de la barra, así el ancho tocable siempre supera
@@ -34,9 +31,10 @@
   min-height: 44px;
   padding-block: 4px;
   border-radius: var(--ppam-radius-control);
-  color: var(--ppam-on-surface-variant);
+  color: #ffffff;
   text-decoration: none;
   transition:
+    background var(--ppam-motion-fast),
     transform 120ms ease,
     opacity 120ms ease;
 }
@@ -63,7 +61,8 @@
 }
 
 .tab-item--active {
-  color: var(--ppam-primary-container);
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.22);
 }
 
 .tab-item__label {

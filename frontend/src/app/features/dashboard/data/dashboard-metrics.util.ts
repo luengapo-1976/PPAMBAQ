@@ -31,13 +31,22 @@ export function applyDashboardFilters(rows: Publicador[], filters: DashboardFilt
     if (filters.codigoCircuito && row.codigo_circuito !== filters.codigoCircuito) {
       return false;
     }
-    if (filters.codigoCongregacion != null && row.codigo_congregacion !== filters.codigoCongregacion) {
+    if (
+      filters.codigoCongregacion != null &&
+      row.codigo_congregacion !== filters.codigoCongregacion
+    ) {
       return false;
     }
-    if (filters.fechaSolicitudDesde && (!row.fecha_solicitud || row.fecha_solicitud < filters.fechaSolicitudDesde)) {
+    if (
+      filters.fechaSolicitudDesde &&
+      (!row.fecha_solicitud || row.fecha_solicitud < filters.fechaSolicitudDesde)
+    ) {
       return false;
     }
-    if (filters.fechaSolicitudHasta && (!row.fecha_solicitud || row.fecha_solicitud > filters.fechaSolicitudHasta)) {
+    if (
+      filters.fechaSolicitudHasta &&
+      (!row.fecha_solicitud || row.fecha_solicitud > filters.fechaSolicitudHasta)
+    ) {
       return false;
     }
     return true;
@@ -103,7 +112,10 @@ export function distributionByEstado(rows: Publicador[]): DistributionSlice[] {
   for (const row of rows) {
     counts.set(row.estado, (counts.get(row.estado) ?? 0) + 1);
   }
-  return ESTADO_ORDER.map((estado) => ({ label: ESTADO_CONFIG[estado].label, value: counts.get(estado) ?? 0 }));
+  return ESTADO_ORDER.map((estado) => ({
+    label: ESTADO_CONFIG[estado].label,
+    value: counts.get(estado) ?? 0,
+  }));
 }
 
 export function distributionBySexo(rows: Publicador[]): DistributionSlice[] {
@@ -129,9 +141,10 @@ export function distributionByEstadoCivil(rows: Publicador[]): DistributionSlice
   for (const row of rows) {
     counts.set(row.estado_civil, (counts.get(row.estado_civil) ?? 0) + 1);
   }
-  return ESTADO_CIVIL_ORDER.map((estadoCivil) => ({ label: estadoCivil, value: counts.get(estadoCivil) ?? 0 })).filter(
-    (slice) => slice.value > 0,
-  );
+  return ESTADO_CIVIL_ORDER.map((estadoCivil) => ({
+    label: estadoCivil,
+    value: counts.get(estadoCivil) ?? 0,
+  })).filter((slice) => slice.value > 0);
 }
 
 export function topCongregaciones(rows: Publicador[], limit = 8): DistributionSlice[] {
@@ -197,15 +210,19 @@ export interface RecentActivityItem {
 
 export function recentActivity(rows: Publicador[], limit = 8): RecentActivityItem[] {
   return [...rows]
-    .filter((row) => !!(row.fecha_modificacion || row.fecha_registro) && row.estado in ESTADO_CONFIG)
+    .filter(
+      (row) => !!(row.fecha_modificacion || row.fecha_registro) && row.estado in ESTADO_CONFIG,
+    )
     .map((row) => {
       const fecha = row.fecha_modificacion ?? row.fecha_registro ?? '';
-      const accion: 'Registrado' | 'Modificado' = row.fecha_modificacion ? 'Modificado' : 'Registrado';
+      const accion: 'Registrado' | 'Modificado' = row.fecha_modificacion
+        ? 'Modificado'
+        : 'Registrado';
       return {
         id: row.id,
         nombre: nombreCompleto(row),
         estado: row.estado,
-        congregacion: row.nombre_congregacion ?? '—',
+        congregacion: row.nombre_congregacion ?? '-',
         fecha,
         accion,
       };

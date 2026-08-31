@@ -25,7 +25,13 @@ export class ParticipanteDesktopHeader {
   private readonly elementRef = inject(ElementRef<HTMLElement>);
 
   protected readonly title = (this.route.snapshot.data['title'] as string) ?? '';
-  protected readonly navItems = PARTICIPANTE_NAV_ITEMS;
+  /** Mientras haya una actualización de datos obligatoria pendiente, el resto del
+   * menú queda oculto: solo "Mis datos" sigue disponible hasta que se guarde ahí. */
+  protected readonly navItems = computed(() =>
+    this.authService.requiereActualizacionDatos()
+      ? PARTICIPANTE_NAV_ITEMS.filter((item) => item.id === 'mis-datos')
+      : PARTICIPANTE_NAV_ITEMS,
+  );
 
   protected readonly nombre = computed(
     () =>

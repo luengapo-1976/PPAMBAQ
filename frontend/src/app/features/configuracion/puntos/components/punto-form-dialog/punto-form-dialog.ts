@@ -5,12 +5,23 @@ import { Dialog } from '../../../../../shared/ui/dialog/dialog';
 import { Button } from '../../../../../shared/ui/button/button';
 import { FormField } from '../../../../../shared/ui/form-field/form-field';
 import { Select, SelectOption } from '../../../../../shared/ui/select/select';
-import { SearchSelect, SearchSelectOption } from '../../../../../shared/ui/search-select/search-select';
+import {
+  SearchSelect,
+  SearchSelectOption,
+} from '../../../../../shared/ui/search-select/search-select';
 import { SnackbarService } from '../../../../../shared/ui/snackbar/snackbar.service';
 import { ApiError } from '../../../../../core/error.interceptor';
 import { MOVIL_PATTERN } from '../../../../../shared/utils/format.util';
 import { ReferenceDataService } from '../../../data/reference-data.service';
-import { Departamento, Municipio, PUNTO_ESTADOS, PUNTO_TIPOS, Punto, PuntoEstado, PuntoTipo } from '../../../data/models';
+import {
+  Departamento,
+  Municipio,
+  PUNTO_ESTADOS,
+  PUNTO_TIPOS,
+  Punto,
+  PuntoEstado,
+  PuntoTipo,
+} from '../../../data/models';
 
 const ESTADO_OPTIONS: SelectOption[] = PUNTO_ESTADOS.map((value) => ({ value, label: value }));
 const TIPO_PUNTO_OPTIONS: SelectOption[] = PUNTO_TIPOS.map((value) => ({ value, label: value }));
@@ -41,7 +52,9 @@ export class PuntoFormDialog {
   protected readonly tipoPuntoOptions = TIPO_PUNTO_OPTIONS;
   private isPatchingForm = false;
 
-  protected readonly dialogTitle = computed(() => (this.mode() === 'create' ? 'Nuevo punto' : 'Editar punto'));
+  protected readonly dialogTitle = computed(() =>
+    this.mode() === 'create' ? 'Nuevo punto' : 'Editar punto',
+  );
 
   protected readonly form = this.fb.group({
     codigo_punto: [{ value: null as number | null, disabled: true }, Validators.required],
@@ -55,9 +68,12 @@ export class PuntoFormDialog {
     estado: [{ value: 'Activo' as PuntoEstado, disabled: true }, Validators.required],
   });
 
-  private readonly selectedDepartamento = toSignal(this.form.controls.codigo_departamento.valueChanges, {
-    initialValue: '',
-  });
+  private readonly selectedDepartamento = toSignal(
+    this.form.controls.codigo_departamento.valueChanges,
+    {
+      initialValue: '',
+    },
+  );
 
   protected readonly departamentoOptions = computed<SearchSelectOption[]>(() =>
     this.departamentos().map((d) => ({
@@ -70,7 +86,10 @@ export class PuntoFormDialog {
     const depto = this.selectedDepartamento();
     return this.municipios()
       .filter((m) => !depto || m.codigo_departamento === depto)
-      .map((m) => ({ value: m.codigo_municipio, label: `${m.codigo_municipio} - ${m.nombre_municipio}` }));
+      .map((m) => ({
+        value: m.codigo_municipio,
+        label: `${m.codigo_municipio} - ${m.nombre_municipio}`,
+      }));
   });
 
   constructor() {
@@ -89,24 +108,26 @@ export class PuntoFormDialog {
       }
     });
 
-    this.form.controls.codigo_departamento.valueChanges.pipe(takeUntilDestroyed()).subscribe((depto) => {
-      const municipioControl = this.form.controls.codigo_municipio;
-      if (depto) {
-        municipioControl.enable({ emitEvent: false });
-      } else {
-        municipioControl.disable({ emitEvent: false });
-      }
-      if (this.isPatchingForm) {
-        return;
-      }
-      const current = municipioControl.value;
-      const stillValid = this.municipios().some(
-        (m) => m.codigo_municipio === current && m.codigo_departamento === depto,
-      );
-      if (current && !stillValid) {
-        municipioControl.setValue('');
-      }
-    });
+    this.form.controls.codigo_departamento.valueChanges
+      .pipe(takeUntilDestroyed())
+      .subscribe((depto) => {
+        const municipioControl = this.form.controls.codigo_municipio;
+        if (depto) {
+          municipioControl.enable({ emitEvent: false });
+        } else {
+          municipioControl.disable({ emitEvent: false });
+        }
+        if (this.isPatchingForm) {
+          return;
+        }
+        const current = municipioControl.value;
+        const stillValid = this.municipios().some(
+          (m) => m.codigo_municipio === current && m.codigo_departamento === depto,
+        );
+        if (current && !stillValid) {
+          municipioControl.setValue('');
+        }
+      });
   }
 
   protected onCancel(): void {
@@ -163,7 +184,9 @@ export class PuntoFormDialog {
       next: () => {
         this.saving.set(false);
         this.snackbar.success(
-          this.mode() === 'edit' ? 'Punto actualizado correctamente.' : 'Punto registrado correctamente.',
+          this.mode() === 'edit'
+            ? 'Punto actualizado correctamente.'
+            : 'Punto registrado correctamente.',
         );
         this.form.reset();
         this.saved.emit();
@@ -178,7 +201,10 @@ export class PuntoFormDialog {
 
   /** Siguiente código disponible = máximo codigo_punto existente + 1 (empieza en 1 si no hay registros). */
   private computeNextCodigo(): number {
-    const maxCodigo = this.puntos().reduce((max, p) => (p.codigo_punto > max ? p.codigo_punto : max), 0);
+    const maxCodigo = this.puntos().reduce(
+      (max, p) => (p.codigo_punto > max ? p.codigo_punto : max),
+      0,
+    );
     return maxCodigo + 1;
   }
 

@@ -9,13 +9,37 @@ import { formatDateShort } from '../../../shared/utils/format.util';
 
 const COLUMNS: ConfigTableColumn<Circuito>[] = [
   { key: 'codigo_circuito', label: 'Código', value: (row) => row.codigo_circuito },
-  { key: 'nombre_viajante', label: 'Nombre del viajante', value: (row) => row.nombre_viajante ?? '—' },
-  { key: 'movil', label: 'Móvil', value: (row) => row.movil ?? '—' },
-  { key: 'correo_electronico', label: 'Correo electrónico', value: (row) => row.correo_electronico ?? '—' },
-  { key: 'usuario_registra', label: 'Usuario registra', value: (row) => row.usuario_registra ?? '—' },
-  { key: 'fecha_registro', label: 'Fecha registro', value: (row) => formatDateShort(row.fecha_registro) },
-  { key: 'usuario_modifica', label: 'Usuario modifica', value: (row) => row.usuario_modifica ?? '—' },
-  { key: 'fecha_modificacion', label: 'Fecha modificación', value: (row) => formatDateShort(row.fecha_modificacion) },
+  {
+    key: 'nombre_viajante',
+    label: 'Nombre del viajante',
+    value: (row) => row.nombre_viajante ?? '-',
+  },
+  { key: 'movil', label: 'Móvil', value: (row) => row.movil ?? '-' },
+  {
+    key: 'correo_electronico',
+    label: 'Correo electrónico',
+    value: (row) => row.correo_electronico ?? '-',
+  },
+  {
+    key: 'usuario_registra',
+    label: 'Usuario registra',
+    value: (row) => row.usuario_registra ?? '-',
+  },
+  {
+    key: 'fecha_registro',
+    label: 'Fecha registro',
+    value: (row) => formatDateShort(row.fecha_registro),
+  },
+  {
+    key: 'usuario_modifica',
+    label: 'Usuario modifica',
+    value: (row) => row.usuario_modifica ?? '-',
+  },
+  {
+    key: 'fecha_modificacion',
+    label: 'Fecha modificación',
+    value: (row) => formatDateShort(row.fecha_modificacion),
+  },
 ];
 
 @Component({

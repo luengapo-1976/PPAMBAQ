@@ -15,6 +15,13 @@ export interface AuthSession {
   login: string;
   rol: string | null;
   publicador: PublicadorPerfil | null;
+  /** true si, al momento de loguearse, había pasado el número de meses configurado en
+   * Configuración > Parámetros generales desde la última actualización de datos del
+   * publicador. Se limpia con marcarDatosActualizados() al guardar en "Mis datos". */
+  requiereActualizacionDatos: boolean;
+  /** true si el publicador todavía no aceptó la versión vigente del texto de
+   * tratamiento de datos personales. Se limpia con marcarAceptacionLegal() al aceptar. */
+  requiereAceptacionLegal: boolean;
 }
 
 interface LoginResponse extends AuthSession {
@@ -60,17 +67,57 @@ export class AuthService {
   readonly tienePublicador = computed(() => !!this.session()?.publicador);
   /** Solo se puede alternar entre Dashboard e Inicio cuando ambas identidades existen. */
   readonly puedeAlternarVista = computed(() => this.tieneRolUsuario() && this.tienePublicador());
+  readonly requiereActualizacionDatos = computed(
+    () => this.session()?.requiereActualizacionDatos ?? false,
+  );
+  readonly requiereAceptacionLegal = computed(
+    () => this.session()?.requiereAceptacionLegal ?? false,
+  );
 
   login(login: string, password: string): Observable<LoginResponse> {
     return this.api.post<LoginResponse>('auth/login', { login, password }).pipe(
       tap((response) => {
         localStorage.setItem(TOKEN_KEY, response.access_token);
-        const session: AuthSession = { login: response.login, rol: response.rol, publicador: response.publicador };
+        const session: AuthSession = {
+          login: response.login,
+          rol: response.rol,
+          publicador: response.publicador,
+          requiereActualizacionDatos: response.requiereActualizacionDatos,
+          requiereAceptacionLegal: response.requiereAceptacionLegal,
+        };
         localStorage.setItem(SESSION_KEY, JSON.stringify(session));
         this.session.set(session);
-        this.setVista(session.rol ? 'usuario' : 'participante');
+        /** Al iniciar sesión siempre se muestra primero Inicio (vista de
+         * participante), incluso para administradores — pueden alternar a
+         * Dashboard con el switch. Si el usuario tiene rol pero NO publicador
+         * vinculado, Inicio no tendría nada útil que mostrar, así que en ese
+         * caso puntual se mantiene el comportamiento anterior (Dashboard). */
+        this.setVista(session.rol && !session.publicador ? 'usuario' : 'participante');
       }),
     );
+  }
+
+  /** Se llama al guardar exitosamente en "Mis datos": resuelve el requerimiento de
+   * actualización obligatoria (si estaba activo) para esta sesión. */
+  marcarDatosActualizados(): void {
+    const session = this.session();
+    if (!session || !session.requiereActualizacionDatos) {
+      return;
+    }
+    const updated: AuthSession = { ...session, requiereActualizacionDatos: false };
+    this.session.set(updated);
+    localStorage.setItem(SESSION_KEY, JSON.stringify(updated));
+  }
+
+  /** Se llama al aceptar exitosamente el texto de tratamiento de datos personales. */
+  marcarAceptacionLegal(): void {
+    const session = this.session();
+    if (!session || !session.requiereAceptacionLegal) {
+      return;
+    }
+    const updated: AuthSession = { ...session, requiereAceptacionLegal: false };
+    this.session.set(updated);
+    localStorage.setItem(SESSION_KEY, JSON.stringify(updated));
   }
 
   setVista(vista: VistaActiva): void {
@@ -88,7 +135,10 @@ export class AuthService {
   }
 
   changePassword(currentPassword: string, newPassword: string): Observable<{ message: string }> {
-    return this.api.post<{ message: string }>('auth/change-password', { currentPassword, newPassword });
+    return this.api.post<{ message: string }>('auth/change-password', {
+      currentPassword,
+      newPassword,
+    });
   }
 
   logout(): void {
@@ -117,7 +167,14 @@ export class AuthService {
     }
 
     try {
-      return JSON.parse(rawSession) as AuthSession;
+      const parsed = JSON.parse(rawSession) as AuthSession;
+      /** Sesiones guardadas antes de estos campos existir no los traen: se normalizan a
+       * false en vez de dejarlos undefined. */
+      return {
+        ...parsed,
+        requiereActualizacionDatos: parsed.requiereActualizacionDatos ?? false,
+        requiereAceptacionLegal: parsed.requiereAceptacionLegal ?? false,
+      };
     } catch {
       return null;
     }

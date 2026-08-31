@@ -34,7 +34,7 @@
   gap: 4px;
   font-size: var(--ppam-small-size);
   font-weight: 600;
-  color: var(--ppam-on-surface-variant);
+  color: var(--ppam-primary-container);
 }
 
 .table-date-filters__field .ppam-input {
@@ -103,7 +103,7 @@
   gap: var(--ppam-space-sm);
   font-size: var(--ppam-small-size);
   font-weight: 600;
-  color: var(--ppam-on-surface-variant);
+  color: var(--ppam-primary-container);
   white-space: nowrap;
 }
 
@@ -146,7 +146,7 @@
 
 .ppam-table thead th {
   background: var(--ppam-surface-container-low);
-  color: var(--ppam-on-surface-variant);
+  color: var(--ppam-primary-container);
   font-weight: 600;
   position: sticky;
   top: 0;

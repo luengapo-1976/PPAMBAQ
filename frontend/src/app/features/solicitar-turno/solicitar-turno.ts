@@ -11,7 +11,12 @@ import { LookupsService } from '../solicitudes/data/lookups.service';
 import { Punto } from '../configuracion/data/models';
 import { formatHoraAmPm } from '../../shared/utils/format.util';
 import { TurnosService } from './data/turnos.service';
-import { MiTurnoResumen, SolicitarTurnoOutcome, SolicitarTurnoResultado, TurnoResumen } from './data/models';
+import {
+  MiTurnoResumen,
+  SolicitarTurnoOutcome,
+  SolicitarTurnoResultado,
+  TurnoResumen,
+} from './data/models';
 import { ParticipanteDesktopHeader } from '../../layout/participante-desktop-header/participante-desktop-header';
 
 type DialogState = 'closed' | 'advertencia' | 'justificacion' | 'resultado';
@@ -87,7 +92,9 @@ export class SolicitarTurno {
     return solicitados !== null && solicitados >= this.misTurnosMaximo();
   });
   protected readonly tieneMisTurnos = computed(() => (this.misTurnosSolicitados() ?? 0) > 0);
-  protected readonly excedeLimite = computed(() => (this.misTurnosSolicitados() ?? 0) > this.misTurnosMaximo());
+  protected readonly excedeLimite = computed(
+    () => (this.misTurnosSolicitados() ?? 0) > this.misTurnosMaximo(),
+  );
 
   /** Turnos a liberar para poder solicitar 1 más: hay que quedar en máximo-1, no en
    * máximo, así que al excedente sobre el máximo se le suma 1. */
@@ -132,13 +139,17 @@ export class SolicitarTurno {
     }
     return [
       { value: TODOS_LOS_DIAS, label: 'Todos los días' },
-      ...[...dias.entries()].sort(([a], [b]) => a - b).map(([numero, nombre]) => ({ value: String(numero), label: nombre })),
+      ...[...dias.entries()]
+        .sort(([a], [b]) => a - b)
+        .map(([numero, nombre]) => ({ value: String(numero), label: nombre })),
     ];
   });
 
   private readonly turnosFiltrados = computed<TurnoResumen[]>(() => {
     const filtro = this.selectedDiaFiltro();
-    return filtro === TODOS_LOS_DIAS ? this.turnos() : this.turnos().filter((t) => String(t.dia_numero) === filtro);
+    return filtro === TODOS_LOS_DIAS
+      ? this.turnos()
+      : this.turnos().filter((t) => String(t.dia_numero) === filtro);
   });
 
   protected readonly mostrarFiltroDia = computed(() => this.diaOptions().length > 2);
@@ -178,7 +189,11 @@ export class SolicitarTurno {
           .map(([, turnosPar]) => {
             const disponibles = turnosPar.filter((t) => t.disponibilidad !== 'ocupado').length;
             const estado: EstadoPar =
-              disponibles === 0 ? 'ocupado' : disponibles === turnosPar.length ? 'libre' : 'parcial';
+              disponibles === 0
+                ? 'ocupado'
+                : disponibles === turnosPar.length
+                  ? 'libre'
+                  : 'parcial';
             return {
               horaInicio: turnosPar[0].hora_inicio,
               horaFin: turnosPar[0].hora_fin,
@@ -253,7 +268,9 @@ export class SolicitarTurno {
   });
 
   protected readonly primaryDisabled = computed(
-    () => this.dialogState() === 'justificacion' && (!this.justificacion().trim() || this.enviandoJustificacion()),
+    () =>
+      this.dialogState() === 'justificacion' &&
+      (!this.justificacion().trim() || this.enviandoJustificacion()),
   );
 
   protected readonly showSecondary = computed(
@@ -379,7 +396,11 @@ export class SolicitarTurno {
     }
   }
 
-  private enviarSolicitud(turno: TurnoResumen, justificacion: string | undefined, onDone?: () => void): void {
+  private enviarSolicitud(
+    turno: TurnoResumen,
+    justificacion: string | undefined,
+    onDone?: () => void,
+  ): void {
     this.setSolicitando(turno.id, true);
     this.turnosService.solicitar(turno.id, justificacion).subscribe({
       next: (resultado) => {
@@ -390,7 +411,9 @@ export class SolicitarTurno {
       error: (err: ApiError) => {
         this.setSolicitando(turno.id, false);
         onDone?.();
-        this.snackbar.error(err?.message ?? 'No se pudo procesar la solicitud. Intenta nuevamente.');
+        this.snackbar.error(
+          err?.message ?? 'No se pudo procesar la solicitud. Intenta nuevamente.',
+        );
       },
     });
   }
@@ -406,7 +429,9 @@ export class SolicitarTurno {
     }
 
     this.dialogMensaje.set(resultado.mensaje);
-    this.dialogTitulo.set(resultado.outcome === 'aprobado' ? 'Solicitud aprobada' : 'Solicitud enviada');
+    this.dialogTitulo.set(
+      resultado.outcome === 'aprobado' ? 'Solicitud aprobada' : 'Solicitud enviada',
+    );
     this.dialogResultadoOutcome.set(resultado.outcome);
     this.dialogState.set('resultado');
   }
@@ -434,7 +459,9 @@ export class SolicitarTurno {
         }),
       )
       .subscribe((data) => {
-        this.turnos.set(data);
+        /** Un horario inactivo (estado_turno) no debe ofrecerse para solicitar: se
+         * excluye por completo de la cuadrícula, como si no existiera. */
+        this.turnos.set(data.filter((turno) => turno.estado_turno !== 'INACTIVO'));
         this.loadingTurnos.set(false);
       });
   }

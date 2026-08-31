@@ -1,4 +1,7 @@
-export type TurnoDisponibilidad = 'ocupado' | 'disponible' | 'disponible_hermano' | 'disponible_hermana';
+export type TurnoDisponibilidad =
+  'ocupado' | 'disponible' | 'disponible_hermano' | 'disponible_hermana';
+
+export type EstadoTurno = 'ACTIVO' | 'INACTIVO';
 
 export interface TurnoResumen {
   id: string;
@@ -8,8 +11,29 @@ export interface TurnoResumen {
   hora_inicio: string;
   hora_fin: string;
   id_publicador: string | null;
+  estado_turno: EstadoTurno | null;
   sexo_ocupante: string | null;
   disponibilidad: TurnoDisponibilidad;
+  nombreOcupante: string | null;
+  movilOcupante: string | null;
+  congregacionOcupante: string | null;
+}
+
+export const DIAS_SEMANA_HORARIO = [
+  'Lunes',
+  'Martes',
+  'Miércoles',
+  'Jueves',
+  'Viernes',
+  'Sábado',
+  'Domingo',
+] as const;
+
+export interface CrearTurnoPayload {
+  codigo_punto: number;
+  dia_nombre: (typeof DIAS_SEMANA_HORARIO)[number];
+  hora_inicio: string;
+  hora_fin: string;
 }
 
 export type SolicitarTurnoOutcome = 'aprobado' | 'requiere_justificacion' | 'pendiente';
@@ -25,6 +49,8 @@ export interface MiTurnoResumen {
   diaNombre: string;
   horaInicio: string;
   horaFin: string;
+  estadoSolicitud: string | null;
+  estadoTurno: EstadoTurno | null;
 }
 
 export interface ConteoTurnosPublicador {
@@ -80,4 +106,18 @@ export interface ActividadHistorialItem {
   arreglosCurso: RespuestaSiNo | null;
   observaciones: string | null;
   registradoPor: string;
+}
+
+export type TurnoHistorialTipo = 'solicitado' | 'rechazado' | 'devuelto';
+
+export interface TurnoHistorialItem {
+  tipo: TurnoHistorialTipo;
+  fecha: string | null;
+  nombrePunto: string;
+  diaNombre: string;
+  horaInicio: string;
+  horaFin: string;
+  justificacion: string | null;
+  motivo: string | null;
+  observacion: string | null;
 }

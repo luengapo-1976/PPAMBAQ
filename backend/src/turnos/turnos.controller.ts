@@ -1,9 +1,21 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { TurnosService } from './turnos.service';
 import { SolicitarTurnoDto } from './dto/solicitar-turno.dto';
 import { DevolverTurnoDto } from './dto/devolver-turno.dto';
 import { ReportarActividadDto } from './dto/reportar-actividad.dto';
 import { AprobarSolicitudDto } from './dto/aprobar-solicitud.dto';
+import { RechazarSolicitudDto } from './dto/rechazar-solicitud.dto';
+import { CrearTurnoDto } from './dto/crear-turno.dto';
+import { ActualizarEstadoTurnoDto } from './dto/actualizar-estado-turno.dto';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import type { AuthenticatedUser } from '../auth/strategies/jwt.strategy';
 
@@ -12,13 +24,46 @@ export class TurnosController {
   constructor(private readonly turnosService: TurnosService) {}
 
   @Get()
-  findByCodigoPunto(@Query('codigo_punto', ParseIntPipe) codigoPunto: number) {
-    return this.turnosService.findByCodigoPunto(codigoPunto);
+  findByCodigoPunto(
+    @Query('codigo_punto', ParseIntPipe) codigoPunto: number,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.turnosService.findByCodigoPunto(codigoPunto, user);
+  }
+
+  @Post()
+  crearTurno(
+    @Body() dto: CrearTurnoDto,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.turnosService.crearTurno(dto, user);
+  }
+
+  @Patch(':id/estado')
+  actualizarEstadoTurno(
+    @Param('id') id: string,
+    @Body() dto: ActualizarEstadoTurnoDto,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.turnosService.actualizarEstadoTurno(id, dto, user);
   }
 
   @Get('conteo-publicador')
-  contarSolicitadosPorUsuario(@CurrentUser() user: AuthenticatedUser) {
-    return this.turnosService.contarSolicitadosPorUsuario(user);
+  contarSolicitadosPorUsuario(
+    @Query('id_publicador') idPublicador: string | undefined,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.turnosService.contarSolicitadosPorUsuario(user, idPublicador);
+  }
+
+  @Get('historial-solicitudes')
+  historialSolicitudes(
+    @Query('id_publicador') idPublicador: string | undefined,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.turnosService.historialSolicitudesPublicador(
+      idPublicador ?? user.publicadorId,
+    );
   }
 
   @Get('validacion/pendientes')
@@ -31,18 +76,44 @@ export class TurnosController {
     return this.turnosService.aprobadosValidacion();
   }
 
+  @Get('validacion/rechazados')
+  rechazadosValidacion() {
+    return this.turnosService.rechazadosValidacion();
+  }
+
   @Post(':id/aprobar-solicitud')
-  aprobarSolicitud(@Param('id') id: string, @Body() dto: AprobarSolicitudDto, @CurrentUser() user: AuthenticatedUser) {
+  aprobarSolicitud(
+    @Param('id') id: string,
+    @Body() dto: AprobarSolicitudDto,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
     return this.turnosService.aprobarSolicitudPendiente(id, dto, user);
   }
 
+  @Post(':id/rechazar-solicitud')
+  rechazarSolicitud(
+    @Param('id') id: string,
+    @Body() dto: RechazarSolicitudDto,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.turnosService.rechazarSolicitudPendiente(id, dto, user);
+  }
+
   @Post(':id/solicitar')
-  solicitar(@Param('id') id: string, @Body() dto: SolicitarTurnoDto, @CurrentUser() user: AuthenticatedUser) {
+  solicitar(
+    @Param('id') id: string,
+    @Body() dto: SolicitarTurnoDto,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
     return this.turnosService.solicitar(id, dto, user);
   }
 
   @Post(':id/devolver')
-  devolver(@Param('id') id: string, @Body() dto: DevolverTurnoDto, @CurrentUser() user: AuthenticatedUser) {
+  devolver(
+    @Param('id') id: string,
+    @Body() dto: DevolverTurnoDto,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
     return this.turnosService.devolver(id, dto, user);
   }
 
@@ -50,18 +121,32 @@ export class TurnosController {
   verificarDisponibilidadActividad(
     @Param('id') id: string,
     @Query('fecha') fecha: string,
+    @Query('id_publicador') idPublicador: string | undefined,
     @CurrentUser() user: AuthenticatedUser,
   ) {
-    return this.turnosService.verificarDisponibilidadActividad(id, fecha, user);
+    return this.turnosService.verificarDisponibilidadActividad(
+      id,
+      fecha,
+      user,
+      idPublicador,
+    );
   }
 
   @Post(':id/actividad-reportada')
-  reportarActividad(@Param('id') id: string, @Body() dto: ReportarActividadDto, @CurrentUser() user: AuthenticatedUser) {
+  reportarActividad(
+    @Param('id') id: string,
+    @Body() dto: ReportarActividadDto,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
     return this.turnosService.reportarActividad(id, dto, user);
   }
 
   @Get(':id/actividad-historial')
-  historialActividad(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
-    return this.turnosService.historialActividad(id, user);
+  historialActividad(
+    @Param('id') id: string,
+    @Query('id_publicador') idPublicador: string | undefined,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.turnosService.historialActividad(id, user, idPublicador);
   }
 }

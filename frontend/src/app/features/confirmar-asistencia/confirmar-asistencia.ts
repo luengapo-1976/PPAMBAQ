@@ -9,8 +9,16 @@ import { PublicadoresService } from '../solicitudes/data/publicadores.service';
 import { LookupsService } from '../solicitudes/data/lookups.service';
 import { Publicador } from '../solicitudes/data/models';
 import { Punto } from '../configuracion/data/models';
-import { TipoEntrenamientoFiltro, applyEntrenamientoFiltro, lugaresDisponibles } from '../solicitudes/data/entrenamiento-filter.util';
-import { formatDateShort, nombreCompleto, todayIsoDate } from '../solicitudes/data/publicador.utils';
+import {
+  TipoEntrenamientoFiltro,
+  applyEntrenamientoFiltro,
+  lugaresDisponibles,
+} from '../solicitudes/data/entrenamiento-filter.util';
+import {
+  formatDateShort,
+  nombreCompleto,
+  todayIsoDate,
+} from '../solicitudes/data/publicador.utils';
 
 @Component({
   selector: 'app-confirmar-asistencia',
@@ -86,7 +94,7 @@ export class ConfirmarAsistencia {
       .map(({ codigo, punto }) => ({
         value: String(codigo),
         label: punto
-          ? `${punto.nombre_punto} — ${punto.direccion ?? 'Sin dirección'} — Encargado: ${punto.encargado ?? '—'}${punto.movil ? ' (' + punto.movil + ')' : ''}`
+          ? `${punto.nombre_punto} - ${punto.direccion ?? 'Sin dirección'} - Encargado: ${punto.encargado ?? '-'}${punto.movil ? ' (' + punto.movil + ')' : ''}`
           : `Punto ${codigo}`,
       }));
   });
@@ -98,8 +106,8 @@ export class ConfirmarAsistencia {
     if (!fecha || !tipo || codigoPunto == null) {
       return [];
     }
-    return [...applyEntrenamientoFiltro(this.publicadores(), { tipo, fecha, codigoPunto })].sort((a, b) =>
-      nombreCompleto(a).localeCompare(nombreCompleto(b)),
+    return [...applyEntrenamientoFiltro(this.publicadores(), { tipo, fecha, codigoPunto })].sort(
+      (a, b) => nombreCompleto(a).localeCompare(nombreCompleto(b)),
     );
   });
 
@@ -179,7 +187,9 @@ export class ConfirmarAsistencia {
     this.publicadoresService.confirmarAsistencia([row.id], tipo).subscribe({
       next: () => {
         this.stopConfirming(row.id);
-        this.publicadores.update((rows) => rows.map((r) => (r.id === row.id ? this.applyAsistencia(r, tipo) : r)));
+        this.publicadores.update((rows) =>
+          rows.map((r) => (r.id === row.id ? this.applyAsistencia(r, tipo) : r)),
+        );
         this.snackbar.success(`Asistencia confirmada: ${nombreCompleto(row)}.`);
       },
       error: () => {
@@ -198,7 +208,9 @@ export class ConfirmarAsistencia {
           this.snackbar.error('Solo el usuario que confirmó la asistencia puede desmarcarla.');
           return;
         }
-        this.publicadores.update((rows) => rows.map((r) => (r.id === row.id ? this.applyRevertir(r, tipo) : r)));
+        this.publicadores.update((rows) =>
+          rows.map((r) => (r.id === row.id ? this.applyRevertir(r, tipo) : r)),
+        );
         this.snackbar.success(`Se desmarcó la asistencia de ${nombreCompleto(row)}.`);
       },
       error: () => {

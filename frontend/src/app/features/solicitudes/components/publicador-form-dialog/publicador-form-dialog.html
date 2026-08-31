@@ -7,7 +7,13 @@
   panelBackground="var(--ppam-surface)"
   (closed)="onCancel()"
 >
-  <app-button dialogToolbar type="button" icon="save" [disabled]="form.invalid || saving()" (click)="onSave()">
+  <app-button
+    dialogToolbar
+    type="button"
+    icon="save"
+    [disabled]="form.invalid || saving()"
+    (click)="onSave()"
+  >
     Guardar
   </app-button>
   <app-button dialogToolbar type="button" variant="secondary" icon="close" (click)="onCancel()">
@@ -38,7 +44,11 @@
   }
 
   <form class="form-grid" [formGroup]="form" (ngSubmit)="onSave()">
-    <app-form-field label="Primer apellido" [required]="true" [control]="form.controls.primer_apellido">
+    <app-form-field
+      label="Primer apellido"
+      [required]="true"
+      [control]="form.controls.primer_apellido"
+    >
       <input
         type="text"
         formControlName="primer_apellido"
@@ -78,7 +88,12 @@
       />
     </app-form-field>
 
-    <app-form-field label="Dirección" [required]="true" [control]="form.controls.direccion" class="form-field--wide">
+    <app-form-field
+      label="Dirección"
+      [required]="true"
+      [control]="form.controls.direccion"
+      class="form-field--wide"
+    >
       <input
         type="text"
         formControlName="direccion"
@@ -88,7 +103,11 @@
       />
     </app-form-field>
 
-    <app-form-field label="Departamento" [required]="true" [control]="form.controls.codigo_departamento">
+    <app-form-field
+      label="Departamento"
+      [required]="true"
+      [control]="form.controls.codigo_departamento"
+    >
       <app-search-select
         formControlName="codigo_departamento"
         [options]="departamentoOptions()"
@@ -96,7 +115,11 @@
       />
     </app-form-field>
 
-    <app-form-field label="Ciudad / municipio" [required]="true" [control]="form.controls.codigo_municipio">
+    <app-form-field
+      label="Ciudad / municipio"
+      [required]="true"
+      [control]="form.controls.codigo_municipio"
+    >
       <app-search-select
         formControlName="codigo_municipio"
         [options]="municipioOptions()"
@@ -104,7 +127,11 @@
       />
     </app-form-field>
 
-    <app-form-field label="Correo electrónico" [required]="true" [control]="form.controls.correo_electronico">
+    <app-form-field
+      label="Correo electrónico"
+      [required]="true"
+      [control]="form.controls.correo_electronico"
+    >
       <input
         type="email"
         formControlName="correo_electronico"
@@ -125,7 +152,11 @@
       />
     </app-form-field>
 
-    <app-form-field label="Congregación" [required]="true" [control]="form.controls.codigo_congregacion">
+    <app-form-field
+      label="Congregación"
+      [required]="true"
+      [control]="form.controls.codigo_congregacion"
+    >
       <app-search-select
         formControlName="codigo_congregacion"
         [options]="congregacionOptions()"
@@ -137,28 +168,40 @@
       <div class="ppam-input ppam-input--readonly">{{ circuitoDisplay() }}</div>
     </app-form-field>
 
-    <app-form-field label="Fecha de nacimiento" [required]="true" [control]="form.controls.fecha_nacimiento">
+    <app-form-field
+      label="Fecha de nacimiento"
+      [required]="true"
+      [control]="form.controls.fecha_nacimiento"
+    >
       <input type="date" formControlName="fecha_nacimiento" class="ppam-input" />
     </app-form-field>
 
     <app-form-field label="Edad">
-      <div class="ppam-input ppam-input--readonly">{{ edadDisplay() ?? '—' }}</div>
+      <div class="ppam-input ppam-input--readonly">{{ edadDisplay() ?? '-' }}</div>
     </app-form-field>
 
     <app-form-field label="Sexo" [required]="true" [control]="form.controls.sexo">
       <app-select formControlName="sexo" [options]="sexoOptions" placeholder="Seleccionar sexo…" />
     </app-form-field>
 
-    <app-form-field label="Fecha de bautismo" [required]="true" [control]="form.controls.fecha_bautismo">
+    <app-form-field
+      label="Fecha de bautismo"
+      [required]="true"
+      [control]="form.controls.fecha_bautismo"
+    >
       <input type="date" formControlName="fecha_bautismo" class="ppam-input" />
     </app-form-field>
 
     <app-form-field label="Años de bautismo">
-      <div class="ppam-input ppam-input--readonly">{{ aniosBautismoDisplay() ?? '—' }}</div>
+      <div class="ppam-input ppam-input--readonly">{{ aniosBautismoDisplay() ?? '-' }}</div>
     </app-form-field>
 
     <app-form-field label="Estado civil" [required]="true" [control]="form.controls.estado_civil">
-      <app-select formControlName="estado_civil" [options]="estadoCivilOptions" placeholder="Seleccionar…" />
+      <app-select
+        formControlName="estado_civil"
+        [options]="estadoCivilOptions"
+        placeholder="Seleccionar…"
+      />
     </app-form-field>
 
     @if (showNombreConyuge()) {
@@ -177,7 +220,11 @@
         />
       </app-form-field>
 
-      <app-form-field label="Apellido de casada" [required]="true" [control]="form.controls.apellido_casada">
+      <app-form-field
+        label="Apellido de casada"
+        [required]="true"
+        [control]="form.controls.apellido_casada"
+      >
         <input
           type="text"
           formControlName="apellido_casada"
@@ -188,19 +235,47 @@
       </app-form-field>
     }
 
-    <app-form-field label="Privilegio ministerial" [required]="true" [control]="form.controls.privilegio_min">
-      <app-select formControlName="privilegio_min" [options]="privilegioMinOptions" placeholder="Seleccionar…" />
+    <app-form-field
+      label="Privilegio ministerial"
+      [required]="true"
+      [control]="form.controls.privilegio_min"
+    >
+      <app-select
+        formControlName="privilegio_min"
+        [options]="privilegioMinOptions"
+        placeholder="Seleccionar…"
+      />
     </app-form-field>
 
-    <app-form-field label="Privilegio de servicio" [required]="true" [control]="form.controls.privilegio_ser">
-      <app-select formControlName="privilegio_ser" [options]="privilegioSerOptions" placeholder="Seleccionar…" />
+    <app-form-field
+      label="Privilegio de servicio"
+      [required]="true"
+      [control]="form.controls.privilegio_ser"
+    >
+      <app-select
+        formControlName="privilegio_ser"
+        [options]="privilegioSerOptions"
+        placeholder="Seleccionar…"
+      />
     </app-form-field>
 
-    <app-form-field label="¿Participó antes?" [required]="true" [control]="form.controls.participo_antes">
-      <app-select formControlName="participo_antes" [options]="participoAntesOptions" placeholder="Seleccionar…" />
+    <app-form-field
+      label="¿Participó antes?"
+      [required]="true"
+      [control]="form.controls.participo_antes"
+    >
+      <app-select
+        formControlName="participo_antes"
+        [options]="participoAntesOptions"
+        placeholder="Seleccionar…"
+      />
     </app-form-field>
 
-    <app-form-field label="Fecha de solicitud" [required]="true" [control]="form.controls.fecha_solicitud">
+    <app-form-field
+      label="Fecha de solicitud"
+      [required]="true"
+      [control]="form.controls.fecha_solicitud"
+    >
       <input type="date" formControlName="fecha_solicitud" class="ppam-input" />
     </app-form-field>
 
@@ -213,7 +288,11 @@
       [required]="true"
       [control]="form.controls.existe_bd_anterior"
     >
-      <app-select formControlName="existe_bd_anterior" [options]="existeBdAnteriorOptions" placeholder="Seleccionar…" />
+      <app-select
+        formControlName="existe_bd_anterior"
+        [options]="existeBdAnteriorOptions"
+        placeholder="Seleccionar…"
+      />
     </app-form-field>
 
     @if (showFechaAprobacion()) {
@@ -242,19 +321,27 @@
       </app-form-field>
 
       <app-form-field label="Lugar de primera capacitación">
-        <div class="ppam-input ppam-input--readonly">{{ primeraCapacitacionPunto()?.nombre_punto || '—' }}</div>
+        <div class="ppam-input ppam-input--readonly">
+          {{ primeraCapacitacionPunto()?.nombre_punto || '-' }}
+        </div>
       </app-form-field>
 
       <app-form-field label="Dirección de primera capacitación">
-        <div class="ppam-input ppam-input--readonly">{{ primeraCapacitacionPunto()?.direccion || '—' }}</div>
+        <div class="ppam-input ppam-input--readonly">
+          {{ primeraCapacitacionPunto()?.direccion || '-' }}
+        </div>
       </app-form-field>
 
       <app-form-field label="Encargado de primera capacitación">
-        <div class="ppam-input ppam-input--readonly">{{ primeraCapacitacionPunto()?.encargado || '—' }}</div>
+        <div class="ppam-input ppam-input--readonly">
+          {{ primeraCapacitacionPunto()?.encargado || '-' }}
+        </div>
       </app-form-field>
 
       <app-form-field label="Móvil de primera capacitación">
-        <div class="ppam-input ppam-input--readonly">{{ primeraCapacitacionPunto()?.movil || '—' }}</div>
+        <div class="ppam-input ppam-input--readonly">
+          {{ primeraCapacitacionPunto()?.movil || '-' }}
+        </div>
       </app-form-field>
     }
 
@@ -266,30 +353,80 @@
       </app-form-field>
 
       <app-form-field label="Lugar de segunda capacitación">
-        <div class="ppam-input ppam-input--readonly">{{ segundaCapacitacionPunto()?.nombre_punto || '—' }}</div>
+        <div class="ppam-input ppam-input--readonly">
+          {{ segundaCapacitacionPunto()?.nombre_punto || '-' }}
+        </div>
       </app-form-field>
 
       <app-form-field label="Dirección de segunda capacitación">
-        <div class="ppam-input ppam-input--readonly">{{ segundaCapacitacionPunto()?.direccion || '—' }}</div>
+        <div class="ppam-input ppam-input--readonly">
+          {{ segundaCapacitacionPunto()?.direccion || '-' }}
+        </div>
       </app-form-field>
 
       <app-form-field label="Encargado de segunda capacitación">
-        <div class="ppam-input ppam-input--readonly">{{ segundaCapacitacionPunto()?.encargado || '—' }}</div>
+        <div class="ppam-input ppam-input--readonly">
+          {{ segundaCapacitacionPunto()?.encargado || '-' }}
+        </div>
       </app-form-field>
 
       <app-form-field label="Móvil de segunda capacitación">
-        <div class="ppam-input ppam-input--readonly">{{ segundaCapacitacionPunto()?.movil || '—' }}</div>
+        <div class="ppam-input ppam-input--readonly">
+          {{ segundaCapacitacionPunto()?.movil || '-' }}
+        </div>
       </app-form-field>
     }
   </form>
+
+  @if (mode() === 'edit' && turnosAsignados().length > 0) {
+    <section class="turnos-asignados">
+      <h3 class="turnos-asignados__titulo">Turnos asignados</h3>
+      <div class="turnos-asignados__grid">
+        @for (turno of turnosAsignados(); track turno.id) {
+          <article class="turnos-asignados__card">
+            <div class="turnos-asignados__card-row turnos-asignados__card-row--punto">
+              <span class="material-symbols-outlined" aria-hidden="true">place</span>
+              <span>{{ turno.nombrePunto }}</span>
+            </div>
+            <div class="turnos-asignados__card-row">
+              <span class="material-symbols-outlined" aria-hidden="true">schedule</span>
+              <span
+                >{{ turno.diaNombre }} · {{ formatHora(turno.horaInicio) }} –
+                {{ formatHora(turno.horaFin) }}</span
+              >
+            </div>
+            @if (turno.estadoSolicitud === 'PENDIENTE') {
+              <span class="turnos-asignados__badge">
+                <span class="material-symbols-outlined" aria-hidden="true">hourglass_top</span>
+                Pendiente de aprobación
+              </span>
+            }
+          </article>
+        }
+      </div>
+    </section>
+  }
+
+  @if (mode() === 'edit' && timelineItems().length > 0) {
+    <section class="turnos-asignados">
+      <h3 class="turnos-asignados__titulo">Historial de solicitudes</h3>
+      <app-timeline [items]="timelineItems()" />
+    </section>
+  }
 </app-dialog>
 
-<app-dialog [open]="duplicateDialogOpen()" title="Posible coincidencia encontrada" (closed)="onDismissDuplicate()">
+<app-dialog
+  [open]="duplicateDialogOpen()"
+  title="Posible coincidencia encontrada"
+  (closed)="onDismissDuplicate()"
+>
   <p class="duplicate-hint">
     @if (duplicateCandidates().length === 1) {
-      Encontramos un registro que podría corresponder a la misma persona. Verifica antes de continuar:
+      Encontramos un registro que podría corresponder a la misma persona. Verifica antes de
+      continuar:
     } @else {
-      Encontramos varios registros que podrían corresponder a la misma persona. Selecciona uno para continuar:
+      Encontramos varios registros que podrían corresponder a la misma persona. Selecciona uno para
+      continuar:
     }
   </p>
 
@@ -308,9 +445,12 @@
           />
           <span class="duplicate-item__info">
             <strong>{{ nombreCompleto(candidate.publicador) }}</strong>
-            <span>Móvil: {{ candidate.publicador.movil || '—' }}</span>
-            <span>Fecha de nacimiento: {{ formatDateShort(candidate.publicador.fecha_nacimiento) }}</span>
-            <span>Congregación: {{ candidate.publicador.nombre_congregacion || '—' }}</span>
+            <span>Móvil: {{ candidate.publicador.movil || '-' }}</span>
+            <span
+              >Fecha de nacimiento:
+              {{ formatDateShort(candidate.publicador.fecha_nacimiento) }}</span
+            >
+            <span>Congregación: {{ candidate.publicador.nombre_congregacion || '-' }}</span>
           </span>
         </label>
       </li>
@@ -318,12 +458,16 @@
   </ul>
 
   <div class="duplicate-actions">
-    <app-button variant="secondary" (click)="onDismissDuplicate()">No, es una persona distinta</app-button>
+    <app-button variant="secondary" (click)="onDismissDuplicate()"
+      >No, es una persona distinta</app-button
+    >
     <app-button [disabled]="!selectedCandidateId()" (click)="onConfirmDuplicate()">
       Cargar datos de la persona seleccionada
     </app-button>
   </div>
   @if (duplicateHasMovilOrCorreo()) {
-    <p class="duplicate-warning">No se puede registrar un móvil o correo electrónico más de una vez.</p>
+    <p class="duplicate-warning">
+      No se puede registrar un móvil o correo electrónico más de una vez.
+    </p>
   }
 </app-dialog>

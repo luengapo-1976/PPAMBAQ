@@ -1,0 +1,130 @@
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.timeline__item {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  column-gap: var(--ppam-space-md);
+  position: relative;
+  padding-bottom: var(--ppam-space-xl);
+}
+
+.timeline__item:last-child {
+  padding-bottom: 0;
+}
+
+.timeline__item:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 19px;
+  top: 40px;
+  bottom: 0;
+  width: 2px;
+  background: var(--ppam-primary-container);
+}
+
+/** Todos los marcadores usan el mismo azul institucional (independiente del tipo de
+ * evento): el estado semántico (éxito/advertencia/error) ya lo comunican el ícono y el
+ * chip de color debajo, así que el marcador no necesita repetirlo. */
+.timeline__marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--ppam-primary-container);
+  color: #ffffff;
+  flex-shrink: 0;
+  z-index: 1;
+  /** El anillo del mismo color que el fondo del panel "corta" la línea conectora al
+   * pasar detrás del marcador, en vez de que se vea la línea cruzando el círculo. */
+  box-shadow: 0 0 0 4px var(--ppam-surface-container-lowest);
+}
+
+.timeline__marker .material-symbols-outlined {
+  font-size: 20px;
+}
+
+.timeline__content {
+  padding-top: 8px;
+  min-width: 0;
+}
+
+.timeline__header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--ppam-space-sm);
+}
+
+.timeline__chip {
+  display: inline-flex;
+  align-items: center;
+  /** margin-left negativo por el mismo valor que el padding izquierdo: mantiene la
+   * forma de píldora pero alinea el texto con el borde izquierdo de las líneas de
+   * detalle de abajo (que no tienen padding). */
+  margin-left: calc(var(--ppam-space-sm) * -1);
+  padding: 2px var(--ppam-space-sm);
+  border-radius: var(--ppam-radius-full);
+  background: var(--ppam-surface-container);
+  color: var(--ppam-on-surface-variant);
+  font-size: var(--ppam-label-size);
+  font-weight: 600;
+  letter-spacing: var(--ppam-label-tracking);
+}
+
+.timeline__item--success .timeline__chip {
+  background: var(--ppam-semantic-success-container);
+  color: var(--ppam-semantic-success);
+}
+
+.timeline__item--warning .timeline__chip {
+  background: var(--ppam-semantic-warning-container);
+  color: var(--ppam-semantic-warning);
+}
+
+.timeline__item--error .timeline__chip {
+  background: var(--ppam-semantic-error-container);
+  color: var(--ppam-semantic-error);
+}
+
+.timeline__date {
+  display: block;
+  margin-bottom: 2px;
+  font-size: var(--ppam-small-size);
+  font-weight: 500;
+  color: var(--ppam-primary-container);
+}
+
+.timeline__detalles {
+  margin: var(--ppam-space-sm) 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.timeline__detalle {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  font-size: var(--ppam-small-size);
+}
+
+.timeline__detalle dt {
+  font-weight: 600;
+  flex-shrink: 0;
+  white-space: nowrap;
+  color: var(--ppam-primary-container);
+}
+
+.timeline__detalle dd {
+  margin: 0;
+  min-width: 0;
+  color: var(--ppam-on-surface);
+}

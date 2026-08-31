@@ -2,11 +2,79 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service';
 import { TablesInsert, TablesUpdate } from '../supabase/database.types';
 
-const SELECT_WITH_SEXO = '*, publicadores(sexo)';
+const SELECT_WITH_SEXO =
+  '*, publicadores(primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, sexo, movil, congregaciones(nombre_congregacion))';
 const SELECT_VALIDACION =
-  '*, puntos(nombre_punto), publicadores(primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, fecha_nacimiento)';
+  '*, puntos(nombre_punto), publicadores(primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, fecha_nacimiento, sexo, estado_civil, nombre_conyuge, movil)';
 
 export interface TurnoConSexo {
+  id: string;
+  codigo_punto: number;
+  dia_numero: number;
+  dia_nombre: string;
+  hora_inicio: string;
+  hora_fin: string;
+  id_publicador: string | null;
+  estado_solicitud: string | null;
+  estado_turno: string | null;
+  justificacion: string | null;
+  situacion_identificada: string | null;
+  observaciones: string | null;
+  pareja_nombre: string | null;
+  pareja_movil: string | null;
+  usuario_registra: string | null;
+  fecha_registro: string | null;
+  usuario_modifica: string | null;
+  fecha_modificacion: string | null;
+  publicadores: {
+    primer_nombre: string | null;
+    segundo_nombre: string | null;
+    primer_apellido: string | null;
+    segundo_apellido: string | null;
+    sexo: string | null;
+    movil: string | null;
+    congregaciones: { nombre_congregacion: string | null } | null;
+  } | null;
+}
+
+export interface TurnoConPunto {
+  id: string;
+  dia_numero: number;
+  dia_nombre: string;
+  hora_inicio: string;
+  hora_fin: string;
+  estado_solicitud: string | null;
+  estado_turno: string | null;
+  puntos: { nombre_punto: string } | null;
+}
+
+export interface TurnoSolicitadoHistorial {
+  id: string;
+  dia_numero: number;
+  dia_nombre: string;
+  hora_inicio: string;
+  hora_fin: string;
+  justificacion: string | null;
+  fecha_modificacion: string | null;
+  puntos: { nombre_punto: string } | null;
+}
+
+export interface TurnoApRechazHistorial {
+  id: string;
+  dia_numero: number;
+  dia_nombre: string;
+  hora_inicio: string;
+  hora_fin: string;
+  estado_solicitud: string | null;
+  justificacion: string | null;
+  justificacion_aprobacion: string | null;
+  justificacion_solicitud: string | null;
+  fecha_modificacion: string | null;
+  fecha_aprobacion: string | null;
+  puntos: { nombre_punto: string } | null;
+}
+
+export interface TurnoRow {
   id: string;
   codigo_punto: number;
   dia_numero: number;
@@ -18,30 +86,28 @@ export interface TurnoConSexo {
   justificacion: string | null;
   situacion_identificada: string | null;
   observaciones: string | null;
+  pareja_nombre: string | null;
+  pareja_movil: string | null;
   usuario_registra: string | null;
   fecha_registro: string | null;
   usuario_modifica: string | null;
   fecha_modificacion: string | null;
-  publicadores: { sexo: string | null } | null;
-}
-
-export interface TurnoConPunto {
-  id: string;
-  dia_numero: number;
-  dia_nombre: string;
-  hora_inicio: string;
-  hora_fin: string;
-  puntos: { nombre_punto: string } | null;
+  aprobado_por: string | null;
+  justificacion_aprobacion: string | null;
+  fecha_aprobacion: string | null;
 }
 
 export interface TurnoValidacion {
   id: string;
   codigo_punto: number;
+  dia_numero: number;
   dia_nombre: string;
   hora_inicio: string;
   hora_fin: string;
   justificacion: string | null;
   situacion_identificada: string | null;
+  pareja_nombre: string | null;
+  pareja_movil: string | null;
   fecha_modificacion: string | null;
   aprobado_por: string | null;
   justificacion_aprobacion: string | null;
@@ -53,6 +119,10 @@ export interface TurnoValidacion {
     primer_apellido: string | null;
     segundo_apellido: string | null;
     fecha_nacimiento: string | null;
+    sexo: string | null;
+    estado_civil: string | null;
+    nombre_conyuge: string | null;
+    movil: string | null;
   } | null;
 }
 
@@ -70,10 +140,12 @@ export class TurnosRepository {
       .order('hora_inicio', { ascending: true });
 
     if (error) {
-      throw new InternalServerErrorException('No se pudo obtener los horarios del punto.');
+      throw new InternalServerErrorException(
+        'No se pudo obtener los horarios del punto.',
+      );
     }
 
-    return (data ?? []) as unknown as TurnoConSexo[];
+    return data ?? [];
   }
 
   async findById(id: string): Promise<TurnoConSexo | null> {
@@ -88,7 +160,7 @@ export class TurnosRepository {
       throw new InternalServerErrorException('No se pudo consultar el turno.');
     }
 
-    return data as unknown as TurnoConSexo | null;
+    return data;
   }
 
   /** Turno "pareja": misma combinación punto+día+hora, distinta fila. Se asume que cada
@@ -114,10 +186,12 @@ export class TurnosRepository {
       .maybeSingle();
 
     if (error) {
-      throw new InternalServerErrorException('No se pudo consultar el turno relacionado.');
+      throw new InternalServerErrorException(
+        'No se pudo consultar el turno relacionado.',
+      );
     }
 
-    return data as unknown as TurnoConSexo | null;
+    return data;
   }
 
   /** Turnos asignados al publicador (aprobados o pendientes), sin importar el punto:
@@ -127,21 +201,121 @@ export class TurnosRepository {
     const { data, error } = await this.supabaseService
       .getClient()
       .from('turnos')
-      .select('id, dia_numero, dia_nombre, hora_inicio, hora_fin, puntos(nombre_punto)')
+      .select(
+        'id, dia_numero, dia_nombre, hora_inicio, hora_fin, estado_solicitud, estado_turno, puntos(nombre_punto)',
+      )
       .eq('id_publicador', publicadorId)
       .order('dia_numero', { ascending: true })
       .order('hora_inicio', { ascending: true });
 
     if (error) {
-      throw new InternalServerErrorException('No se pudo consultar tus turnos solicitados.');
+      throw new InternalServerErrorException(
+        'No se pudo consultar tus turnos solicitados.',
+      );
     }
 
-    return (data ?? []) as unknown as TurnoConPunto[];
+    return data ?? [];
+  }
+
+  /** Turnos actualmente asignados o pendientes al publicador, con la justificación y la
+   * fecha de la solicitud — usado para el evento "Solicitado" de la línea de tiempo en
+   * "Editar solicitud". No filtra por estado_solicitud a propósito: un turno rechazado o
+   * devuelto ya no tiene id_publicador (quedó libre), así que esta consulta solo puede
+   * ver los que siguen asignados/pendientes; el resto del historial viene de
+   * findApRechazPorPublicador. */
+  async findSolicitadosPorPublicador(
+    publicadorId: string,
+  ): Promise<TurnoSolicitadoHistorial[]> {
+    const { data, error } = await this.supabaseService
+      .getClient()
+      .from('turnos')
+      .select(
+        'id, dia_numero, dia_nombre, hora_inicio, hora_fin, justificacion, fecha_modificacion, puntos(nombre_punto)',
+      )
+      .eq('id_publicador', publicadorId);
+
+    if (error) {
+      throw new InternalServerErrorException(
+        'No se pudo consultar el historial de solicitudes.',
+      );
+    }
+
+    return data ?? [];
+  }
+
+  /** Copias de solicitudes ya resueltas manualmente (rechazadas) o devueltas, para el
+   * mismo histórico de línea de tiempo. Se excluyen las APROBADO: esas siguen visibles en
+   * turnos (findSolicitadosPorPublicador) y no aportan un evento distinto. */
+  async findApRechazPorPublicador(
+    publicadorId: string,
+  ): Promise<TurnoApRechazHistorial[]> {
+    const { data, error } = await this.supabaseService
+      .getClient()
+      .from('turnos_apro_rechaz')
+      .select(
+        'id, dia_numero, dia_nombre, hora_inicio, hora_fin, estado_solicitud, justificacion, justificacion_aprobacion, justificacion_solicitud, fecha_modificacion, fecha_aprobacion, puntos(nombre_punto)',
+      )
+      .eq('id_publicador', publicadorId)
+      .neq('estado_solicitud', 'APROBADO');
+
+    if (error) {
+      throw new InternalServerErrorException(
+        'No se pudo consultar el historial de solicitudes.',
+      );
+    }
+
+    return data ?? [];
+  }
+
+  /** Crea un nuevo horario (cupo) para un punto, usado por "Habilitar nuevo horario"
+   * en el calendario de Puntos. */
+  async crear(payload: TablesInsert<'turnos'>): Promise<TurnoConSexo> {
+    const { data, error } = await this.supabaseService
+      .getClient()
+      .from('turnos')
+      .insert(payload)
+      .select(SELECT_WITH_SEXO)
+      .single();
+
+    if (error) {
+      throw new InternalServerErrorException(
+        'No se pudo crear el nuevo horario.',
+      );
+    }
+
+    return data;
+  }
+
+  /** Activa o inactiva un horario ya existente, sin condicionar a su estado actual
+   * (a diferencia de asignarSiLibre/liberarSiEsDelPublicador, aquí no hay condición de
+   * carrera que evitar: es una acción administrativa directa sobre un turno puntual). */
+  async actualizarEstado(
+    id: string,
+    payload: TablesUpdate<'turnos'>,
+  ): Promise<TurnoConSexo | null> {
+    const { data, error } = await this.supabaseService
+      .getClient()
+      .from('turnos')
+      .update(payload)
+      .eq('id', id)
+      .select(SELECT_WITH_SEXO)
+      .maybeSingle();
+
+    if (error) {
+      throw new InternalServerErrorException(
+        'No se pudo actualizar el estado del horario.',
+      );
+    }
+
+    return data;
   }
 
   /** Update condicionado a que el turno siga libre (id_publicador IS NULL), para evitar
    * una condición de carrera si dos publicadores solicitan el mismo turno a la vez. */
-  async asignarSiLibre(id: string, payload: TablesUpdate<'turnos'>): Promise<TurnoConSexo | null> {
+  async asignarSiLibre(
+    id: string,
+    payload: TablesUpdate<'turnos'>,
+  ): Promise<TurnoConSexo | null> {
     const { data, error } = await this.supabaseService
       .getClient()
       .from('turnos')
@@ -152,15 +326,21 @@ export class TurnosRepository {
       .maybeSingle();
 
     if (error) {
-      throw new InternalServerErrorException('No se pudo registrar la solicitud del turno.');
+      throw new InternalServerErrorException(
+        'No se pudo registrar la solicitud del turno.',
+      );
     }
 
-    return data as unknown as TurnoConSexo | null;
+    return data;
   }
 
   /** Update condicionado a que el turno siga asignado a este publicador, para evitar
    * liberar (o registrar como entregado) un turno que ya no le pertenece. */
-  async liberarSiEsDelPublicador(id: string, publicadorId: string, payload: TablesUpdate<'turnos'>): Promise<boolean> {
+  async liberarSiEsDelPublicador(
+    id: string,
+    publicadorId: string,
+    payload: TablesUpdate<'turnos'>,
+  ): Promise<boolean> {
     const { data, error } = await this.supabaseService
       .getClient()
       .from('turnos')
@@ -179,7 +359,10 @@ export class TurnosRepository {
 
   /** Libera TODOS los turnos asignados a un publicador (sin condicionar a un id
    * puntual), usado al procesar una solicitud de baja. */
-  async liberarTodosDelPublicador(publicadorId: string, payload: TablesUpdate<'turnos'>): Promise<void> {
+  async liberarTodosDelPublicador(
+    publicadorId: string,
+    payload: TablesUpdate<'turnos'>,
+  ): Promise<void> {
     const { error } = await this.supabaseService
       .getClient()
       .from('turnos')
@@ -187,15 +370,24 @@ export class TurnosRepository {
       .eq('id_publicador', publicadorId);
 
     if (error) {
-      throw new InternalServerErrorException('No se pudo liberar tus turnos asignados.');
+      throw new InternalServerErrorException(
+        'No se pudo liberar tus turnos asignados.',
+      );
     }
   }
 
-  async registrarEntrega(payload: TablesInsert<'turnos_entregados'>): Promise<void> {
-    const { error } = await this.supabaseService.getClient().from('turnos_entregados').insert(payload);
+  async registrarEntrega(
+    payload: TablesInsert<'turnos_entregados'>,
+  ): Promise<void> {
+    const { error } = await this.supabaseService
+      .getClient()
+      .from('turnos_entregados')
+      .insert(payload);
 
     if (error) {
-      throw new InternalServerErrorException('No se pudo registrar la devolución del turno.');
+      throw new InternalServerErrorException(
+        'No se pudo registrar la devolución del turno.',
+      );
     }
   }
 
@@ -217,17 +409,26 @@ export class TurnosRepository {
       .maybeSingle();
 
     if (error) {
-      throw new InternalServerErrorException('No se pudo verificar si la actividad ya fue reportada.');
+      throw new InternalServerErrorException(
+        'No se pudo verificar si la actividad ya fue reportada.',
+      );
     }
 
     return data;
   }
 
-  async registrarActividad(payload: TablesInsert<'actividad_reportada'>): Promise<void> {
-    const { error } = await this.supabaseService.getClient().from('actividad_reportada').insert(payload);
+  async registrarActividad(
+    payload: TablesInsert<'actividad_reportada'>,
+  ): Promise<void> {
+    const { error } = await this.supabaseService
+      .getClient()
+      .from('actividad_reportada')
+      .insert(payload);
 
     if (error) {
-      throw new InternalServerErrorException('No se pudo registrar el reporte de actividad.');
+      throw new InternalServerErrorException(
+        'No se pudo registrar el reporte de actividad.',
+      );
     }
   }
 
@@ -250,7 +451,9 @@ export class TurnosRepository {
       .eq('hora_fin', horaFin);
 
     if (error) {
-      throw new InternalServerErrorException('No se pudo consultar los turnos de este horario.');
+      throw new InternalServerErrorException(
+        'No se pudo consultar los turnos de este horario.',
+      );
     }
 
     return (data ?? []).map((turno) => turno.id);
@@ -267,10 +470,12 @@ export class TurnosRepository {
       .order('fecha_modificacion', { ascending: false });
 
     if (error) {
-      throw new InternalServerErrorException('No se pudo consultar los casos pendientes por validar.');
+      throw new InternalServerErrorException(
+        'No se pudo consultar los casos pendientes por validar.',
+      );
     }
 
-    return (data ?? []) as unknown as TurnoValidacion[];
+    return data ?? [];
   }
 
   /** Histórico de casos que pasaron por esta revisión manual (se distingue de la
@@ -285,14 +490,85 @@ export class TurnosRepository {
       .order('fecha_aprobacion', { ascending: false });
 
     if (error) {
-      throw new InternalServerErrorException('No se pudo consultar el histórico de casos aprobados.');
+      throw new InternalServerErrorException(
+        'No se pudo consultar el histórico de casos aprobados.',
+      );
     }
 
-    return (data ?? []) as unknown as TurnoValidacion[];
+    return data ?? [];
   }
 
-  /** Update condicionado a que el turno siga PENDIENTE, para evitar aprobarlo dos veces. */
-  async aprobarSolicitud(id: string, payload: TablesUpdate<'turnos'>): Promise<boolean> {
+  /** Update condicionado a que el turno siga PENDIENTE, para evitar aprobarlo dos veces.
+   * Devuelve la fila completa (no solo el id) porque el servicio necesita copiarla, ya
+   * actualizada, a turnos_apro_rechaz. */
+  async aprobarSolicitud(
+    id: string,
+    payload: TablesUpdate<'turnos'>,
+  ): Promise<TurnoRow | null> {
+    const { data, error } = await this.supabaseService
+      .getClient()
+      .from('turnos')
+      .update(payload)
+      .eq('id', id)
+      .eq('estado_solicitud', 'PENDIENTE')
+      .select('*')
+      .maybeSingle();
+
+    if (error) {
+      throw new InternalServerErrorException(
+        'No se pudo aprobar la solicitud.',
+      );
+    }
+
+    return data;
+  }
+
+  /** Histórico de casos rechazados manualmente. A diferencia de los aprobados, el turno
+   * rechazado se libera (vuelve a quedar disponible en la tabla turnos, misma lógica que
+   * una devolución) — por eso el histórico de rechazos vive aparte, en turnos_apro_rechaz,
+   * y no se puede leer consultando turnos por estado_solicitud = 'RECHAZADO'. */
+  async findRechazadosValidacion(): Promise<TurnoValidacion[]> {
+    const { data, error } = await this.supabaseService
+      .getClient()
+      .from('turnos_apro_rechaz')
+      .select(SELECT_VALIDACION)
+      .eq('estado_solicitud', 'RECHAZADO')
+      .order('fecha_aprobacion', { ascending: false });
+
+    if (error) {
+      throw new InternalServerErrorException(
+        'No se pudo consultar el histórico de casos rechazados.',
+      );
+    }
+
+    return data ?? [];
+  }
+
+  /** Copia de auditoría de una solicitud ya procesada (aprobada, rechazada o devuelta),
+   * usada por Casos por validar, Retirar/Devolver turno y sus equivalentes. */
+  async registrarApRechaz(
+    payload: TablesInsert<'turnos_apro_rechaz'>,
+  ): Promise<void> {
+    const { error } = await this.supabaseService
+      .getClient()
+      .from('turnos_apro_rechaz')
+      .insert(payload);
+
+    if (error) {
+      throw new InternalServerErrorException(
+        'No se pudo registrar el histórico de la solicitud.',
+      );
+    }
+  }
+
+  /** Update condicionado a que el turno siga PENDIENTE, para evitar rechazarlo dos veces.
+   * El payload que envía el servicio no marca el turno como RECHAZADO: lo libera (mismos
+   * campos que una devolución), porque el histórico de la decisión se guarda aparte en
+   * turnos_apro_rechaz. */
+  async rechazarSolicitud(
+    id: string,
+    payload: TablesUpdate<'turnos'>,
+  ): Promise<boolean> {
     const { data, error } = await this.supabaseService
       .getClient()
       .from('turnos')
@@ -303,25 +579,33 @@ export class TurnosRepository {
       .maybeSingle();
 
     if (error) {
-      throw new InternalServerErrorException('No se pudo aprobar la solicitud.');
+      throw new InternalServerErrorException(
+        'No se pudo rechazar la solicitud.',
+      );
     }
 
     return !!data;
   }
 
-  async findActividadesPorTurnos(turnoIds: string[]): Promise<ActividadHistorial[]> {
+  async findActividadesPorTurnos(
+    turnoIds: string[],
+  ): Promise<ActividadHistorial[]> {
     const { data, error } = await this.supabaseService
       .getClient()
       .from('actividad_reportada')
-      .select('id, fecha_actividad, cumplio_turno, inicio_conversacion, arreglos_curso, observaciones, usuario_registra')
+      .select(
+        'id, fecha_actividad, cumplio_turno, inicio_conversacion, arreglos_curso, observaciones, usuario_registra',
+      )
       .in('id_turno', turnoIds)
       .order('fecha_actividad', { ascending: false });
 
     if (error) {
-      throw new InternalServerErrorException('No se pudo consultar el histórico de actividad.');
+      throw new InternalServerErrorException(
+        'No se pudo consultar el histórico de actividad.',
+      );
     }
 
-    return (data ?? []) as unknown as ActividadHistorial[];
+    return data ?? [];
   }
 }
 

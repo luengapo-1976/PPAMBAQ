@@ -22,7 +22,9 @@ export class Mensajes {
   protected readonly dialogOpen = signal(false);
   protected readonly dialogMode = signal<'create' | 'edit'>('create');
 
-  protected readonly tipos = computed(() => [...new Set(this.mensajes().map((m) => m.tipo))].sort());
+  protected readonly tipos = computed(() =>
+    [...new Set(this.mensajes().map((m) => m.tipo))].sort(),
+  );
 
   constructor() {
     this.loadMensajes();

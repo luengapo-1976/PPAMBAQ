@@ -27,9 +27,12 @@ function nombreDiaSemana(fechaIso: string): string {
 function formatFechaLarga(fechaIso: string): string {
   const [anio, mes, dia] = fechaIso.split('-').map(Number);
   const fecha = new Date(Date.UTC(anio, mes - 1, dia));
-  return new Intl.DateTimeFormat('es-CO', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(
-    fecha,
-  );
+  return new Intl.DateTimeFormat('es-CO', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(fecha);
 }
 
 @Component({
@@ -118,7 +121,11 @@ export class ReportarActividad {
     this.loading.set(true);
     this.turnosService.contarSolicitados().subscribe({
       next: (conteo) => {
-        this.misTurnos.set(conteo.turnos);
+        /** Un turno inactivo sigue contando para el límite de 3 (por eso no se filtra
+         * en el conteo en sí), pero no admite nuevos reportes de actividad mientras
+         * esté inactivo: se excluye de esta lista (Devolver turno sí lo sigue
+         * mostrando, para poder liberarlo igual). */
+        this.misTurnos.set(conteo.turnos.filter((turno) => turno.estadoTurno !== 'INACTIVO'));
         this.loading.set(false);
       },
       error: () => {
@@ -180,7 +187,9 @@ export class ReportarActividad {
 
     const diaSeleccionado = nombreDiaSemana(value);
     if (diaSeleccionado.toLowerCase() !== turno.diaNombre.trim().toLowerCase()) {
-      this.fechaError.set(`Esa fecha cae en ${diaSeleccionado}. Elige una fecha que sea ${turno.diaNombre}.`);
+      this.fechaError.set(
+        `Esa fecha cae en ${diaSeleccionado}. Elige una fecha que sea ${turno.diaNombre}.`,
+      );
       return;
     }
 
@@ -194,7 +203,9 @@ export class ReportarActividad {
       },
       error: () => {
         this.verificandoFecha.set(false);
-        this.fechaError.set('No se pudo verificar la disponibilidad de esta fecha. Intenta nuevamente.');
+        this.fechaError.set(
+          'No se pudo verificar la disponibilidad de esta fecha. Intenta nuevamente.',
+        );
       },
     });
   }
@@ -246,8 +257,12 @@ export class ReportarActividad {
       .reportarActividad(turno.id, {
         fechaActividad: this.fechaActividad(),
         cumplioTurno,
-        inicioConversacion: this.mostrarInicioConversacion() ? (this.inicioConversacion() ?? undefined) : undefined,
-        arreglosCurso: this.mostrarArreglosCurso() ? (this.arreglosCurso() ?? undefined) : undefined,
+        inicioConversacion: this.mostrarInicioConversacion()
+          ? (this.inicioConversacion() ?? undefined)
+          : undefined,
+        arreglosCurso: this.mostrarArreglosCurso()
+          ? (this.arreglosCurso() ?? undefined)
+          : undefined,
         observaciones: this.observaciones().trim() || undefined,
       })
       .subscribe({
@@ -258,7 +273,9 @@ export class ReportarActividad {
         },
         error: (err: ApiError) => {
           this.enviando.set(false);
-          this.snackbar.error(err?.message ?? 'No se pudo enviar el reporte de actividad. Intenta nuevamente.');
+          this.snackbar.error(
+            err?.message ?? 'No se pudo enviar el reporte de actividad. Intenta nuevamente.',
+          );
         },
       });
   }

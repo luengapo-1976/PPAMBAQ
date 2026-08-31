@@ -1,0 +1,113 @@
+:host {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1892 / 720;
+  overflow: hidden;
+}
+
+.carousel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.carousel:focus-visible {
+  outline: 2px solid var(--ppam-primary-container);
+  outline-offset: -2px;
+}
+
+.carousel__viewport {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.carousel__slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transform: scale(1.06);
+  transition:
+    opacity 240ms ease,
+    transform 240ms ease;
+}
+
+.carousel__slide--active {
+  position: relative;
+  opacity: 1;
+  transform: scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carousel__slide {
+    transition: none;
+    transform: none;
+  }
+}
+
+.carousel__control {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: var(--ppam-radius-full);
+  background: rgba(0, 0, 0, 0.35);
+  color: #ffffff;
+  cursor: pointer;
+  transition: background var(--ppam-motion-fast);
+}
+
+.carousel__control:hover {
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.carousel__control--prev {
+  left: var(--ppam-space-sm);
+}
+
+.carousel__control--next {
+  right: var(--ppam-space-sm);
+}
+
+.carousel__dots {
+  position: absolute;
+  bottom: var(--ppam-space-sm);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: var(--ppam-space-xs);
+}
+
+.carousel__dot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.carousel__dot::after {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: var(--ppam-radius-full);
+  background: rgba(255, 255, 255, 0.6);
+  transition: background var(--ppam-motion-fast);
+}
+
+.carousel__dot--active::after {
+  background: #ffffff;
+}

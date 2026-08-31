@@ -1,11 +1,10 @@
 <app-participante-desktop-header />
 
 <div class="reportar-actividad">
-
   @if (vista() === 'grid') {
     <p class="reportar-actividad__legend">
-      {{ primerNombre() }}, a continuación se presentan los turnos que tienes asignados actualmente. Da clic en el
-      botón "Reportar actividad" del horario implicado.
+      {{ primerNombre() }}, a continuación se presentan los turnos que tienes asignados actualmente.
+      Da clic en el botón "Reportar actividad" del horario implicado.
     </p>
 
     @if (loading()) {
@@ -32,9 +31,26 @@
               <span class="material-symbols-outlined" aria-hidden="true">schedule</span>
               <span>{{ formatHora(turno.horaInicio) }} – {{ formatHora(turno.horaFin) }}</span>
             </div>
+            @if (turno.estadoSolicitud === 'PENDIENTE') {
+              <span class="estado-badge estado-badge--pendiente">
+                <span class="material-symbols-outlined" aria-hidden="true">hourglass_top</span>
+                Pendiente de aprobación
+              </span>
+            }
             <div class="turno-card__actions">
-              <app-button type="button" (click)="onAbrirReporte(turno)">Reportar actividad</app-button>
-              <app-button type="button" variant="secondary" (click)="onVerHistorial(turno)">
+              <app-button
+                type="button"
+                [disabled]="turno.estadoSolicitud === 'PENDIENTE'"
+                (click)="onAbrirReporte(turno)"
+              >
+                Reportar actividad
+              </app-button>
+              <app-button
+                type="button"
+                variant="secondary"
+                [disabled]="turno.estadoSolicitud === 'PENDIENTE'"
+                (click)="onVerHistorial(turno)"
+              >
                 Consultar registros anteriores
               </app-button>
             </div>
@@ -72,20 +88,26 @@
 
             <div class="historial-card__row">
               <span class="historial-card__label">¿Se cumplió el turno?</span>
-              <span class="historial-card__valor">{{ item.cumplioTurno === 'SI' ? 'Sí' : 'No' }}</span>
+              <span class="historial-card__valor">{{
+                item.cumplioTurno === 'SI' ? 'Sí' : 'No'
+              }}</span>
             </div>
 
             @if (item.cumplioTurno === 'SI') {
               <div class="historial-card__row">
                 <span class="historial-card__label">¿Se inició alguna conversación?</span>
-                <span class="historial-card__valor">{{ item.inicioConversacion === 'SI' ? 'Sí' : 'No' }}</span>
+                <span class="historial-card__valor">{{
+                  item.inicioConversacion === 'SI' ? 'Sí' : 'No'
+                }}</span>
               </div>
             }
 
             @if (item.cumplioTurno === 'SI' && item.inicioConversacion === 'SI') {
               <div class="historial-card__row">
                 <span class="historial-card__label">¿Arreglos para curso bíblico?</span>
-                <span class="historial-card__valor">{{ item.arreglosCurso === 'SI' ? 'Sí' : 'No' }}</span>
+                <span class="historial-card__valor">{{
+                  item.arreglosCurso === 'SI' ? 'Sí' : 'No'
+                }}</span>
               </div>
             }
 
@@ -104,8 +126,17 @@
   }
 </div>
 
-<app-dialog [open]="dialogState() !== 'closed'" [title]="dialogTitulo()" (closed)="onDialogClosed()">
-  <app-button dialogToolbar type="button" [disabled]="primaryDisabled()" (click)="onPrimaryAction()">
+<app-dialog
+  [open]="dialogState() !== 'closed'"
+  [title]="dialogTitulo()"
+  (closed)="onDialogClosed()"
+>
+  <app-button
+    dialogToolbar
+    type="button"
+    [disabled]="primaryDisabled()"
+    (click)="onPrimaryAction()"
+  >
     {{ primaryLabel() }}
   </app-button>
   <app-button

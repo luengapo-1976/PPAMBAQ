@@ -6,7 +6,13 @@
   panelBackground="var(--ppam-surface)"
   (closed)="onCancel()"
 >
-  <app-button dialogToolbar type="button" icon="save" [disabled]="form.invalid || saving()" (click)="onSave()">
+  <app-button
+    dialogToolbar
+    type="button"
+    icon="save"
+    [disabled]="form.invalid || saving()"
+    (click)="onSave()"
+  >
     Guardar
   </app-button>
   <app-button dialogToolbar type="button" variant="secondary" icon="close" (click)="onCancel()">

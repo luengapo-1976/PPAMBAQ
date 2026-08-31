@@ -3,7 +3,10 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Dialog } from '../../../../../shared/ui/dialog/dialog';
 import { Button } from '../../../../../shared/ui/button/button';
 import { FormField } from '../../../../../shared/ui/form-field/form-field';
-import { SearchSelect, SearchSelectOption } from '../../../../../shared/ui/search-select/search-select';
+import {
+  SearchSelect,
+  SearchSelectOption,
+} from '../../../../../shared/ui/search-select/search-select';
 import { SnackbarService } from '../../../../../shared/ui/snackbar/snackbar.service';
 import { ApiError } from '../../../../../core/error.interceptor';
 import { ReferenceDataService } from '../../../data/reference-data.service';
@@ -30,7 +33,9 @@ export class MunicipioFormDialog {
 
   protected readonly saving = signal(false);
 
-  protected readonly dialogTitle = computed(() => (this.mode() === 'create' ? 'Nuevo municipio' : 'Editar municipio'));
+  protected readonly dialogTitle = computed(() =>
+    this.mode() === 'create' ? 'Nuevo municipio' : 'Editar municipio',
+  );
 
   protected readonly departamentoOptions = computed<SearchSelectOption[]>(() =>
     this.departamentos().map((d) => ({
@@ -99,7 +104,9 @@ export class MunicipioFormDialog {
       next: () => {
         this.saving.set(false);
         this.snackbar.success(
-          this.mode() === 'edit' ? 'Municipio actualizado correctamente.' : 'Municipio registrado correctamente.',
+          this.mode() === 'edit'
+            ? 'Municipio actualizado correctamente.'
+            : 'Municipio registrado correctamente.',
         );
         this.form.reset();
         this.saved.emit();

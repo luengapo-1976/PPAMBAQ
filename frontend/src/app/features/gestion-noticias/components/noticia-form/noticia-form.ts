@@ -1,4 +1,14 @@
-import { Component, ElementRef, computed, effect, inject, input, output, signal, viewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  computed,
+  effect,
+  inject,
+  input,
+  output,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Dialog } from '../../../../shared/ui/dialog/dialog';
 import { Button } from '../../../../shared/ui/button/button';
@@ -44,11 +54,8 @@ export class NoticiaForm {
   private readonly contenidoRef = viewChild<ElementRef<HTMLDivElement>>('contenidoEditor');
   private readonly fileInputRef = viewChild<ElementRef<HTMLInputElement>>('imagenInput');
 
-  protected readonly dialogTitle = computed(() => (this.mode() === 'create' ? 'Nueva noticia' : 'Editar noticia'));
-
-  protected readonly estadoActual = computed(() => this.record()?.estado ?? 'BORRADOR');
-  protected readonly publicarLabel = computed(() =>
-    this.estadoActual() === 'PUBLICADA' ? 'Volver a borrador' : 'Publicar',
+  protected readonly dialogTitle = computed(() =>
+    this.mode() === 'create' ? 'Nueva noticia' : 'Editar noticia',
   );
 
   protected readonly form = this.fb.group({
@@ -56,6 +63,8 @@ export class NoticiaForm {
     resumen: ['', [Validators.required, Validators.maxLength(300)]],
     contenido: ['', [Validators.required]],
     imagen_url: [null as string | null],
+    storage_path: [null as string | null],
+    fecha_maxima_publicacion: [null as string | null],
   });
 
   constructor() {
@@ -125,6 +134,7 @@ export class NoticiaForm {
       next: (result) => {
         this.uploading.set(false);
         this.form.controls.imagen_url.setValue(result.url);
+        this.form.controls.storage_path.setValue(result.path);
         this.form.controls.imagen_url.markAsDirty();
         this.imagenFileName.set(file.name);
         this.snackbar.success('Imagen cargada correctamente.');
@@ -138,19 +148,12 @@ export class NoticiaForm {
 
   protected onRemoveImagen(): void {
     this.form.controls.imagen_url.setValue(null);
+    this.form.controls.storage_path.setValue(null);
     this.form.controls.imagen_url.markAsDirty();
     this.imagenFileName.set(null);
   }
 
   protected onGuardar(): void {
-    this.guardar();
-  }
-
-  protected onPublicarToggle(): void {
-    this.guardar(this.estadoActual() === 'PUBLICADA' ? 'BORRADOR' : 'PUBLICADA');
-  }
-
-  private guardar(estado?: 'BORRADOR' | 'PUBLICADA'): void {
     if (this.form.invalid || this.saving() || this.uploading()) {
       this.form.markAllAsTouched();
       return;
@@ -161,24 +164,21 @@ export class NoticiaForm {
       resumen: this.form.controls.resumen.value!,
       contenido: this.form.controls.contenido.value!,
       imagen_url: this.form.controls.imagen_url.value,
-      ...(estado ? { estado } : {}),
+      storage_path: this.form.controls.storage_path.value,
+      fecha_maxima_publicacion: this.form.controls.fecha_maxima_publicacion.value || null,
     };
 
     const editing = this.record();
     this.saving.set(true);
-    const request$ = editing ? this.noticiasService.update(editing.id, payload) : this.noticiasService.create(payload);
+    const request$ = editing
+      ? this.noticiasService.update(editing.id, payload)
+      : this.noticiasService.create(payload);
 
     request$.subscribe({
       next: () => {
         this.saving.set(false);
         this.snackbar.success(
-          estado === 'PUBLICADA'
-            ? 'Noticia publicada correctamente.'
-            : estado === 'BORRADOR'
-              ? 'Noticia devuelta a borrador.'
-              : editing
-                ? 'Noticia actualizada correctamente.'
-                : 'Noticia guardada correctamente.',
+          editing ? 'Noticia actualizada correctamente.' : 'Noticia guardada correctamente.',
         );
         this.form.reset();
         this.imagenFileName.set(null);
@@ -209,6 +209,8 @@ export class NoticiaForm {
       resumen: record.resumen,
       contenido: record.contenido,
       imagen_url: record.imagen_url,
+      storage_path: record.storage_path,
+      fecha_maxima_publicacion: record.fecha_maxima_publicacion,
     });
     this.imagenFileName.set(record.imagen_url ? fileNameFromUrl(record.imagen_url) : null);
     queueMicrotask(() => {

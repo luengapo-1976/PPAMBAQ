@@ -1,4 +1,11 @@
-import { IsIn, IsNotEmpty, IsOptional, IsString, MaxLength, ValidateIf } from 'class-validator';
+import {
+  IsIn,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+  ValidateIf,
+} from 'class-validator';
 
 export const MOTIVOS_DEVOLUCION = [
   'Ocupado (mis circunstancias han cambiado)',
@@ -25,4 +32,11 @@ export class DevolverTurnoDto {
   @IsString()
   @MaxLength(500)
   observaciones?: string;
+
+  /** Solo la usa el flujo administrativo ("Retirar turno"): el turno de qué
+   * publicador se está devolviendo. Si no viene, se usa el publicador del
+   * usuario logueado (flujo normal de participante). */
+  @IsOptional()
+  @IsString()
+  id_publicador?: string;
 }

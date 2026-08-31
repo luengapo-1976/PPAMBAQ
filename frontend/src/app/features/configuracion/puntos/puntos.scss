@@ -3,3 +3,20 @@
   border-radius: var(--ppam-radius-card);
   padding: var(--ppam-space-md);
 }
+
+.puntos-page__filter {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 240px;
+  margin-bottom: var(--ppam-space-md);
+  font-size: var(--ppam-small-size);
+  font-weight: 600;
+  color: var(--ppam-primary-container);
+}
+
+@media (max-width: 599px) {
+  .puntos-page__filter {
+    width: 100%;
+  }
+}

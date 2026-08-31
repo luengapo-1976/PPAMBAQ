@@ -1,0 +1,225 @@
+<div class="admin-informe-turno">
+  <p class="admin-informe-turno__legend">
+    Busca al publicador por nombre o móvil para ver los turnos que tiene asignados y reportar
+    actividad.
+  </p>
+
+  <app-search-select
+    [options]="publicadorOptions()"
+    placeholder="Buscar publicador por nombre o móvil…"
+    emptyMessage="No se encontraron publicadores"
+    [ngModel]="selectedPublicadorId()"
+    (ngModelChange)="onSeleccionarPublicador($event)"
+  />
+
+  @if (vista() === 'grid') {
+    @if (!selectedPublicadorId()) {
+      <div class="admin-informe-turno__empty">
+        <span class="material-symbols-outlined" aria-hidden="true">person_search</span>
+        <p>Busca un publicador para ver sus turnos asignados.</p>
+      </div>
+    } @else if (loading()) {
+      <div class="admin-informe-turno__grid">
+        @for (i of [1, 2, 3]; track i) {
+          <div class="skeleton-block"></div>
+        }
+      </div>
+    } @else if (misTurnos().length === 0) {
+      <div class="admin-informe-turno__empty">
+        <span class="material-symbols-outlined" aria-hidden="true">event_busy</span>
+        <p>{{ nombreCompleto(selectedPublicador()!) }} no tiene turnos asignados actualmente.</p>
+      </div>
+    } @else {
+      <div class="admin-informe-turno__grid">
+        @for (turno of misTurnos(); track turno.id) {
+          <article class="turno-card">
+            <h2 class="turno-card__punto">{{ turno.nombrePunto }}</h2>
+            <div class="turno-card__row">
+              <span class="material-symbols-outlined" aria-hidden="true">calendar_today</span>
+              <span>{{ turno.diaNombre }}</span>
+            </div>
+            <div class="turno-card__row">
+              <span class="material-symbols-outlined" aria-hidden="true">schedule</span>
+              <span>{{ formatHora(turno.horaInicio) }} – {{ formatHora(turno.horaFin) }}</span>
+            </div>
+            @if (turno.estadoSolicitud === 'PENDIENTE') {
+              <span class="estado-badge estado-badge--pendiente">
+                <span class="material-symbols-outlined" aria-hidden="true">hourglass_top</span>
+                Pendiente de aprobación
+              </span>
+            }
+            <div class="turno-card__actions">
+              <app-button
+                type="button"
+                [disabled]="turno.estadoSolicitud === 'PENDIENTE'"
+                (click)="onAbrirReporte(turno)"
+              >
+                Reportar actividad
+              </app-button>
+              <app-button
+                type="button"
+                variant="secondary"
+                [disabled]="turno.estadoSolicitud === 'PENDIENTE'"
+                (click)="onVerHistorial(turno)"
+              >
+                Consultar registros anteriores
+              </app-button>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  } @else if (historialTurno(); as turno) {
+    <button type="button" class="admin-informe-turno__volver" (click)="onVolverAGrid()">
+      <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span>
+      <span>Volver</span>
+    </button>
+
+    <p class="admin-informe-turno__dialog-punto">
+      <strong>{{ turno.nombrePunto }}</strong> · {{ turno.diaNombre }} ·
+      {{ formatHora(turno.horaInicio) }} – {{ formatHora(turno.horaFin) }}
+    </p>
+
+    @if (cargandoHistorial()) {
+      <div class="admin-informe-turno__grid">
+        @for (i of [1, 2]; track i) {
+          <div class="skeleton-block"></div>
+        }
+      </div>
+    } @else if (historial().length === 0) {
+      <div class="admin-informe-turno__empty">
+        <span class="material-symbols-outlined" aria-hidden="true">history</span>
+        <p>Todavía no hay registros de actividad para este horario.</p>
+      </div>
+    } @else {
+      <div class="historial-list">
+        @for (item of historial(); track item.fechaActividad + item.registradoPor) {
+          <article class="historial-card">
+            <h3 class="historial-card__fecha">{{ formatFecha(item.fechaActividad) }}</h3>
+
+            <div class="historial-card__row">
+              <span class="historial-card__label">¿Se cumplió el turno?</span>
+              <span class="historial-card__valor">{{
+                item.cumplioTurno === 'SI' ? 'Sí' : 'No'
+              }}</span>
+            </div>
+
+            @if (item.cumplioTurno === 'SI') {
+              <div class="historial-card__row">
+                <span class="historial-card__label">¿Se inició alguna conversación?</span>
+                <span class="historial-card__valor">{{
+                  item.inicioConversacion === 'SI' ? 'Sí' : 'No'
+                }}</span>
+              </div>
+            }
+
+            @if (item.cumplioTurno === 'SI' && item.inicioConversacion === 'SI') {
+              <div class="historial-card__row">
+                <span class="historial-card__label">¿Arreglos para curso bíblico?</span>
+                <span class="historial-card__valor">{{
+                  item.arreglosCurso === 'SI' ? 'Sí' : 'No'
+                }}</span>
+              </div>
+            }
+
+            @if (item.observaciones) {
+              <div class="historial-card__row">
+                <span class="historial-card__label">Observaciones</span>
+                <span class="historial-card__valor">{{ item.observaciones }}</span>
+              </div>
+            }
+
+            <p class="historial-card__autor">Registrado por {{ item.registradoPor }}</p>
+          </article>
+        }
+      </div>
+    }
+  }
+</div>
+
+<app-dialog
+  [open]="dialogState() !== 'closed'"
+  [title]="dialogTitulo()"
+  (closed)="onDialogClosed()"
+>
+  <app-button
+    dialogToolbar
+    type="button"
+    [disabled]="primaryDisabled()"
+    (click)="onPrimaryAction()"
+  >
+    {{ primaryLabel() }}
+  </app-button>
+  <app-button
+    dialogToolbar
+    type="button"
+    variant="secondary"
+    [style.display]="dialogState() === 'form' ? null : 'none'"
+    (click)="onCancelarDialog()"
+  >
+    Cancelar
+  </app-button>
+
+  @if (dialogState() === 'form') {
+    @if (turnoSeleccionado(); as turno) {
+      <p class="admin-informe-turno__dialog-punto">
+        <strong>{{ turno.nombrePunto }}</strong> · {{ turno.diaNombre }} ·
+        {{ formatHora(turno.horaInicio) }} – {{ formatHora(turno.horaFin) }}
+      </p>
+    }
+
+    <label class="admin-informe-turno__field">
+      <span>Fecha de la actividad</span>
+      <input
+        type="date"
+        class="ppam-input"
+        [max]="maxFecha"
+        [ngModel]="fechaActividad()"
+        (ngModelChange)="onFechaChange($event)"
+      />
+      @if (verificandoFecha()) {
+        <span class="admin-informe-turno__hint">Verificando disponibilidad…</span>
+      } @else if (fechaError()) {
+        <span class="admin-informe-turno__error">{{ fechaError() }}</span>
+      }
+    </label>
+
+    <app-si-no-toggle
+      label="¿Se cumplió el turno?"
+      [value]="cumplioTurno()"
+      (valueChange)="onCumplioTurnoChange($event)"
+    />
+
+    @if (mostrarInicioConversacion()) {
+      <app-si-no-toggle
+        label="¿Se inició alguna conversación?"
+        [value]="inicioConversacion()"
+        (valueChange)="onInicioConversacionChange($event)"
+      />
+    }
+
+    @if (mostrarArreglosCurso()) {
+      <app-si-no-toggle
+        label="¿Se hicieron arreglos para iniciar algún curso bíblico?"
+        [value]="arreglosCurso()"
+        (valueChange)="onArreglosCursoChange($event)"
+      />
+    }
+
+    <label class="admin-informe-turno__field">
+      <span>Observaciones (opcional)</span>
+      <textarea
+        class="ppam-textarea"
+        rows="3"
+        maxlength="500"
+        [ngModel]="observaciones()"
+        (ngModelChange)="observaciones.set($event)"
+      ></textarea>
+    </label>
+  } @else {
+    <div class="admin-informe-turno__dialog-confirmacion">
+      <span class="material-symbols-outlined" aria-hidden="true">task_alt</span>
+    </div>
+    <p class="admin-informe-turno__dialog-texto">{{ dialogMensaje() }}</p>
+  }
+</app-dialog>

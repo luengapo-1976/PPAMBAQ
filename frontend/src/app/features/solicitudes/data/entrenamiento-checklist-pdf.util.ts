@@ -31,7 +31,7 @@ export async function exportEntrenamientoChecklistToPdf(
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(15);
   doc.setFont('helvetica', 'bold');
-  doc.text(`Lista de chequeo — ${tipo}`, PAGE_MARGIN, 26);
+  doc.text(`Lista de chequeo - ${tipo}`, PAGE_MARGIN, 26);
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
   const generadoEl = new Date().toLocaleString('es-CO', { dateStyle: 'long', timeStyle: 'short' });
@@ -46,7 +46,7 @@ export async function exportEntrenamientoChecklistToPdf(
     const nombreDepartamento = punto
       ? departamentosPorCodigo.get(punto.codigo_departamento)?.nombre_departamento
       : undefined;
-    const direccion = [punto?.direccion, nombreMunicipio, nombreDepartamento].filter(Boolean).join(', ') || '—';
+    const direccion = [punto?.direccion, nombreMunicipio, nombreDepartamento].filter(Boolean).join(', ') || '-';
 
     if (cursorY > pageHeight - 170) {
       doc.addPage();
@@ -66,7 +66,7 @@ export async function exportEntrenamientoChecklistToPdf(
     cursorY += 13;
     doc.text(`Dirección: ${direccion}`, PAGE_MARGIN, cursorY);
     cursorY += 13;
-    doc.text(`Encargado del entrenamiento: ${punto?.encargado || '—'} - Móvil: ${punto?.movil || '—'}`, PAGE_MARGIN, cursorY);
+    doc.text(`Encargado del entrenamiento: ${punto?.encargado || '-'} - Móvil: ${punto?.movil || '-'}`, PAGE_MARGIN, cursorY);
     cursorY += 13;
 
     // Una línea de espacio antes de la tabla.
@@ -83,8 +83,8 @@ export async function exportEntrenamientoChecklistToPdf(
         index + 1,
         nombreCompleto(p),
         p.movil,
-        p.nombre_congregacion ?? '—',
-        p.codigo_circuito ?? '—',
+        p.nombre_congregacion ?? '-',
+        p.codigo_circuito ?? '-',
         '',
       ]),
       styles: {
@@ -111,7 +111,7 @@ export async function exportEntrenamientoChecklistToPdf(
     doc.setPage(i);
     doc.setFontSize(8);
     doc.setTextColor(140, 140, 140);
-    doc.text('PPAM BAQ — Lista de chequeo de entrenamiento', PAGE_MARGIN, pageHeight - 16);
+    doc.text('PPAM BAQ - Lista de chequeo de entrenamiento', PAGE_MARGIN, pageHeight - 16);
     doc.text(`Página ${i} de ${pageCount}`, pageWidth - PAGE_MARGIN, pageHeight - 16, { align: 'right' });
   }
 

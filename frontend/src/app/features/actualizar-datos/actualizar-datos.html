@@ -1,7 +1,6 @@
 <app-participante-desktop-header />
 
 <div class="actualizar-datos">
-
   @if (loading()) {
     <div class="actualizar-datos__skeleton">
       @for (i of [1, 2, 3, 4]; track i) {
@@ -10,9 +9,9 @@
     </div>
   } @else {
     <p class="actualizar-datos__legend">
-      {{ primerNombre() }}, a continuación se presentan tus datos registrados. Por favor revísalos y cambia solo
-      aquellos que requieren ser actualizados. Al final da clic en el botón "Guardar" que encontrarás al final de
-      la página.
+      {{ primerNombre() }}, a continuación se presentan tus datos registrados. Por favor revísalos y
+      cambia solo aquellos que requieren ser actualizados. Al final da clic en el botón "Guardar"
+      que encontrarás al final de la página.
     </p>
 
     <form class="form-grid" [formGroup]="form" (ngSubmit)="onGuardar()">
@@ -56,7 +55,11 @@
         />
       </app-form-field>
 
-      <app-form-field label="Dirección" [control]="form.controls.direccion" class="form-field--wide">
+      <app-form-field
+        label="Dirección"
+        [control]="form.controls.direccion"
+        class="form-field--wide"
+      >
         <input
           type="text"
           formControlName="direccion"
@@ -83,11 +86,22 @@
       </app-form-field>
 
       <app-form-field label="Correo electrónico" [control]="form.controls.correo_electronico">
-        <input type="email" formControlName="correo_electronico" class="ppam-input" maxlength="100" />
+        <input
+          type="email"
+          formControlName="correo_electronico"
+          class="ppam-input"
+          maxlength="100"
+        />
       </app-form-field>
 
       <app-form-field label="Móvil" [control]="form.controls.movil">
-        <input type="tel" formControlName="movil" class="ppam-input" maxlength="10" inputmode="numeric" />
+        <input
+          type="tel"
+          formControlName="movil"
+          class="ppam-input"
+          maxlength="10"
+          inputmode="numeric"
+        />
       </app-form-field>
 
       <app-form-field label="Congregación" [control]="form.controls.codigo_congregacion">
@@ -107,11 +121,15 @@
       </app-form-field>
 
       <app-form-field label="Edad">
-        <div class="ppam-input ppam-input--readonly">{{ edadDisplay() ?? '—' }}</div>
+        <div class="ppam-input ppam-input--readonly">{{ edadDisplay() ?? '-' }}</div>
       </app-form-field>
 
       <app-form-field label="Sexo" [control]="form.controls.sexo">
-        <app-select formControlName="sexo" [options]="sexoOptions" placeholder="Seleccionar sexo…" />
+        <app-select
+          formControlName="sexo"
+          [options]="sexoOptions"
+          placeholder="Seleccionar sexo…"
+        />
       </app-form-field>
 
       <app-form-field label="Fecha de bautismo" [control]="form.controls.fecha_bautismo">
@@ -119,15 +137,23 @@
       </app-form-field>
 
       <app-form-field label="Años de bautismo">
-        <div class="ppam-input ppam-input--readonly">{{ aniosBautismoDisplay() ?? '—' }}</div>
+        <div class="ppam-input ppam-input--readonly">{{ aniosBautismoDisplay() ?? '-' }}</div>
       </app-form-field>
 
       <app-form-field label="Estado civil" [control]="form.controls.estado_civil">
-        <app-select formControlName="estado_civil" [options]="estadoCivilOptions" placeholder="Seleccionar…" />
+        <app-select
+          formControlName="estado_civil"
+          [options]="estadoCivilOptions"
+          placeholder="Seleccionar…"
+        />
       </app-form-field>
 
       @if (showNombreConyuge()) {
-        <app-form-field label="Nombre del cónyuge" [control]="form.controls.nombre_conyuge" class="form-field--wide">
+        <app-form-field
+          label="Nombre del cónyuge"
+          [control]="form.controls.nombre_conyuge"
+          class="form-field--wide"
+        >
           <input
             type="text"
             formControlName="nombre_conyuge"
@@ -149,23 +175,42 @@
       }
 
       <app-form-field label="Privilegio ministerial" [control]="form.controls.privilegio_min">
-        <app-select formControlName="privilegio_min" [options]="privilegioMinOptions" placeholder="Seleccionar…" />
+        <app-select
+          formControlName="privilegio_min"
+          [options]="privilegioMinOptions"
+          placeholder="Seleccionar…"
+        />
       </app-form-field>
 
       <app-form-field label="Privilegio de servicio" [control]="form.controls.privilegio_ser">
-        <app-select formControlName="privilegio_ser" [options]="privilegioSerOptions" placeholder="Seleccionar…" />
+        <app-select
+          formControlName="privilegio_ser"
+          [options]="privilegioSerOptions"
+          placeholder="Seleccionar…"
+        />
       </app-form-field>
 
       <app-form-field label="¿Participó antes?" [control]="form.controls.participo_antes">
-        <app-select formControlName="participo_antes" [options]="participoAntesOptions" placeholder="Seleccionar…" />
+        <app-select
+          formControlName="participo_antes"
+          [options]="participoAntesOptions"
+          placeholder="Seleccionar…"
+        />
       </app-form-field>
     </form>
 
     <div class="actualizar-datos__actions">
-      <app-button type="button" variant="danger" icon="person_remove" (click)="onAbrirBaja()">
-        Solicitar mi baja de la PPAM
-      </app-button>
-      <app-button type="button" icon="save" [disabled]="form.invalid || saving()" (click)="onGuardar()">
+      @if (!datosDesactualizados()) {
+        <app-button type="button" variant="danger" icon="person_remove" (click)="onAbrirBaja()">
+          Solicitar mi baja de la PPAM
+        </app-button>
+      }
+      <app-button
+        type="button"
+        icon="save"
+        [disabled]="form.invalid || saving()"
+        (click)="onGuardar()"
+      >
         {{ saving() ? 'Guardando…' : 'Guardar' }}
       </app-button>
     </div>
@@ -181,7 +226,11 @@
   <p class="actualizar-datos__dialog-texto">{{ dialogMensaje() }}</p>
 </app-dialog>
 
-<app-dialog [open]="bajaPaso() !== 'cerrado'" [title]="bajaTitulo()" (closed)="onBajaDialogClosed()">
+<app-dialog
+  [open]="bajaPaso() !== 'cerrado'"
+  [title]="bajaTitulo()"
+  (closed)="onBajaDialogClosed()"
+>
   <app-button
     dialogToolbar
     type="button"
@@ -206,11 +255,12 @@
       <span class="material-symbols-outlined" aria-hidden="true">warning</span>
     </div>
     <p class="actualizar-datos__dialog-texto">
-      {{ primerNombre() }}, es importante que tengas en cuenta que esta acción te retirará de la base de datos de
-      publicadores activos en la PPAM y liberará automáticamente todos los turnos que tengas asignados en este
-      momento. Es una acción irreversible y por eso te hacemos esta aclaración antes de continuar. Si llegaste a esta
-      opción por error, no pasa nada, solo devuélvete a la pantalla anterior o cierre esta ventana. Si deseas seguir
-      adelante, por favor da clic en el botón "Entiendo y deseo continuar".
+      {{ primerNombre() }}, es importante que tengas en cuenta que esta acción te retirará de la
+      base de datos de publicadores activos en la PPAM y liberará automáticamente todos los turnos
+      que tengas asignados en este momento. Es una acción irreversible y por eso te hacemos esta
+      aclaración antes de continuar. Si llegaste a esta opción por error, no pasa nada, solo
+      devuélvete a la pantalla anterior o cierre esta ventana. Si deseas seguir adelante, por favor
+      da clic en el botón "Entiendo y deseo continuar".
     </p>
   } @else if (bajaPaso() === 'justificacion') {
     <label class="actualizar-datos__baja-field">

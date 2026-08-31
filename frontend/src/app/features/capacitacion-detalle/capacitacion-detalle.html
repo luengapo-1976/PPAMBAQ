@@ -1,0 +1,41 @@
+<app-participante-desktop-header />
+
+<div class="capacitacion-detalle">
+  @if (loading()) {
+    <div class="skeleton-block skeleton-block--image"></div>
+    <div class="skeleton-block skeleton-block--text"></div>
+    <div class="skeleton-block skeleton-block--text"></div>
+  } @else if (capacitacion(); as item) {
+    @if (item.tipo === 'IMAGEN' && item.imagen_url) {
+      <app-zoom-image [src]="item.imagen_url" [alt]="item.titulo" />
+    } @else if (embedUrl()) {
+      <div class="capacitacion-detalle__video">
+        <iframe
+          [src]="embedUrl()"
+          title="Video de capacitación"
+          allow="
+            accelerometer;
+            autoplay;
+            clipboard-write;
+            encrypted-media;
+            gyroscope;
+            picture-in-picture;
+          "
+          allowfullscreen
+        ></iframe>
+      </div>
+    } @else if (item.video_url) {
+      <a class="capacitacion-detalle__link" [href]="item.video_url" target="_blank" rel="noopener">
+        <span class="material-symbols-outlined" aria-hidden="true">open_in_new</span>
+        Ver video
+      </a>
+    }
+    <h1 class="capacitacion-detalle__title">{{ item.titulo }}</h1>
+    <p class="capacitacion-detalle__resumen">{{ item.resumen }}</p>
+  } @else {
+    <div class="capacitacion-detalle__empty">
+      <span class="material-symbols-outlined" aria-hidden="true">smart_display</span>
+      <p>No se encontró este elemento.</p>
+    </div>
+  }
+</div>

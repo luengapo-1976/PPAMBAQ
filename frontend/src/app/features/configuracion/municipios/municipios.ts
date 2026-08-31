@@ -23,7 +23,8 @@ export class Municipios {
   protected readonly loading = signal(true);
 
   protected readonly nombreDepartamento = (codigo: string): string =>
-    this.departamentos().find((d) => d.codigo_departamento === codigo)?.nombre_departamento ?? codigo;
+    this.departamentos().find((d) => d.codigo_departamento === codigo)?.nombre_departamento ??
+    codigo;
 
   protected readonly columns = computed<ConfigTableColumn<Municipio>[]>(() => [
     { key: 'codigo_municipio', label: 'Código', value: (row) => row.codigo_municipio },

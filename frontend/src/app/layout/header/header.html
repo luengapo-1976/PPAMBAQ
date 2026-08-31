@@ -32,7 +32,12 @@
       @if (menuOpen()) {
         <ul class="header__menu" role="menu">
           <li role="none">
-            <button type="button" role="menuitem" class="header__menu-item" (click)="onChangePassword()">
+            <button
+              type="button"
+              role="menuitem"
+              class="header__menu-item"
+              (click)="onChangePassword()"
+            >
               <span class="material-symbols-outlined" aria-hidden="true">lock_reset</span>
               <span>Cambiar contraseña</span>
             </button>
@@ -49,4 +54,7 @@
   </div>
 </header>
 
-<app-change-password-dialog [open]="changePasswordOpen()" (closed)="changePasswordOpen.set(false)" />
+<app-change-password-dialog
+  [open]="changePasswordOpen()"
+  (closed)="changePasswordOpen.set(false)"
+/>

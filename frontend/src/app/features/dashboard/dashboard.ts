@@ -56,7 +56,9 @@ export class Dashboard {
 
   protected readonly kpis = computed(() => computeKpis(this.filteredPublicadores()));
 
-  protected readonly recentActivityItems = computed(() => recentActivity(this.filteredPublicadores(), 8));
+  protected readonly recentActivityItems = computed(() =>
+    recentActivity(this.filteredPublicadores(), 8),
+  );
 
   protected readonly circuitoSummaryRows = computed(() =>
     buildCircuitoSummary(this.filteredPublicadores(), this.circuitos(), this.congregaciones()),

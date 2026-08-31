@@ -6,18 +6,14 @@
   panelBackground="var(--ppam-surface)"
   (closed)="onCancel()"
 >
-  <app-button dialogToolbar type="button" icon="save" [disabled]="form.invalid || saving() || uploading()" (click)="onGuardar()">
-    {{ saving() ? 'Guardando…' : 'Guardar' }}
-  </app-button>
   <app-button
     dialogToolbar
     type="button"
-    variant="secondary"
-    icon="campaign"
+    icon="save"
     [disabled]="form.invalid || saving() || uploading()"
-    (click)="onPublicarToggle()"
+    (click)="onGuardar()"
   >
-    {{ publicarLabel() }}
+    {{ saving() ? 'Guardando…' : 'Guardar' }}
   </app-button>
   <app-button dialogToolbar type="button" variant="ghost" icon="close" (click)="onCancel()">
     Cancelar
@@ -39,7 +35,10 @@
 
     <app-form-field label="Imagen de portada">
       <div class="noticia-form__imagen-control">
-        <div class="noticia-form__imagen-name" [class.noticia-form__imagen-name--empty]="!imagenFileName()">
+        <div
+          class="noticia-form__imagen-name"
+          [class.noticia-form__imagen-name--empty]="!imagenFileName()"
+        >
           {{ imagenFileName() || 'Sin imagen seleccionada' }}
         </div>
         @if (imagenFileName()) {
@@ -53,20 +52,51 @@
             <span class="material-symbols-outlined" aria-hidden="true">close</span>
           </button>
         }
-        <app-button type="button" variant="secondary" [disabled]="uploading()" (click)="onExaminar()">
+        <app-button
+          type="button"
+          variant="secondary"
+          [disabled]="uploading()"
+          (click)="onExaminar()"
+        >
           {{ uploading() ? 'Subiendo…' : 'Examinar' }}
         </app-button>
-        <input #imagenInput type="file" accept="image/*" class="noticia-form__file-input" (change)="onFileSelected($event)" />
+        <input
+          #imagenInput
+          type="file"
+          accept="image/*"
+          class="noticia-form__file-input"
+          (change)="onFileSelected($event)"
+        />
       </div>
+    </app-form-field>
+
+    <app-form-field
+      label="Fecha máxima de publicación"
+      [control]="form.controls.fecha_maxima_publicacion"
+      hint="Si se deja vacía, no vence: queda visible hasta que la desactives manualmente desde el switch de la tabla."
+    >
+      <input type="date" formControlName="fecha_maxima_publicacion" class="ppam-input" />
     </app-form-field>
 
     <app-form-field label="Contenido" [required]="true" [control]="form.controls.contenido">
       <div class="noticia-form__editor">
         <div class="noticia-form__editor-toolbar">
-          <button type="button" class="noticia-form__style-btn" aria-label="Negrita" title="Negrita" (click)="exec('bold')">
+          <button
+            type="button"
+            class="noticia-form__style-btn"
+            aria-label="Negrita"
+            title="Negrita"
+            (click)="exec('bold')"
+          >
             <span class="material-symbols-outlined" aria-hidden="true">format_bold</span>
           </button>
-          <button type="button" class="noticia-form__style-btn" aria-label="Cursiva" title="Cursiva" (click)="exec('italic')">
+          <button
+            type="button"
+            class="noticia-form__style-btn"
+            aria-label="Cursiva"
+            title="Cursiva"
+            (click)="exec('italic')"
+          >
             <span class="material-symbols-outlined" aria-hidden="true">format_italic</span>
           </button>
           <button
@@ -96,7 +126,13 @@
           >
             <span class="material-symbols-outlined" aria-hidden="true">format_list_numbered</span>
           </button>
-          <button type="button" class="noticia-form__style-btn" aria-label="Insertar enlace" title="Insertar enlace" (click)="onInsertLink()">
+          <button
+            type="button"
+            class="noticia-form__style-btn"
+            aria-label="Insertar enlace"
+            title="Insertar enlace"
+            (click)="onInsertLink()"
+          >
             <span class="material-symbols-outlined" aria-hidden="true">link</span>
           </button>
         </div>

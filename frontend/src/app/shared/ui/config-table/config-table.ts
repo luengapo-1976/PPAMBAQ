@@ -22,8 +22,15 @@ export class ConfigTable<T> {
   readonly newRecordLabel = input('Nuevo registro');
   readonly emptyMessage = input('No hay registros que coincidan con el filtro actual.');
 
+  /** Ícono opcional de una segunda acción por fila (además de "Editar"). Si no se
+   * define, no se muestra ningún botón extra — mantiene el componente genérico para
+   * las páginas de configuración que no lo necesitan. */
+  readonly extraActionIcon = input<string | null>(null);
+  readonly extraActionLabel = input('Ver más');
+
   readonly newRecord = output<void>();
   readonly editRecord = output<T>();
+  readonly extraAction = output<T>();
 
   protected readonly searchText = signal('');
   protected readonly sortKey = signal<string | null>(null);
@@ -37,7 +44,11 @@ export class ConfigTable<T> {
       return base;
     }
     return base.filter((row) =>
-      cols.some((col) => String(col.value(row) ?? '').toLowerCase().includes(query)),
+      cols.some((col) =>
+        String(col.value(row) ?? '')
+          .toLowerCase()
+          .includes(query),
+      ),
     );
   });
 

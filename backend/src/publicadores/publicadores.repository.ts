@@ -32,7 +32,8 @@ export interface PublicadorRetirado {
 /** Supabase/PostgREST limita cada consulta a un máximo de filas (por defecto 1000),
  * así que hay que paginar con .range() para traer la tabla completa. */
 const PAGE_SIZE = 1000;
-const AUTH_PROFILE_COLUMNS = 'id, login, movil, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido';
+const AUTH_PROFILE_COLUMNS =
+  'id, login, movil, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, fecha_actualizacion_datos';
 
 export interface PublicadorAuthProfile {
   id: string;
@@ -42,6 +43,7 @@ export interface PublicadorAuthProfile {
   segundo_nombre: string | null;
   primer_apellido: string | null;
   segundo_apellido: string | null;
+  fecha_actualizacion_datos: string | null;
 }
 
 @Injectable()

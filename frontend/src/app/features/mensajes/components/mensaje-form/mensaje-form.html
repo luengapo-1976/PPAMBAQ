@@ -6,7 +6,13 @@
   panelBackground="var(--ppam-surface)"
   (closed)="onCancel()"
 >
-  <app-button dialogToolbar type="button" icon="save" [disabled]="form.invalid || saving() || uploading()" (click)="onSave()">
+  <app-button
+    dialogToolbar
+    type="button"
+    icon="save"
+    [disabled]="form.invalid || saving() || uploading()"
+    (click)="onSave()"
+  >
     Guardar
   </app-button>
   <app-button dialogToolbar type="button" variant="secondary" icon="close" (click)="onCancel()">
@@ -21,7 +27,12 @@
 
   <form class="mensaje-form" [formGroup]="form" (ngSubmit)="onSave()">
     <div class="mensaje-form__row">
-      <app-form-field label="Tipo de mensaje" [required]="true" [control]="form.controls.tipo" class="mensaje-form__tipo">
+      <app-form-field
+        label="Tipo de mensaje"
+        [required]="true"
+        [control]="form.controls.tipo"
+        class="mensaje-form__tipo"
+      >
         <app-search-select
           formControlName="tipo"
           [options]="tipoOptions()"
@@ -33,7 +44,10 @@
 
       <app-form-field label="Adjunto asociado" class="mensaje-form__adjunto">
         <div class="mensaje-form__adjunto-control">
-          <div class="mensaje-form__adjunto-name" [class.mensaje-form__adjunto-name--empty]="!adjuntoFileName()">
+          <div
+            class="mensaje-form__adjunto-name"
+            [class.mensaje-form__adjunto-name--empty]="!adjuntoFileName()"
+          >
             {{ adjuntoFileName() || 'Sin archivo seleccionado' }}
           </div>
           @if (adjuntoFileName()) {
@@ -47,7 +61,12 @@
               <span class="material-symbols-outlined" aria-hidden="true">close</span>
             </button>
           }
-          <app-button type="button" variant="secondary" [disabled]="uploading()" (click)="onExaminar()">
+          <app-button
+            type="button"
+            variant="secondary"
+            [disabled]="uploading()"
+            (click)="onExaminar()"
+          >
             {{ uploading() ? 'Subiendo…' : 'Examinar' }}
           </app-button>
           <input
@@ -64,7 +83,7 @@
       label="Mensaje"
       [required]="true"
       [control]="form.controls.mensaje"
-      hint="Escribe &quot;/&quot; para insertar un campo de la solicitud (nombre, móvil, punto de capacitación…)."
+      hint='Escribe "/" para insertar un campo de la solicitud (nombre, móvil, punto de capacitación…).'
     >
       <div class="mensaje-form__editor">
         <div class="mensaje-form__editor-toolbar">
@@ -93,7 +112,7 @@
           class="mensaje-form__textarea"
           rows="14"
           maxlength="2000"
-          placeholder="Escribe el mensaje que se enviará por WhatsApp… (usa &quot;/&quot; para insertar un campo)"
+          placeholder='Escribe el mensaje que se enviará por WhatsApp… (usa "/" para insertar un campo)'
           (input)="onMensajeInput()"
           (keydown)="onMensajeKeydown($event)"
           (blur)="closeMention()"
@@ -126,40 +145,50 @@
   }
 </app-dialog>
 
-<app-dialog [open]="helpOpen()" title="Campos disponibles para mensajes" (closed)="helpOpen.set(false)">
-  <app-button dialogToolbar type="button" variant="secondary" icon="close" (click)="helpOpen.set(false)">
+<app-dialog
+  [open]="helpOpen()"
+  title="Campos disponibles para mensajes"
+  (closed)="helpOpen.set(false)"
+>
+  <app-button
+    dialogToolbar
+    type="button"
+    variant="secondary"
+    icon="close"
+    (click)="helpOpen.set(false)"
+  >
     Cerrar
   </app-button>
 
   <div class="mensaje-help">
     <p>
-      Mientras escribes el mensaje, presiona <strong>"/"</strong> para abrir un menú con los campos de la
-      solicitud del publicador. Al seleccionar uno, se inserta en el texto encerrado entre
-      <code>&lt;&gt;</code> (por ejemplo <code>&lt;primer_nombre&gt;</code>). Al enviar el mensaje, cada uno de
-      estos campos se reemplaza por el valor real de la solicitud del destinatario.
+      Mientras escribes el mensaje, presiona <strong>"/"</strong> para abrir un menú con los campos
+      de la solicitud del publicador. Al seleccionar uno, se inserta en el texto encerrado entre
+      <code>&lt;&gt;</code> (por ejemplo <code>&lt;primer_nombre&gt;</code>). Al enviar el mensaje,
+      cada uno de estos campos se reemplaza por el valor real de la solicitud del destinatario.
     </p>
 
     <h3>Reglas especiales</h3>
     <ul class="mensaje-help__rules">
       <li><code>sexo</code> se reemplaza por el texto "Femenino" o "Masculino".</li>
       <li>
-        <code>nombre_completo</code> se reemplaza por primer nombre, segundo nombre, primer apellido y segundo
-        apellido, separados por un espacio.
+        <code>nombre_completo</code> se reemplaza por primer nombre, segundo nombre, primer apellido
+        y segundo apellido, separados por un espacio.
       </li>
       <li><code>congregacion</code> muestra el nombre de la congregación del publicador.</li>
       <li><code>circuito</code> muestra el código del circuito de esa congregación.</li>
       <li>
-        <code>lugar_primera_capacitacion</code> y <code>lugar_segunda_capacitacion</code> muestran el nombre del
-        punto asignado a cada capacitación; <code>direccion_</code>, <code>encargado_</code> y
-        <code>movil_encargado_</code> de cada una muestran la dirección, el encargado y el móvil de ese mismo
-        punto.
+        <code>lugar_primera_capacitacion</code> y <code>lugar_segunda_capacitacion</code> muestran
+        el nombre del punto asignado a cada capacitación; <code>direccion_</code>,
+        <code>encargado_</code> y <code>movil_encargado_</code> de cada una muestran la dirección,
+        el encargado y el móvil de ese mismo punto.
       </li>
       <li>
         <code>primer_nombre</code>, <code>segundo_nombre</code>, <code>primer_apellido</code>,
-        <code>segundo_apellido</code> y <code>nombre_completo</code> se anteponen siempre con "hermano" o
-        "hermana" según el sexo del publicador (con mayúscula inicial si el campo queda al comienzo de una
-        línea, en minúscula en cualquier otro lugar), y el nombre se muestra con la primera letra de cada
-        palabra en mayúscula.
+        <code>segundo_apellido</code> y <code>nombre_completo</code> se anteponen siempre con
+        "hermano" o "hermana" según el sexo del publicador (con mayúscula inicial si el campo queda
+        al comienzo de una línea, en minúscula en cualquier otro lugar), y el nombre se muestra con
+        la primera letra de cada palabra en mayúscula.
       </li>
     </ul>
 
