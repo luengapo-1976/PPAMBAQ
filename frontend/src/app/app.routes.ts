@@ -40,6 +40,7 @@ export const routes: Routes = [
     canActivate: [authGuard],
     canActivateChild: [aceptacionLegalGuard, datosActualizacionGuard],
     children: [
+      { path: '', pathMatch: 'full', redirectTo: 'inicio' },
       {
         path: 'inicio',
         loadComponent: () => import('./features/inicio/inicio').then((m) => m.Inicio),

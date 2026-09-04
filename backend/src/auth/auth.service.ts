@@ -10,6 +10,7 @@ import {
   AceptacionesLegalesService,
   TIPO_TRATAMIENTO_DATOS,
 } from '../aceptaciones-legales/aceptaciones-legales.service';
+import { LoginAttemptsService } from './login-attempts.service';
 import { LoginDto } from './dto/login.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
@@ -67,14 +68,18 @@ export class AuthService {
     private readonly mailService: MailService,
     private readonly parametrosService: ParametrosService,
     private readonly aceptacionesLegalesService: AceptacionesLegalesService,
+    private readonly loginAttemptsService: LoginAttemptsService,
   ) {}
 
   async login(dto: LoginDto) {
+    this.loginAttemptsService.assertNotLocked(dto.login);
+
     const usuario = await this.usuariosRepository.findByLogin(dto.login);
 
     if (usuario) {
       const passwordMatches = await this.passwordService.compare(dto.password, usuario.password_hash);
       if (!passwordMatches) {
+        this.loginAttemptsService.registerFailure(dto.login);
         throw new UnauthorizedException(INVALID_CREDENTIALS_MESSAGE);
       }
 
@@ -99,6 +104,7 @@ export class AuthService {
         TIPO_TRATAMIENTO_DATOS,
       );
 
+      this.loginAttemptsService.registerSuccess(dto.login);
       return {
         access_token: accessToken,
         login: usuario.login,
@@ -115,6 +121,7 @@ export class AuthService {
     const movil = dto.password.trim();
     const publicador = await this.publicadoresRepository.findByLoginAndMovil(login, movil);
     if (!publicador) {
+      this.loginAttemptsService.registerFailure(dto.login);
       throw new UnauthorizedException(INVALID_CREDENTIALS_MESSAGE);
     }
 
@@ -132,6 +139,7 @@ export class AuthService {
       TIPO_TRATAMIENTO_DATOS,
     );
 
+    this.loginAttemptsService.registerSuccess(dto.login);
     return {
       access_token: accessToken,
       login: publicador.login ?? login,

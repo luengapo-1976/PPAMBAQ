@@ -36,7 +36,11 @@ export class Login {
   }
 
   protected readonly submitting = signal(false);
-  protected readonly errorMessage = signal<string | null>(null);
+  protected readonly errorMessage = signal<string | null>(
+    this.activatedRoute.snapshot.queryParamMap.get('sesionExpirada')
+      ? 'Tu sesión expiró por inactividad. Ingresa nuevamente.'
+      : null,
+  );
   protected readonly passwordVisible = signal(false);
 
   protected readonly form = this.fb.group({
