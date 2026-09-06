@@ -1,0 +1,1 @@
+import {y,z as p,H}from'./main-PQWR7IMR.js';var n=class r{api=y(p);list(){return this.api.get("parametros")}update(t,a){return this.api.put(`parametros/${t}`,a)}static \u0275fac=function(a){return new(a||r)};static \u0275prov=H({token:r,factory:r.\u0275fac,providedIn:"root"})};export{n};
