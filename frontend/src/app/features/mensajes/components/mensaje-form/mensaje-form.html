@@ -28,6 +28,17 @@
   <form class="mensaje-form" [formGroup]="form" (ngSubmit)="onSave()">
     <div class="mensaje-form__row">
       <app-form-field
+        label="Categoría"
+        [required]="true"
+        [control]="form.controls.categoria"
+        class="mensaje-form__tipo"
+      >
+        <app-select formControlName="categoria" [options]="categoriaOptions" placeholder="Seleccionar categoría…" />
+      </app-form-field>
+    </div>
+
+    <div class="mensaje-form__row">
+      <app-form-field
         label="Tipo de mensaje"
         [required]="true"
         [control]="form.controls.tipo"
@@ -161,44 +172,64 @@
   </app-button>
 
   <div class="mensaje-help">
-    <p>
-      Mientras escribes el mensaje, presiona <strong>"/"</strong> para abrir un menú con los campos
-      de la solicitud del publicador. Al seleccionar uno, se inserta en el texto encerrado entre
-      <code>&lt;&gt;</code> (por ejemplo <code>&lt;primer_nombre&gt;</code>). Al enviar el mensaje,
-      cada uno de estos campos se reemplaza por el valor real de la solicitud del destinatario.
-    </p>
+    @if (esCategoriaCaso()) {
+      <p>
+        Mientras escribes el mensaje, presiona <strong>"/"</strong> para abrir un menú con los campos
+        del caso (turno y publicador que lo solicitó). Al seleccionar uno, se inserta en el texto
+        encerrado entre <code>&lt;&gt;</code> (por ejemplo <code>&lt;nombre_punto&gt;</code>). Al
+        enviar el WhatsApp de respuesta, cada uno de estos campos se reemplaza por el valor real del
+        caso aprobado o rechazado.
+      </p>
 
-    <h3>Reglas especiales</h3>
-    <ul class="mensaje-help__rules">
-      <li><code>sexo</code> se reemplaza por el texto "Femenino" o "Masculino".</li>
-      <li>
-        <code>nombre_completo</code> se reemplaza por primer nombre, segundo nombre, primer apellido
-        y segundo apellido, separados por un espacio.
-      </li>
-      <li><code>congregacion</code> muestra el nombre de la congregación del publicador.</li>
-      <li><code>circuito</code> muestra el código del circuito de esa congregación.</li>
-      <li>
-        <code>lugar_primera_capacitacion</code> y <code>lugar_segunda_capacitacion</code> muestran
-        el nombre del punto asignado a cada capacitación; <code>direccion_</code>,
-        <code>encargado_</code> y <code>movil_encargado_</code> de cada una muestran la dirección,
-        el encargado y el móvil de ese mismo punto.
-      </li>
-      <li>
-        <code>primer_nombre</code>, <code>segundo_nombre</code>, <code>primer_apellido</code>,
-        <code>segundo_apellido</code> y <code>nombre_completo</code> se anteponen siempre con
-        "hermano" o "hermana" según el sexo del publicador (con mayúscula inicial si el campo queda
-        al comienzo de una línea, en minúscula en cualquier otro lugar), y el nombre se muestra con
-        la primera letra de cada palabra en mayúscula.
-      </li>
-    </ul>
+      <h3>Reglas especiales</h3>
+      <ul class="mensaje-help__rules">
+        <li>
+          <code>primer_nombre</code> y <code>nombre_completo</code> se anteponen siempre con
+          "hermano" o "hermana" según el sexo del publicador (con mayúscula inicial si el campo queda
+          al comienzo de una línea, en minúscula en cualquier otro lugar), y el nombre se muestra con
+          la primera letra de cada palabra en mayúscula.
+        </li>
+      </ul>
+    } @else {
+      <p>
+        Mientras escribes el mensaje, presiona <strong>"/"</strong> para abrir un menú con los campos
+        de la solicitud del publicador. Al seleccionar uno, se inserta en el texto encerrado entre
+        <code>&lt;&gt;</code> (por ejemplo <code>&lt;primer_nombre&gt;</code>). Al enviar el mensaje,
+        cada uno de estos campos se reemplaza por el valor real de la solicitud del destinatario.
+      </p>
+
+      <h3>Reglas especiales</h3>
+      <ul class="mensaje-help__rules">
+        <li><code>sexo</code> se reemplaza por el texto "Femenino" o "Masculino".</li>
+        <li>
+          <code>nombre_completo</code> se reemplaza por primer nombre, segundo nombre, primer apellido
+          y segundo apellido, separados por un espacio.
+        </li>
+        <li><code>congregacion</code> muestra el nombre de la congregación del publicador.</li>
+        <li><code>circuito</code> muestra el código del circuito de esa congregación.</li>
+        <li>
+          <code>lugar_primera_capacitacion</code> y <code>lugar_segunda_capacitacion</code> muestran
+          el nombre del punto asignado a cada capacitación; <code>direccion_</code>,
+          <code>encargado_</code> y <code>movil_encargado_</code> de cada una muestran la dirección,
+          el encargado y el móvil de ese mismo punto.
+        </li>
+        <li>
+          <code>primer_nombre</code>, <code>segundo_nombre</code>, <code>primer_apellido</code>,
+          <code>segundo_apellido</code> y <code>nombre_completo</code> se anteponen siempre con
+          "hermano" o "hermana" según el sexo del publicador (con mayúscula inicial si el campo queda
+          al comienzo de una línea, en minúscula en cualquier otro lugar), y el nombre se muestra con
+          la primera letra de cada palabra en mayúscula.
+        </li>
+      </ul>
+    }
 
     <h3>Campos disponibles</h3>
     <ul class="mensaje-help__fields">
-      @for (item of mensajeTokens; track item.token) {
+      @for (item of mensajeTokens(); track item.token) {
         <li>
           <code>&lt;{{ item.token }}&gt;</code>
           <span>{{ item.descripcion }}</span>
-          @if (tokensConHermano.has(item.token)) {
+          @if (tokensConHermano().has(item.token)) {
             <app-badge tone="info">hermano/hermana</app-badge>
           }
         </li>

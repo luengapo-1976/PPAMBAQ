@@ -34,6 +34,10 @@ export class TurnosService {
     });
   }
 
+  eliminarHorario(turnoId: string): Observable<{ mensaje: string }> {
+    return this.api.delete<{ mensaje: string }>(`turnos/${turnoId}`);
+  }
+
   /** idPublicador lo usan las páginas administrativas (Editar solicitud, Retirar
    * turno, Informe de turno) para consultar los turnos de un publicador elegido
    * por búsqueda, en vez de los del usuario logueado. */

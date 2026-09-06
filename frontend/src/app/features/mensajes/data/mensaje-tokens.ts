@@ -88,3 +88,47 @@ export const MENSAJE_TOKENS_CON_HERMANO: ReadonlySet<string> = new Set([
   'segundo_nombre',
   'nombre_completo',
 ]);
+
+/** Campos disponibles para mensajes de categoría "RESPUESTA CASOS" (los que se envían
+ * al aprobar/rechazar un caso en Casos por validar). Es un catálogo distinto al de
+ * ENTRENAMIENTO porque el contexto es un caso de turno, no el registro completo de un
+ * publicador — debe reflejar exactamente los campos que reconoce la sustitución real,
+ * implementada en `casos-por-validar/data/mensaje-respuesta.util.ts`. */
+export const MENSAJE_TOKENS_CASO: MensajeToken[] = [
+  { token: 'dia', descripcion: 'Día de la semana del turno.' },
+  {
+    token: 'encargado_punto',
+    descripcion: 'Nombre del encargado del punto de predicación del turno.',
+  },
+  { token: 'fecha_respuesta', descripcion: 'Fecha en que se aprobó o rechazó la solicitud.' },
+  { token: 'fecha_solicitud', descripcion: 'Fecha en que se solicitó el turno.' },
+  { token: 'hora_fin', descripcion: 'Hora de fin del turno.' },
+  { token: 'hora_inicio', descripcion: 'Hora de inicio del turno.' },
+  {
+    token: 'justificacion',
+    descripcion: 'Justificación que dio el publicador al solicitar el turno.',
+  },
+  {
+    token: 'justificacion_aprobacion',
+    descripcion: 'Motivo registrado por el administrador al aprobar o rechazar la solicitud.',
+  },
+  { token: 'movil', descripcion: 'Número de móvil del publicador que solicitó el turno.' },
+  {
+    token: 'movil_encargado_punto',
+    descripcion: 'Número de móvil del encargado del punto de predicación del turno.',
+  },
+  { token: 'nombre_completo', descripcion: 'Nombre completo del publicador que solicitó el turno.' },
+  { token: 'nombre_punto', descripcion: 'Nombre del punto de predicación del turno.' },
+  { token: 'primer_nombre', descripcion: 'Primer nombre del publicador que solicitó el turno.' },
+  {
+    token: 'situacion_identificada',
+    descripcion: 'Situación identificada en el turno, si aplica.',
+  },
+];
+
+/** Igual que MENSAJE_TOKENS_CON_HERMANO, pero para el catálogo de RESPUESTA CASOS: solo
+ * existen estos dos campos de nombre en ese contexto. */
+export const MENSAJE_TOKENS_CASO_CON_HERMANO: ReadonlySet<string> = new Set([
+  'primer_nombre',
+  'nombre_completo',
+]);

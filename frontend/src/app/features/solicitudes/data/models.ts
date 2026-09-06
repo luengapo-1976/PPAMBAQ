@@ -130,3 +130,34 @@ export type PublicadorPayload = Omit<
 export type PublicadorUpdatePayload = {
   [K in keyof PublicadorPayload]?: PublicadorPayload[K] | null;
 };
+
+/** Resultado de buscar en publicadores_retirados si alguien ya existió antes en la
+ * PPAM (ver "Nueva solicitud" en Gestión de solicitudes). Trae tanto los datos para
+ * mostrarle al administrador el resumen del retiro (fecha_registro/fecha_retiro,
+ * congregación, justificación) como los necesarios para precargar el formulario. */
+export interface PublicadorRetiradoBusqueda {
+  id: string;
+  primer_apellido: string | null;
+  segundo_apellido: string | null;
+  primer_nombre: string | null;
+  segundo_nombre: string | null;
+  direccion: string | null;
+  codigo_departamento: string | null;
+  codigo_municipio: string | null;
+  correo_electronico: string | null;
+  movil: string | null;
+  codigo_congregacion: number | null;
+  fecha_nacimiento: string | null;
+  sexo: Sexo | null;
+  fecha_bautismo: string | null;
+  estado_civil: EstadoCivil | null;
+  nombre_conyuge: string | null;
+  apellido_casada: string | null;
+  privilegio_min: PrivilegioMin | null;
+  privilegio_ser: PrivilegioSer | null;
+  participo_antes: ParticipoAntes | null;
+  fecha_registro: string | null;
+  fecha_retiro: string | null;
+  justificacion: string;
+  estado_solicitud_retiro: string | null;
+}

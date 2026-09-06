@@ -1,6 +1,8 @@
 export interface TurnoValidacionResumen {
   id: string;
   nombrePunto: string;
+  encargadoPunto: string | null;
+  movilEncargadoPunto: string | null;
   diaNombre: string;
   horaInicio: string;
   horaFin: string;
@@ -17,6 +19,8 @@ export interface TurnoValidacionResumen {
   fechaAprobacion: string | null;
   parejaNombre: string | null;
   parejaMovil: string | null;
+  sexo: 'M' | 'F' | null;
+  mensajeWhatsappEnviado: boolean;
 }
 
 export interface RetiroResumen {

@@ -180,6 +180,15 @@ export const routes: Routes = [
         data: { title: 'Informe de turno' },
       },
       {
+        path: 'admin-retirar-ppam',
+        loadComponent: () =>
+          import('./features/admin-retirar-ppam/admin-retirar-ppam').then(
+            (m) => m.AdminRetirarPpam,
+          ),
+        title: 'Retirar de la PPAM · PPAM BAQ',
+        data: { title: 'Retirar de la PPAM' },
+      },
+      {
         path: 'gestion-noticias',
         loadComponent: () =>
           import('./features/gestion-noticias/gestion-noticias').then((m) => m.GestionNoticias),

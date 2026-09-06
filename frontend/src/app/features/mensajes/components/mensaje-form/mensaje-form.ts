@@ -10,6 +10,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { Dialog } from '../../../../shared/ui/dialog/dialog';
 import { Button } from '../../../../shared/ui/button/button';
 import { Badge } from '../../../../shared/ui/badge/badge';
@@ -17,13 +18,16 @@ import {
   SearchSelect,
   SearchSelectOption,
 } from '../../../../shared/ui/search-select/search-select';
+import { Select } from '../../../../shared/ui/select/select';
 import { FormField } from '../../../../shared/ui/form-field/form-field';
 import { SnackbarService } from '../../../../shared/ui/snackbar/snackbar.service';
 import { ApiError } from '../../../../core/error.interceptor';
 import { MensajesService } from '../../data/mensajes.service';
-import { Mensaje } from '../../data/models';
+import { Mensaje, MENSAJE_CATEGORIA_OPTIONS, MensajeCategoria } from '../../data/models';
 import {
   MENSAJE_TOKENS,
+  MENSAJE_TOKENS_CASO,
+  MENSAJE_TOKENS_CASO_CON_HERMANO,
   MENSAJE_TOKENS_CON_HERMANO,
   MensajeToken,
 } from '../../data/mensaje-tokens';
@@ -125,7 +129,7 @@ function getCaretCoordinates(
 
 @Component({
   selector: 'app-mensaje-form',
-  imports: [ReactiveFormsModule, Dialog, Button, Badge, SearchSelect, FormField],
+  imports: [ReactiveFormsModule, Dialog, Button, Badge, SearchSelect, Select, FormField],
   templateUrl: './mensaje-form.html',
   styleUrl: './mensaje-form.scss',
 })
@@ -136,7 +140,7 @@ export class MensajeForm {
 
   readonly open = input(false);
   readonly mode = input<'create' | 'edit'>('create');
-  readonly tipos = input<string[]>([]);
+  readonly mensajes = input<Mensaje[]>([]);
   readonly record = input<Mensaje | null>(null);
 
   readonly closed = output<void>();
@@ -152,13 +156,9 @@ export class MensajeForm {
     this.mode() === 'create' ? 'Nuevo mensaje' : 'Editar mensaje',
   );
 
-  protected readonly tipoOptions = computed<SearchSelectOption[]>(() =>
-    this.tipos().map((tipo) => ({ value: tipo, label: tipo })),
-  );
+  protected readonly categoriaOptions = MENSAJE_CATEGORIA_OPTIONS;
 
   protected readonly helpOpen = signal(false);
-  protected readonly mensajeTokens = MENSAJE_TOKENS;
-  protected readonly tokensConHermano = MENSAJE_TOKENS_CON_HERMANO;
 
   protected readonly mentionOpen = signal(false);
   protected readonly mentionQuery = signal('');
@@ -166,18 +166,58 @@ export class MensajeForm {
   protected readonly mentionPosition = signal<{ top: number; left: number } | null>(null);
   private mentionStart: number | null = null;
 
-  protected readonly filteredMentionTokens = computed<MensajeToken[]>(() => {
-    const query = this.mentionQuery().trim().toLowerCase();
-    return query ? MENSAJE_TOKENS.filter((t) => t.token.includes(query)) : MENSAJE_TOKENS;
-  });
-
   protected readonly form = this.fb.group({
+    categoria: ['' as MensajeCategoria | '', [Validators.required]],
     tipo: ['', [Validators.required, Validators.maxLength(50)]],
     mensaje: ['', [Validators.required, Validators.maxLength(2000)]],
     adjunto_asociado: [null as string | null],
   });
 
+  private readonly selectedCategoria = toSignal(this.form.controls.categoria.valueChanges, {
+    initialValue: '',
+  });
+
+  /** Los tipos disponibles dependen de la categoría elegida: solo se ofrecen los que ya
+   * existen en mensajes de esa misma categoría (además, [allowCustomValue] sigue
+   * permitiendo escribir uno nuevo). */
+  protected readonly tipoOptions = computed<SearchSelectOption[]>(() => {
+    const categoria = this.selectedCategoria();
+    const tipos = [
+      ...new Set(this.mensajes().filter((m) => m.categoria === categoria).map((m) => m.tipo)),
+    ].sort();
+    return tipos.map((tipo) => ({ value: tipo, label: tipo }));
+  });
+
+  /** El catálogo de campos del menú "/" depende de la categoría: los de RESPUESTA CASOS
+   * son datos del turno/caso, no del publicador completo — deben reflejar exactamente lo
+   * que sustituye mensaje-respuesta.util.ts, no los de ENTRENAMIENTO. */
+  protected readonly mensajeTokens = computed<MensajeToken[]>(() =>
+    this.selectedCategoria() === 'RESPUESTA CASOS' ? MENSAJE_TOKENS_CASO : MENSAJE_TOKENS,
+  );
+  protected readonly tokensConHermano = computed<ReadonlySet<string>>(() =>
+    this.selectedCategoria() === 'RESPUESTA CASOS'
+      ? MENSAJE_TOKENS_CASO_CON_HERMANO
+      : MENSAJE_TOKENS_CON_HERMANO,
+  );
+
+  protected readonly filteredMentionTokens = computed<MensajeToken[]>(() => {
+    const query = this.mentionQuery().trim().toLowerCase();
+    const tokens = this.mensajeTokens();
+    return query ? tokens.filter((t) => t.token.includes(query)) : tokens;
+  });
+
+  protected readonly esCategoriaCaso = computed(() => this.selectedCategoria() === 'RESPUESTA CASOS');
+
   constructor() {
+    effect(() => {
+      // Si cambia la categoría y el tipo elegido ya no pertenece a ella, se limpia.
+      const options = this.tipoOptions();
+      const current = this.form.controls.tipo.value;
+      if (current && !options.some((o) => o.value === current)) {
+        this.form.controls.tipo.setValue('');
+      }
+    });
+
     effect(() => {
       const isOpen = this.open();
       if (!isOpen) {
@@ -373,6 +413,7 @@ export class MensajeForm {
     }
 
     const payload = {
+      categoria: this.form.controls.categoria.value as MensajeCategoria,
       tipo: this.form.controls.tipo.value!,
       mensaje: this.form.controls.mensaje.value!,
       adjunto_asociado: this.form.controls.adjunto_asociado.value,
@@ -409,6 +450,7 @@ export class MensajeForm {
 
   private populateForm(record: Mensaje): void {
     this.form.patchValue({
+      categoria: record.categoria,
       tipo: record.tipo,
       mensaje: record.mensaje,
       adjunto_asociado: record.adjunto_asociado,

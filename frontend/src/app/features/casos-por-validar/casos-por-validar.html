@@ -7,6 +7,12 @@
     </div>
     <div class="skeleton-block skeleton-block--table"></div>
   } @else {
+    <div class="casos-page__toolbar">
+      <app-button variant="secondary" icon="forum" (click)="onAbrirConfigMensajes()">
+        Mensajes de respuesta
+      </app-button>
+    </div>
+
     <section class="casos-page__kpis">
       <app-stat-card
         icon="pending_actions"
@@ -59,6 +65,7 @@
               <th>Fecha de solicitud</th>
               @if (mostrarColumnaDecision()) {
                 <th>{{ etiquetaDecisionPor() }}</th>
+                <th>WhatsApp</th>
               }
             </tr>
           </thead>
@@ -73,11 +80,24 @@
                 <td>{{ formatDateShort(row.fechaSolicitud) }}</td>
                 @if (mostrarColumnaDecision()) {
                   <td>{{ row.aprobadoPor }}</td>
+                  <td>
+                    @if (!row.mensajeWhatsappEnviado) {
+                      <button
+                        type="button"
+                        class="casos-page__whatsapp-btn"
+                        aria-label="Enviar WhatsApp de respuesta"
+                        title="Enviar WhatsApp de respuesta"
+                        (click)="onEnviarWhatsappDesdeGrid(row); $event.stopPropagation()"
+                      >
+                        <span class="material-symbols-outlined" aria-hidden="true">chat</span>
+                      </button>
+                    }
+                  </td>
                 }
               </tr>
             } @empty {
               <tr>
-                <td [attr.colspan]="mostrarColumnaDecision() ? 7 : 6" class="ppam-table__empty">
+                <td [attr.colspan]="mostrarColumnaDecision() ? 8 : 6" class="ppam-table__empty">
                   @switch (estado()) {
                     @case ('pendientes') {
                       No hay turnos pendientes por validar.
@@ -167,6 +187,15 @@
                 <span class="material-symbols-outlined" aria-hidden="true">verified</span>
                 <span>{{ etiquetaDecisionPor() }} {{ row.aprobadoPor }}</span>
               </div>
+              @if (!row.mensajeWhatsappEnviado) {
+                <app-button
+                  variant="whatsapp"
+                  icon="chat"
+                  (click)="onEnviarWhatsappDesdeGrid(row); $event.stopPropagation()"
+                >
+                  Enviar WhatsApp de respuesta
+                </app-button>
+              }
             }
           </article>
         } @empty {
@@ -192,7 +221,7 @@
               <span>{{ nombreCompletoRetiro(row) }}</span>
             </div>
             <div class="caso-card__row">
-              <span class="material-symbols-outlined" aria-hidden="true">church</span>
+              <span class="material-symbols-outlined" aria-hidden="true">home</span>
               <span>{{ congregacionNombre(row.codigo_congregacion) }}</span>
             </div>
             <div class="caso-card__row">
@@ -252,13 +281,26 @@
         >Cancelar</app-button
       >
     </ng-container>
+  } @else if (dialogPaso() === 'whatsapp') {
+    <ng-container dialogToolbar>
+      <app-button type="button" variant="whatsapp" icon="chat" (click)="onContinuarWhatsapp()">
+        Siguiente
+      </app-button>
+      <app-button type="button" variant="secondary" (click)="onOmitirWhatsapp()">Ahora no</app-button>
+    </ng-container>
   } @else {
     <app-button dialogToolbar type="button" variant="secondary" (click)="onCerrarDialog()"
       >Cerrar</app-button
     >
   }
 
-  @if (dialogPaso() === 'justificacion') {
+  @if (dialogPaso() === 'whatsapp') {
+    <p>
+      A continuación se enviará un mensaje de WhatsApp a <strong>{{ pendingWhatsappNombre() }}</strong>
+      notificando la respuesta a su solicitud. Al dar clic en "Siguiente" se abrirá WhatsApp Web con
+      el mensaje precargado.
+    </p>
+  } @else if (dialogPaso() === 'justificacion') {
     <label class="casos-page__field">
       <span>{{ justificacionLabel() }}</span>
       <textarea
@@ -390,4 +432,47 @@
       }
     </dl>
   }
+</app-dialog>
+
+<app-dialog
+  [open]="configDialogOpen()"
+  title="Mensajes de respuesta"
+  (closed)="onCerrarConfigMensajes()"
+>
+  <app-button
+    dialogToolbar
+    type="button"
+    [disabled]="savingConfig()"
+    (click)="onGuardarConfigMensajes()"
+  >
+    {{ savingConfig() ? 'Guardando…' : 'Guardar' }}
+  </app-button>
+  <app-button dialogToolbar type="button" variant="secondary" (click)="onCerrarConfigMensajes()">
+    Cancelar
+  </app-button>
+
+  <p>
+    Elige, para cada evento, el mensaje de categoría "Respuesta casos" que se precargará al enviar el
+    WhatsApp de respuesta al publicador.
+  </p>
+
+  <label class="casos-page__field">
+    <span>Mensaje al aprobar una solicitud</span>
+    <app-select
+      [options]="mensajeRespuestaOptions()"
+      placeholder="Seleccionar mensaje…"
+      [ngModel]="configMensajeAprobacionId()"
+      (ngModelChange)="configMensajeAprobacionId.set($event)"
+    />
+  </label>
+
+  <label class="casos-page__field">
+    <span>Mensaje al rechazar una solicitud</span>
+    <app-select
+      [options]="mensajeRespuestaOptions()"
+      placeholder="Seleccionar mensaje…"
+      [ngModel]="configMensajeRechazoId()"
+      (ngModelChange)="configMensajeRechazoId.set($event)"
+    />
+  </label>
 </app-dialog>

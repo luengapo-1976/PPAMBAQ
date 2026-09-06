@@ -60,20 +60,26 @@ export class EnviarMensajePanel {
     initialValue: null,
   });
 
+  /** Solo se ofrecen mensajes de categoría ENTRENAMIENTO: los de "RESPUESTA CASOS" son
+   * exclusivos del flujo de aprobación/rechazo en Casos por validar. */
+  protected readonly mensajesEntrenamiento = computed(() =>
+    this.mensajes().filter((m) => m.categoria === 'ENTRENAMIENTO'),
+  );
+
   protected readonly tipoOptions = computed<SearchSelectOption[]>(() => {
-    const tipos = [...new Set(this.mensajes().map((m) => m.tipo))].sort();
+    const tipos = [...new Set(this.mensajesEntrenamiento().map((m) => m.tipo))].sort();
     return tipos.map((t) => ({ value: t, label: t }));
   });
 
   protected readonly mensajeOptions = computed<SearchSelectOption[]>(() => {
     const tipo = this.selectedTipo();
-    return this.mensajes()
+    return this.mensajesEntrenamiento()
       .filter((m) => m.tipo === tipo)
       .map((m) => ({ value: m.id, label: truncate(m.mensaje) }));
   });
 
   protected readonly selectedMensaje = computed(
-    () => this.mensajes().find((m) => m.id === this.selectedMensajeId()) ?? null,
+    () => this.mensajesEntrenamiento().find((m) => m.id === this.selectedMensajeId()) ?? null,
   );
 
   protected readonly adjuntoNombre = computed(() => {

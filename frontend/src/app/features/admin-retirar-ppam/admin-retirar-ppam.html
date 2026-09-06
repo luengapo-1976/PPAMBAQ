@@ -1,0 +1,85 @@
+<div class="admin-retirar-ppam">
+  <p class="admin-retirar-ppam__legend">
+    Busca al publicador por nombre o móvil para registrar su retiro de la PPAM.
+  </p>
+
+  <app-search-select
+    [options]="publicadorOptions()"
+    placeholder="Buscar publicador por nombre o móvil…"
+    emptyMessage="No se encontraron publicadores"
+    [ngModel]="selectedPublicadorId()"
+    (ngModelChange)="onSeleccionarPublicador($event)"
+  />
+
+  @if (!selectedPublicadorId()) {
+    <div class="admin-retirar-ppam__empty">
+      <span class="material-symbols-outlined" aria-hidden="true">person_search</span>
+      <p>Busca un publicador para ver su información y registrar su retiro.</p>
+    </div>
+  } @else if (selectedPublicador(); as publicador) {
+    <article class="publicador-card">
+      <h2 class="publicador-card__nombre">{{ nombreCompleto(publicador) }}</h2>
+      <div class="publicador-card__row">
+        <span class="material-symbols-outlined" aria-hidden="true">call</span>
+        <span>{{ publicador.movil || '-' }}</span>
+      </div>
+      <div class="publicador-card__row">
+        <span class="material-symbols-outlined" aria-hidden="true">home</span>
+        <span>{{ publicador.nombre_congregacion || '-' }}</span>
+      </div>
+      <app-button type="button" variant="danger" icon="person_remove" (click)="onAbrirRetiro()">
+        Retirar de la PPAM
+      </app-button>
+    </article>
+  }
+</div>
+
+<app-dialog [open]="dialogPaso() !== 'cerrado'" [title]="dialogTitulo()" (closed)="onDialogClosed()">
+  <app-button
+    dialogToolbar
+    type="button"
+    [variant]="primaryVariant()"
+    [disabled]="primaryDisabled()"
+    (click)="onPrimaryAction()"
+  >
+    {{ primaryLabel() }}
+  </app-button>
+  <app-button
+    dialogToolbar
+    type="button"
+    variant="secondary"
+    [style.display]="muestraCancelar() ? null : 'none'"
+    (click)="onCancelarDialog()"
+  >
+    Cancelar
+  </app-button>
+
+  @if (dialogPaso() === 'advertencia' && selectedPublicador(); as publicador) {
+    <div class="admin-retirar-ppam__dialog-advertencia">
+      <span class="material-symbols-outlined" aria-hidden="true">warning</span>
+    </div>
+    <p class="admin-retirar-ppam__dialog-texto">
+      Esta acción retirará a <strong>{{ nombreCompleto(publicador) }}</strong> de la base de datos
+      de publicadores activos en la PPAM y liberará automáticamente todos los turnos que tenga
+      asignados en este momento. Es una acción irreversible. Si deseas seguir adelante, da clic en
+      el botón "Entiendo y deseo continuar".
+    </p>
+  } @else if (dialogPaso() === 'justificacion') {
+    <label class="admin-retirar-ppam__field">
+      <span>Justificación</span>
+      <textarea
+        class="ppam-textarea"
+        rows="4"
+        maxlength="1000"
+        placeholder="Motivo del retiro…"
+        [ngModel]="justificacion()"
+        (ngModelChange)="justificacion.set($event)"
+      ></textarea>
+    </label>
+  } @else if (dialogPaso() === 'confirmacion') {
+    <div class="admin-retirar-ppam__dialog-confirmacion">
+      <span class="material-symbols-outlined" aria-hidden="true">task_alt</span>
+    </div>
+    <p class="admin-retirar-ppam__dialog-texto">{{ mensajeConfirmacion() }}</p>
+  }
+</app-dialog>

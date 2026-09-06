@@ -30,6 +30,7 @@ import {
   PrivilegioSer,
   Publicador,
   PublicadorPayload,
+  PublicadorRetiradoBusqueda,
   PublicadorUpdatePayload,
   Sexo,
 } from '../../data/models';
@@ -152,6 +153,14 @@ export class PublicadorFormDialog {
   protected readonly duplicateHasMovilOrCorreo = computed(
     () => this.duplicateReasons().has('movil') || this.duplicateReasons().has('correo'),
   );
+
+  /** Complementa la validación de duplicados activos de arriba: solo se consulta
+   * cuando esa no encontró nada, para detectar si la persona ya existió antes en la
+   * PPAM y se retiró (tabla publicadores_retirados). */
+  private readonly dismissedRetiradoKeys = signal<Set<string>>(new Set());
+  protected readonly retiradoDialogOpen = signal(false);
+  protected readonly retiradoCandidates = signal<PublicadorRetiradoBusqueda[]>([]);
+  protected readonly selectedRetiradoId = signal<string | null>(null);
 
   protected readonly form = this.fb.group({
     primer_apellido: ['', [Validators.required, Validators.maxLength(20)]],
@@ -596,6 +605,35 @@ export class PublicadorFormDialog {
     );
   }
 
+  protected congregacionNombre(codigo: number | null): string {
+    if (codigo == null) {
+      return '-';
+    }
+    return this.congregaciones().find((c) => c.codigo_congregacion === codigo)?.nombre_congregacion ?? '-';
+  }
+
+  protected onDismissRetirado(): void {
+    this.retiradoDialogOpen.set(false);
+  }
+
+  /** A diferencia de onConfirmDuplicate, aquí NO se fija matchedExistingId: el
+   * registro retirado no existe en la tabla activa, así que "Guardar" debe seguir
+   * insertando uno nuevo, solo que ya con los datos previos precargados para que el
+   * administrador los revise y actualice. */
+  protected onConfirmRetirado(): void {
+    const id = this.selectedRetiradoId();
+    const retirado = this.retiradoCandidates().find((r) => r.id === id);
+    if (!retirado) {
+      return;
+    }
+    this.populateFormFromRetirado(retirado);
+    this.retiradoDialogOpen.set(false);
+    this.snackbar.show(
+      'Se cargaron los datos de su registro anterior en la PPAM. Revisa y actualiza lo que corresponda antes de guardar.',
+      'info',
+    );
+  }
+
   private checkForDuplicates(): void {
     if (this.duplicateDialogOpen()) {
       return;
@@ -617,6 +655,7 @@ export class PublicadorFormDialog {
     );
 
     if (candidates.length === 0) {
+      this.checkForRetirados(raw.movil ?? '', raw.correo_electronico ?? '');
       return;
     }
 
@@ -632,6 +671,79 @@ export class PublicadorFormDialog {
     this.selectedCandidateId.set(candidates.length === 1 ? candidates[0].publicador.id : null);
     this.dismissedDuplicateKeys.update((prev) => new Set(prev).add(key));
     this.duplicateDialogOpen.set(true);
+  }
+
+  /** Solo aplica en "Nueva solicitud" (no tendría sentido al editar una ya existente),
+   * y solo cuando la validación de duplicados activos de arriba no encontró nada. Si
+   * la búsqueda falla (p. ej. problema de red pasajero) se ignora en silencio: es una
+   * validación complementaria, no debe bloquear el registro. */
+  private checkForRetirados(movil: string, correo: string): void {
+    if (this.mode() !== 'create' || this.retiradoDialogOpen()) {
+      return;
+    }
+    const movilTrim = movil.trim();
+    const correoTrim = correo.trim();
+    if (!movilTrim && !correoTrim) {
+      return;
+    }
+    this.publicadoresService.buscarRetirados(movilTrim || null, correoTrim || null).subscribe({
+      next: (candidatos) => {
+        if (candidatos.length === 0) {
+          return;
+        }
+        const key = candidatos
+          .map((r) => r.id)
+          .sort()
+          .join(',');
+        if (this.dismissedRetiradoKeys().has(key)) {
+          return;
+        }
+        this.retiradoCandidates.set(candidatos);
+        this.selectedRetiradoId.set(candidatos.length === 1 ? candidatos[0].id : null);
+        this.dismissedRetiradoKeys.update((prev) => new Set(prev).add(key));
+        this.retiradoDialogOpen.set(true);
+      },
+      error: () => {
+        // Silencioso a propósito — ver comentario del método.
+      },
+    });
+  }
+
+  /** A diferencia de populateForm, solo carga los datos personales/demográficos del
+   * registro retirado — nunca el estado del flujo de solicitud (estado,
+   * entrenamiento_requerido, fechas de aprobación/capacitación, etc.): esta es una
+   * solicitud nueva, no la continuación de la anterior, así que ese estado debe
+   * arrancar limpio con los valores por defecto de "Nueva solicitud". */
+  private populateFormFromRetirado(retirado: PublicadorRetiradoBusqueda): void {
+    this.isPatchingForm = true;
+    if (retirado.codigo_departamento) {
+      this.form.controls.codigo_municipio.enable({ emitEvent: false });
+    }
+    this.form.patchValue({
+      primer_apellido: retirado.primer_apellido,
+      segundo_apellido: retirado.segundo_apellido,
+      primer_nombre: retirado.primer_nombre,
+      segundo_nombre: retirado.segundo_nombre,
+      direccion: retirado.direccion,
+      codigo_departamento: retirado.codigo_departamento,
+      codigo_municipio: retirado.codigo_municipio,
+      correo_electronico: retirado.correo_electronico,
+      movil: retirado.movil,
+      codigo_congregacion:
+        retirado.codigo_congregacion != null ? String(retirado.codigo_congregacion) : null,
+      fecha_nacimiento: toDateInputValue(retirado.fecha_nacimiento),
+      sexo: retirado.sexo,
+      fecha_bautismo: toDateInputValue(retirado.fecha_bautismo),
+      estado_civil: retirado.estado_civil,
+      nombre_conyuge: retirado.nombre_conyuge ?? '',
+      apellido_casada: retirado.apellido_casada ?? '',
+      privilegio_min: retirado.privilegio_min,
+      privilegio_ser: retirado.privilegio_ser,
+      participo_antes: retirado.participo_antes,
+    });
+    this.isPatchingForm = false;
+    this.form.markAllAsTouched();
+    this.checkForDuplicates();
   }
 
   /** En "Editar solicitud" se quita Validators.required de todos los campos (las demás

@@ -10,6 +10,8 @@ const GREEN_RGB: [number, number, number] = [81, 155, 109];
 const ALT_ROW_RGB: [number, number, number] = [250, 250, 251];
 const CELL_FONT_SIZE = 7.5;
 const CELL_LINE_HEIGHT = CELL_FONT_SIZE * 1.15;
+const CELL_PADDING = 5;
+const HORA_COL_WIDTH = 85;
 
 export interface FilaCalendarioPdf {
   horaInicio: string;
@@ -31,11 +33,31 @@ interface CeldaLinea {
   color: [number, number, number];
 }
 
-/** Una línea por dato a mostrar: el nombre del publicador en negrita, "Disponible…"
- * en verde y negrita (igual criterio que en pantalla), el resto en texto normal. Se
- * usa tanto para el string plano que arma el ancho/alto de la celda como para el
- * redibujado con estilos mixtos en didDrawCell. */
-function celdaLineas(turnos: TurnoResumen[]): CeldaLinea[] {
+/** Parte un texto en tantas líneas físicas como haga falta para caber en maxWidth
+ * (con la fuente/estilo ya activos en doc), conservando el mismo negrita/color en
+ * cada línea resultante. Así, un nombre, congregación o etiqueta "Disponible…" más
+ * ancho que la columna se reparte en 2 (o más) líneas en vez de desbordarse. */
+function agregarLineasEnvueltas(
+  doc: jsPDF,
+  lineas: CeldaLinea[],
+  texto: string,
+  bold: boolean,
+  color: [number, number, number],
+  maxWidth: number,
+): void {
+  doc.setFont('helvetica', bold ? 'bold' : 'normal');
+  const partes = doc.splitTextToSize(texto, maxWidth) as string[];
+  for (const parte of partes) {
+    lineas.push({ texto: parte, bold, color });
+  }
+}
+
+/** Una línea (o varias, si no cabe en el ancho de la columna) por dato a mostrar: el
+ * nombre del publicador en negrita, "Disponible…" en verde y negrita (igual criterio
+ * que en pantalla), el resto en texto normal. Se usa tanto para el string plano que
+ * arma el ancho/alto de la celda como para el redibujado con estilos mixtos en
+ * didDrawCell — por eso ambos deben recibir el mismo maxWidth. */
+function celdaLineas(doc: jsPDF, turnos: TurnoResumen[], maxWidth: number): CeldaLinea[] {
   if (turnos.length === 0) {
     return [{ texto: '-', bold: false, color: TEXT_RGB }];
   }
@@ -45,26 +67,40 @@ function celdaLineas(turnos: TurnoResumen[]): CeldaLinea[] {
       lineas.push({ texto: '', bold: false, color: TEXT_RGB });
     }
     if (turno.disponibilidad === 'ocupado') {
-      lineas.push({
-        texto: turno.nombreOcupante || 'Publicador asignado',
-        bold: true,
-        color: TEXT_RGB,
-      });
-      lineas.push({ texto: turno.movilOcupante || '-', bold: false, color: TEXT_RGB });
-      lineas.push({ texto: turno.congregacionOcupante || '-', bold: false, color: TEXT_RGB });
+      agregarLineasEnvueltas(
+        doc,
+        lineas,
+        turno.nombreCortoOcupante || 'Publicador asignado',
+        true,
+        TEXT_RGB,
+        maxWidth,
+      );
+      agregarLineasEnvueltas(doc, lineas, turno.movilOcupante || '-', false, TEXT_RGB, maxWidth);
+      agregarLineasEnvueltas(
+        doc,
+        lineas,
+        turno.congregacionOcupante || '-',
+        false,
+        TEXT_RGB,
+        maxWidth,
+      );
     } else {
-      lineas.push({
-        texto: etiquetaDisponibilidad(turno.disponibilidad),
-        bold: true,
-        color: GREEN_RGB,
-      });
+      agregarLineasEnvueltas(
+        doc,
+        lineas,
+        etiquetaDisponibilidad(turno.disponibilidad),
+        true,
+        GREEN_RGB,
+        maxWidth,
+      );
     }
   });
+  doc.setFont('helvetica', 'normal');
   return lineas;
 }
 
-function celdaTexto(turnos: TurnoResumen[]): string {
-  return celdaLineas(turnos)
+function celdaTexto(doc: jsPDF, turnos: TurnoResumen[], maxWidth: number): string {
+  return celdaLineas(doc, turnos, maxWidth)
     .map((linea) => linea.texto)
     .join('\n');
 }
@@ -108,10 +144,20 @@ export async function exportPuntoCalendarioToPdf(
   doc.setFont('helvetica', 'normal');
   doc.text(movilTexto, infoX, infoY);
 
+  /** Ancho de columna de día fijado explícitamente (no autocalculado por autoTable):
+   * así se conoce de antemano el ancho disponible para el texto, necesario para
+   * decidir dónde partir en 2 líneas un nombre, congregación o etiqueta "Disponible…"
+   * que no quepa — tanto al construir `body` (de donde autoTable calcula el alto de
+   * cada fila) como al redibujar el contenido en didDrawCell. */
+  const margenHorizontal = 24;
+  const diaColWidth = (pageWidth - margenHorizontal * 2 - HORA_COL_WIDTH) / diasSemana.length;
+  const diaColTextWidth = diaColWidth - CELL_PADDING * 2;
+
+  doc.setFontSize(CELL_FONT_SIZE);
   const head = ['Rango de horas', ...diasSemana];
   const body = filas.map((fila) => [
     `${formatHoraAmPm(fila.horaInicio)} – ${formatHoraAmPm(fila.horaFin)}`,
-    ...fila.celdas.map((celdas) => celdaTexto(celdas)),
+    ...fila.celdas.map((celdas) => celdaTexto(doc, celdas, diaColTextWidth)),
   ]);
 
   autoTable(doc, {
@@ -140,11 +186,18 @@ export async function exportPuntoCalendarioToPdf(
       halign: 'center',
     },
     columnStyles: {
-      0: { cellWidth: 85, fontStyle: 'bold' },
+      0: { cellWidth: HORA_COL_WIDTH, fontStyle: 'bold' },
+      1: { cellWidth: diaColWidth },
+      2: { cellWidth: diaColWidth },
+      3: { cellWidth: diaColWidth },
+      4: { cellWidth: diaColWidth },
+      5: { cellWidth: diaColWidth },
+      6: { cellWidth: diaColWidth },
+      7: { cellWidth: diaColWidth },
     },
     bodyStyles: { halign: 'center' },
     alternateRowStyles: { fillColor: ALT_ROW_RGB },
-    margin: { left: 24, right: 24 },
+    margin: { left: margenHorizontal, right: margenHorizontal },
     /** jsPDF-autotable dibuja el texto de cada celda con un único estilo; para poder
      * poner el nombre del publicador en negrita y "Disponible…" en verde y negrita
      * dentro de la misma celda, se repinta el interior (sin tocar el borde) y se
@@ -158,7 +211,7 @@ export async function exportPuntoCalendarioToPdf(
       if (turnos.length === 0) {
         return;
       }
-      const lineas = celdaLineas(turnos);
+      const lineas = celdaLineas(doc, turnos, diaColTextWidth);
 
       const inset = 0.6;
       const isAltRow = data.row.index % 2 === 1;

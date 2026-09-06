@@ -45,6 +45,14 @@ export class PublicadoresService {
     return (rows as unknown as PublicadorRow[]).map(flatten);
   }
 
+  /** "Nueva solicitud" en Gestión de solicitudes ya valida duplicados contra
+   * publicadores activos en el frontend; esta búsqueda es el complemento — solo se
+   * consulta cuando esa validación no encontró nada — para detectar si la persona ya
+   * existió antes en la PPAM y se retiró. */
+  async buscarRetirados(movil: string | null, correo: string | null) {
+    return this.publicadoresRepository.findRetiradosPorMovilOCorreo(movil, correo);
+  }
+
   async create(dto: CreatePublicadorDto, usuarioLogin: string) {
     const login = await this.buildUniqueLogin(dto.primer_nombre, dto.primer_apellido, dto.segundo_apellido);
     const row = await this.publicadoresRepository.create({
@@ -105,19 +113,20 @@ export class PublicadoresService {
     };
   }
 
-  /** Traslada el registro del participante logueado a publicadores_retirados y
-   * bloquea su acceso (sufijo en el móvil, que hace las veces de contraseña). Los
-   * turnos asignados NO se liberan aquí: eso ocurre solo cuando el equipo de
-   * administradores aprueba la solicitud (ver PublicadoresService.aprobarRetiro).
-   * Igual que actualizarMisDatos, el id nunca sale del token: siempre se actúa
-   * sobre user.publicadorId. */
-  async solicitarBaja(dto: SolicitarBajaDto, user: AuthenticatedUser): Promise<{ mensaje: string }> {
-    if (!user.publicadorId) {
-      throw new ForbiddenException('Debes ingresar como participante para solicitar tu baja.');
-    }
-    const row = await this.publicadoresRepository.findByIdFull(user.publicadorId);
+  /** Traslada el registro a publicadores_retirados y bloquea su acceso (sufijo en el
+   * móvil, que hace las veces de contraseña). Los turnos asignados NO se liberan aquí:
+   * eso ocurre solo cuando el equipo de administradores aprueba la solicitud (ver
+   * PublicadoresService.aprobarRetiro). Compartida entre el autoservicio del
+   * participante (solicitarBaja) y el retiro hecho por un administrador en nombre de
+   * otro publicador (solicitarBajaAdmin). */
+  private async ejecutarRetiro(
+    publicadorId: string,
+    justificacion: string,
+    usuarioLogin: string,
+  ): Promise<{ primerNombre: string }> {
+    const row = await this.publicadoresRepository.findByIdFull(publicadorId);
     if (!row) {
-      throw new NotFoundException('No se encontró tu registro de publicador.');
+      throw new NotFoundException('No se encontró el registro del publicador.');
     }
 
     const { congregaciones, ...datos } = row as PublicadorRow;
@@ -125,26 +134,56 @@ export class PublicadoresService {
 
     await this.publicadoresRepository.insertRetirado({
       ...(datos as TablesInsert<'publicadores_retirados'>),
-      justificacion: dto.justificacion.trim(),
+      justificacion: justificacion.trim(),
       fecha_retiro: hoy,
-      usuario_retira: user.login,
+      usuario_retira: usuarioLogin,
       estado_solicitud_retiro: 'PENDIENTE VALIDACIÓN',
     });
 
     const movilActual = (datos.movil as string | null) ?? '';
-    await this.publicadoresRepository.update(user.publicadorId, {
+    await this.publicadoresRepository.update(publicadorId, {
       movil: `${movilActual}_pendiente_retiro`,
-      usuario_modifica: user.login,
+      usuario_modifica: usuarioLogin,
       fecha_modificacion: hoy,
     });
 
     const primerNombre = ((datos.primer_nombre as string | null) ?? '').trim() || 'Publicador';
+    return { primerNombre };
+  }
+
+  /** Igual que actualizarMisDatos, el id nunca sale del token: siempre se actúa sobre
+   * user.publicadorId. */
+  async solicitarBaja(dto: SolicitarBajaDto, user: AuthenticatedUser): Promise<{ mensaje: string }> {
+    if (!user.publicadorId) {
+      throw new ForbiddenException('Debes ingresar como participante para solicitar tu baja.');
+    }
+    const { primerNombre } = await this.ejecutarRetiro(
+      user.publicadorId,
+      dto.justificacion,
+      user.login,
+    );
+
     return {
       mensaje:
         `${primerNombre} muchas gracias por el tiempo y el esfuerzo que has dedicado a apoyar esta faceta de la ` +
         `predicación con los exhibidores. Valoramos mucho tu disposición para servir a Jehová de esta manera. ` +
         `Esperamos que, si en algún momento tus circunstancias te lo permiten, podamos volver a verte participando ` +
         `con nosotros en esta faceta del servicio. ¡Muchas gracias por todo!.`,
+    };
+  }
+
+  /** Retiro registrado por un administrador en nombre de un publicador elegido por
+   * búsqueda (opción "Retirar de la PPAM" del BackOffice) — misma lógica que
+   * solicitarBaja, pero con el id explícito en vez de tomarlo del token. */
+  async solicitarBajaAdmin(
+    publicadorId: string,
+    dto: SolicitarBajaDto,
+    user: AuthenticatedUser,
+  ): Promise<{ mensaje: string }> {
+    const { primerNombre } = await this.ejecutarRetiro(publicadorId, dto.justificacion, user.login);
+
+    return {
+      mensaje: `Se registró correctamente el retiro de ${primerNombre} de la PPAM.`,
     };
   }
 

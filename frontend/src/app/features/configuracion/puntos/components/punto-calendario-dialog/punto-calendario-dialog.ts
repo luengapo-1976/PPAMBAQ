@@ -208,6 +208,50 @@ export class PuntoCalendarioDialog {
     });
   }
 
+  // ---------- Eliminar horario (solo editable) ----------
+  // Requisito para poder solapar un nuevo horario con uno existente: primero hay que
+  // eliminar el anterior. Si tiene publicadores asignados, el backend rechaza el
+  // borrado y pide retirarlos primero (Devolver/Retirar turno).
+
+  protected readonly eliminandoCeldaKey = signal<string | null>(null);
+  protected readonly eliminarHorarioTurnos = signal<TurnoResumen[] | null>(null);
+
+  protected onAbrirEliminarHorario(turnos: TurnoResumen[]): void {
+    if (turnos.length === 0) {
+      return;
+    }
+    this.eliminarHorarioTurnos.set(turnos);
+  }
+
+  protected onCancelarEliminarHorario(): void {
+    this.eliminarHorarioTurnos.set(null);
+  }
+
+  protected onConfirmarEliminarHorario(): void {
+    const turnos = this.eliminarHorarioTurnos();
+    if (!turnos || this.eliminandoCeldaKey()) {
+      return;
+    }
+    const clave = this.claveCelda(turnos);
+    this.eliminandoCeldaKey.set(clave);
+    forkJoin(turnos.map((t) => this.turnosService.eliminarHorario(t.id))).subscribe({
+      next: () => {
+        this.eliminandoCeldaKey.set(null);
+        this.eliminarHorarioTurnos.set(null);
+        this.snackbar.success('El horario fue eliminado correctamente.');
+        const codigo = this.punto()?.codigo_punto;
+        if (codigo) {
+          this.cargarTurnos(codigo);
+        }
+      },
+      error: (err: ApiError) => {
+        this.eliminandoCeldaKey.set(null);
+        this.eliminarHorarioTurnos.set(null);
+        this.snackbar.error(err?.message ?? 'No se pudo eliminar el horario.');
+      },
+    });
+  }
+
   // ---------- Habilitar nuevo horario (solo editable) ----------
 
   protected readonly nuevoHorarioAbierto = signal(false);
@@ -226,12 +270,36 @@ export class PuntoCalendarioDialog {
     return !inicio || !fin || fin > inicio;
   });
 
+  /** Horario existente (de cualquier estado) del mismo día que se solapa con lo que
+   * el administrador está por crear — misma regla que valida el backend, para avisar
+   * en pantalla antes de intentar guardar, no solo después de un error del servidor.
+   * Se normaliza a "HH:MM" porque el <input type="time"> no trae segundos y los
+   * horarios guardados sí. */
+  protected readonly nuevoHorarioConflicto = computed<TurnoResumen | null>(() => {
+    const dia = this.nuevoHorarioDia();
+    const inicio = this.nuevoHorarioHoraInicio();
+    const fin = this.nuevoHorarioHoraFin();
+    if (!dia || !inicio || !fin || !this.horaOrdenValido()) {
+      return null;
+    }
+    const soloHoraMinuto = (hora: string) => hora.slice(0, 5);
+    return (
+      this.turnos().find(
+        (t) =>
+          t.dia_nombre === dia &&
+          soloHoraMinuto(t.hora_inicio) < fin &&
+          soloHoraMinuto(t.hora_fin) > inicio,
+      ) ?? null
+    );
+  });
+
   protected readonly nuevoHorarioValido = computed(
     () =>
       !!this.nuevoHorarioDia() &&
       !!this.nuevoHorarioHoraInicio() &&
       !!this.nuevoHorarioHoraFin() &&
-      this.horaOrdenValido(),
+      this.horaOrdenValido() &&
+      !this.nuevoHorarioConflicto(),
   );
 
   protected onAbrirNuevoHorario(): void {

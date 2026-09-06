@@ -1,7 +1,13 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiService } from '../../../core/api.service';
-import { MensajeRelacionadoCon, Publicador, PublicadorPayload, PublicadorUpdatePayload } from './models';
+import {
+  MensajeRelacionadoCon,
+  Publicador,
+  PublicadorPayload,
+  PublicadorRetiradoBusqueda,
+  PublicadorUpdatePayload,
+} from './models';
 
 @Injectable({ providedIn: 'root' })
 export class PublicadoresService {
@@ -69,5 +75,31 @@ export class PublicadoresService {
       ids,
       tipoEntrenamiento,
     });
+  }
+
+  /** Retiro de la PPAM registrado por un administrador en nombre de un publicador
+   * elegido por búsqueda — misma lógica que "Solicitar mi baja" del participante, pero
+   * con el id explícito en la ruta. */
+  solicitarBaja(id: string, justificacion: string): Observable<{ mensaje: string }> {
+    return this.api.post<{ mensaje: string }>(`publicadores/${id}/solicitar-baja`, {
+      justificacion,
+    });
+  }
+
+  /** "Nueva solicitud": busca si la persona ya existió antes en la PPAM y se retiró
+   * (tabla publicadores_retirados), por móvil y/o correo. Solo tiene sentido llamarla
+   * cuando ya se confirmó que no hay coincidencia entre los publicadores activos. */
+  buscarRetirados(
+    movil: string | null,
+    correo: string | null,
+  ): Observable<PublicadorRetiradoBusqueda[]> {
+    const params: Record<string, string> = {};
+    if (movil) {
+      params['movil'] = movil;
+    }
+    if (correo) {
+      params['correo'] = correo;
+    }
+    return this.api.get<PublicadorRetiradoBusqueda[]>('publicadores/retirados/buscar', params);
   }
 }

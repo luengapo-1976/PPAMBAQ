@@ -15,6 +15,9 @@ export interface TurnoResumen {
   sexo_ocupante: string | null;
   disponibilidad: TurnoDisponibilidad;
   nombreOcupante: string | null;
+  /** Solo primer nombre + primer apellido — usado en el calendario del punto (grilla y
+   * PDF), donde el espacio por columna es reducido. */
+  nombreCortoOcupante: string | null;
   movilOcupante: string | null;
   congregacionOcupante: string | null;
 }

@@ -77,6 +77,8 @@ export interface ConteoTurnosPublicador {
 export interface TurnoValidacionResumen {
   id: string;
   nombrePunto: string;
+  encargadoPunto: string | null;
+  movilEncargadoPunto: string | null;
   diaNombre: string;
   horaInicio: string;
   horaFin: string;
@@ -96,6 +98,12 @@ export interface TurnoValidacionResumen {
    * calcula para los casos pendientes de revisión. */
   parejaNombre: string | null;
   parejaMovil: string | null;
+  /** 'M' | 'F' del publicador solicitante — usado por el frontend para anteponer
+   * "hermano"/"hermana" al sustituir el nombre en el mensaje de WhatsApp de respuesta. */
+  sexo: string | null;
+  /** Solo tiene sentido para 'aprobados'/'rechazados': indica si ya se envió (o se
+   * marcó como enviado) el WhatsApp con la respuesta de la decisión a este publicador. */
+  mensajeWhatsappEnviado: boolean;
 }
 
 export type TurnoHistorialTipo = 'solicitado' | 'rechazado' | 'devuelto';
@@ -139,6 +147,9 @@ export interface TurnoResumen {
    * punto (comparando su propio móvil con el móvil registrado del punto) — para el resto
    * de usuarios quedan en null y la vista solo muestra el sexo de quien ocupa el turno. */
   nombreOcupante: string | null;
+  /** Solo primer nombre + primer apellido: usado en el calendario del punto (grilla y
+   * PDF), donde el espacio por columna es reducido y no cabe el nombre completo. */
+  nombreCortoOcupante: string | null;
   movilOcupante: string | null;
   congregacionOcupante: string | null;
 }
@@ -208,6 +219,35 @@ export class TurnosService {
       );
     }
 
+    /** No debe existir (activo o inactivo) un horario del mismo punto/día que se
+     * solape con el nuevo: dos rangos se solapan si uno empieza antes de que el otro
+     * termine, en ambos sentidos. Se compara contra TODOS los horarios existentes del
+     * punto (sin filtrar por estado_turno) porque uno inactivo sigue siendo un
+     * registro real que el administrador debe resolver explícitamente (eliminarlo o
+     * ajustarlo) antes de poder crear uno que se le encime.
+     * Se normaliza a "HH:MM" (sin segundos) antes de comparar: el DTO llega sin
+     * segundos (input type="time") pero lo ya guardado en turnos sí los trae — sin
+     * normalizar, una comparación de strings de distinto largo puede marcar como
+     * solapados dos horarios que en realidad solo son consecutivos (ej. termina a las
+     * 09:00 y el siguiente empieza a las 09:00). */
+    const soloHoraMinuto = (hora: string) => hora.slice(0, 5);
+    const nuevoInicio = soloHoraMinuto(dto.hora_inicio);
+    const nuevoFin = soloHoraMinuto(dto.hora_fin);
+    const existentes = await this.turnosRepository.findByCodigoPunto(dto.codigo_punto);
+    const solapado = existentes.find(
+      (t) =>
+        t.dia_nombre === dto.dia_nombre &&
+        soloHoraMinuto(t.hora_inicio) < nuevoFin &&
+        soloHoraMinuto(t.hora_fin) > nuevoInicio,
+    );
+    if (solapado) {
+      throw new ConflictException(
+        `Ya existe un horario de ${soloHoraMinuto(solapado.hora_inicio)} a ${soloHoraMinuto(solapado.hora_fin)} ` +
+          `los ${dto.dia_nombre} en este punto, que se solapa con el horario que intentas crear. Debes ` +
+          'eliminar (o ajustar) ese horario antes de continuar.',
+      );
+    }
+
     const hoy = todayIsoDateBogota();
     const payload = {
       codigo_punto: dto.codigo_punto,
@@ -252,6 +292,33 @@ export class TurnosService {
           ? 'El horario fue activado correctamente.'
           : 'El horario fue inactivado correctamente.',
     };
+  }
+
+  /** Elimina definitivamente un cupo del calendario de un punto — a diferencia de
+   * activar/inactivar, esto lo borra por completo (usado, por ejemplo, para resolver
+   * un solapamiento de horarios: el administrador debe eliminar el horario anterior
+   * antes de poder crear uno nuevo que lo reemplace). El frontend llama este endpoint
+   * una vez por cada cupo del horario (misma convención que actualizarEstadoTurno). */
+  async eliminarHorario(turnoId: string): Promise<{ mensaje: string }> {
+    const turno = await this.turnosRepository.findById(turnoId);
+    if (!turno) {
+      throw new NotFoundException('El horario indicado no existe.');
+    }
+    if (turno.id_publicador) {
+      throw new ConflictException(
+        'No se puede eliminar este horario porque tiene un publicador asignado. Retíralo primero ' +
+          'e inténtalo de nuevo.',
+      );
+    }
+
+    const eliminado = await this.turnosRepository.eliminar(turnoId);
+    if (!eliminado) {
+      throw new ConflictException(
+        'No se pudo eliminar el horario: puede que se le haya asignado un publicador justo ahora. Intenta nuevamente.',
+      );
+    }
+
+    return { mensaje: 'El horario fue eliminado correctamente.' };
   }
 
   /** idPublicadorOverride lo usan las páginas administrativas (Editar solicitud,
@@ -707,7 +774,7 @@ export class TurnosService {
     turnoId: string,
     dto: AprobarSolicitudDto,
     user: AuthenticatedUser,
-  ): Promise<{ mensaje: string }> {
+  ): Promise<{ mensaje: string; id: string }> {
     const aprobado = await this.turnosRepository.aprobarSolicitud(turnoId, {
       estado_solicitud: ESTADO_APROBADO,
       aprobado_por: user.login,
@@ -743,14 +810,17 @@ export class TurnosService {
       justificacion_aprobacion: aprobado.justificacion_aprobacion,
     });
 
-    return { mensaje: 'La solicitud fue aprobada correctamente.' };
+    /** El id que le interesa al frontend para el paso de WhatsApp es el del turno (no
+     * el de la copia recién creada en turnos_apro_rechaz): aprobadosValidacion() sigue
+     * leyendo de turnos, así que ese es el id que identifica el caso en esa grilla. */
+    return { mensaje: 'La solicitud fue aprobada correctamente.', id: aprobado.id };
   }
 
   async rechazarSolicitudPendiente(
     turnoId: string,
     dto: RechazarSolicitudDto,
     user: AuthenticatedUser,
-  ): Promise<{ mensaje: string }> {
+  ): Promise<{ mensaje: string; id: string }> {
     const turno = await this.turnosRepository.findById(turnoId);
     if (!turno || turno.estado_solicitud !== ESTADO_PENDIENTE) {
       throw new ConflictException('Esta solicitud ya fue procesada.');
@@ -774,7 +844,7 @@ export class TurnosService {
       throw new ConflictException('Esta solicitud ya fue procesada.');
     }
 
-    await this.turnosRepository.registrarApRechaz({
+    const registro = await this.turnosRepository.registrarApRechaz({
       codigo_punto: turno.codigo_punto,
       dia_numero: turno.dia_numero,
       dia_nombre: turno.dia_nombre,
@@ -796,7 +866,30 @@ export class TurnosService {
       justificacion_aprobacion: dto.justificacion.trim(),
     });
 
-    return { mensaje: 'La solicitud fue rechazada correctamente.' };
+    /** A diferencia de aprobar, aquí sí importa el id de la copia recién creada: el
+     * turno original quedó liberado (ya no identifica este caso), así que
+     * rechazadosValidacion() lee de turnos_apro_rechaz y ese es el id real de la fila. */
+    return { mensaje: 'La solicitud fue rechazada correctamente.', id: registro.id };
+  }
+
+  /** Marca que ya se envió (o se acaba de abrir el enlace de) el WhatsApp con la
+   * respuesta de una decisión de Casos por validar — ver el comentario de
+   * registrarApRechaz para por qué "aprobados" y "rechazados" se resuelven contra
+   * tablas distintas. */
+  async marcarMensajeWhatsappEnviado(
+    estado: 'aprobados' | 'rechazados',
+    id: string,
+  ): Promise<{ mensaje: string }> {
+    const marcado =
+      estado === 'aprobados'
+        ? await this.turnosRepository.marcarWhatsappEnviadoAprobado(id, todayIsoDateBogota())
+        : await this.turnosRepository.marcarWhatsappEnviadoRechazado(id, todayIsoDateBogota());
+
+    if (!marcado) {
+      throw new ConflictException('El caso indicado no existe.');
+    }
+
+    return { mensaje: 'Se registró el envío del mensaje de WhatsApp.' };
   }
 
   /** Línea de tiempo de "Editar solicitud": combina los turnos que el publicador tiene
@@ -934,6 +1027,8 @@ export class TurnosService {
     return {
       id: turno.id,
       nombrePunto: turno.puntos?.nombre_punto ?? 'Punto sin nombre',
+      encargadoPunto: turno.puntos?.encargado ?? null,
+      movilEncargadoPunto: turno.puntos?.movil ?? null,
       diaNombre: turno.dia_nombre,
       horaInicio: turno.hora_inicio,
       horaFin: turno.hora_fin,
@@ -952,6 +1047,8 @@ export class TurnosService {
       fechaAprobacion: turno.fecha_aprobacion,
       parejaNombre,
       parejaMovil,
+      sexo: publicador?.sexo ?? null,
+      mensajeWhatsappEnviado: turno.mensaje_whatsapp_enviado,
     };
   }
 
@@ -1131,6 +1228,13 @@ export class TurnosService {
           )
           .join(' ') || null
       : null;
+    const nombreCortoOcupante = ocupante
+      ? [ocupante.primer_nombre, ocupante.primer_apellido]
+          .filter(
+            (parte): parte is string => !!parte && parte.trim().length > 0,
+          )
+          .join(' ') || null
+      : null;
 
     return {
       id: turno.id,
@@ -1144,6 +1248,7 @@ export class TurnosService {
       sexo_ocupante: turno.publicadores?.sexo ?? null,
       disponibilidad,
       nombreOcupante,
+      nombreCortoOcupante,
       movilOcupante: ocupante?.movil ?? null,
       congregacionOcupante:
         ocupante?.congregaciones?.nombre_congregacion ?? null,

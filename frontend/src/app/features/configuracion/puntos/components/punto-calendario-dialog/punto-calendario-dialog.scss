@@ -89,21 +89,34 @@
 }
 
 .punto-calendario__scroll {
-  overflow-x: auto;
+  overflow: auto;
   border: 1px solid var(--ppam-outline-variant);
   border-radius: var(--ppam-radius-card);
 }
 
+/* Alto acotado a propósito: así el desplazamiento vertical ocurre DENTRO de este
+   contenedor (no en el diálogo completo), que es lo que permite que el encabezado de
+   días (position: sticky; top: 0) quede realmente inmovilizado al bajar por los
+   horarios. Ver también .punto-calendario__corner/.punto-calendario__dia-header. */
+.punto-calendario__scroll--grid {
+  max-height: 62vh;
+}
+
 .punto-calendario__grid {
   display: grid;
-  grid-template-columns: 180px repeat(7, minmax(190px, 1fr));
-  min-width: 1530px;
+  /* Sin min-width fijo: las columnas de día se reparten el ancho disponible (piso de
+     92px, con margen para la barra de scroll vertical del contenedor) para que, en
+     pantallas de escritorio típicas (>=1024px), los 7 días quepan sin necesidad de
+     scroll horizontal. Por debajo de ese piso (tablets angostas) el overflow-x del
+     contenedor sigue permitiendo desplazamiento horizontal. */
+  grid-template-columns: minmax(80px, 105px) repeat(7, minmax(80px, 1fr));
 }
 
 .punto-calendario__corner {
   position: sticky;
+  top: 0;
   left: 0;
-  z-index: 2;
+  z-index: 3;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -118,6 +131,10 @@
 }
 
 .punto-calendario__dia-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  min-width: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -145,10 +162,15 @@
   font-weight: 600;
   font-size: var(--ppam-small-size);
   border-top: 2px solid var(--ppam-outline-variant);
-  white-space: nowrap;
+  text-align: center;
 }
 
 .punto-calendario__celda {
+  /* Sin esto, el contenido no partible (p. ej. el móvil, una cadena de dígitos sin
+     espacios) fija un ancho mínimo propio que ignora el "minmax" de la columna del
+     grid — el clásico caso de "min-width: auto" en celdas flex/grid — y termina
+     forzando scroll horizontal aunque sobre espacio disponible. */
+  min-width: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -200,8 +222,38 @@
   opacity: 0.55;
 }
 
+.celda-slot__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ppam-space-sm);
+}
+
 .celda-slot__switch {
   align-self: flex-start;
+}
+
+.celda-slot__eliminar-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: var(--ppam-radius-control);
+  background: transparent;
+  color: var(--ppam-semantic-error);
+  cursor: pointer;
+}
+
+.celda-slot__eliminar-btn .material-symbols-outlined {
+  font-size: 18px;
+}
+
+.celda-slot__eliminar-btn:hover {
+  background: var(--ppam-semantic-error-container);
 }
 
 .punto-calendario__nuevo-field {

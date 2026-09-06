@@ -173,6 +173,8 @@ The shape language is "Rounded" to soften the professional aesthetic and make th
 
 Icons must always be **Material Symbols Outline** to maintain the lightweight, airy feel of the typography and spacing.
 
+- **Congregación:** use the `home` icon. Never use `church` (a church with a cross on top) anywhere in the app.
+
 ## Components
 
 ### Buttons

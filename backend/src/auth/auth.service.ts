@@ -43,6 +43,9 @@ function toPerfil(publicador: PublicadorAuthProfile): PublicadorPerfil {
 
 const INVALID_CREDENTIALS_MESSAGE = 'Usuario o contraseña incorrectos.';
 const INVALID_CURRENT_PASSWORD_MESSAGE = 'La contraseña actual no es correcta.';
+const ESTADO_CUMPLE_REQUISITOS = 'CUMPLE REQUISITOS';
+const REGISTRO_EN_PROCESO_MESSAGE =
+  'Tu registro en la PPAM todavía está en proceso. Podrás ingresar a la aplicación una vez tu solicitud cumpla los requisitos.';
 const FORGOT_PASSWORD_GENERIC_MESSAGE =
   'Si el correo está registrado, en unos minutos recibirás un mensaje con una contraseña temporal.';
 const TEMP_PASSWORD_CHARSET = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
@@ -123,6 +126,14 @@ export class AuthService {
     if (!publicador) {
       this.loginAttemptsService.registerFailure(dto.login);
       throw new UnauthorizedException(INVALID_CREDENTIALS_MESSAGE);
+    }
+
+    /** Aunque el login y el móvil (que hace de contraseña) coincidan, un participante
+     * solo puede entrar a la aplicación una vez su solicitud "cumple requisitos" — no
+     * cuenta como intento fallido para el bloqueo de intentos, porque las credenciales
+     * sí son correctas: la persona solo debe esperar a que su registro avance. */
+    if (publicador.estado !== ESTADO_CUMPLE_REQUISITOS) {
+      throw new UnauthorizedException(REGISTRO_EN_PROCESO_MESSAGE);
     }
 
     const accessToken = await this.jwtService.signAsync({

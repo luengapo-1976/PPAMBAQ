@@ -80,14 +80,25 @@
           @for (celdas of fila.celdas; track $index) {
             <div class="punto-calendario__celda">
               @if (editable() && celdas.length > 0) {
-                <app-switch
-                  class="celda-slot__switch"
-                  [checked]="celdas[0].estado_turno !== 'INACTIVO'"
-                  [disabled]="actualizandoCeldaKey() === claveCelda(celdas)"
-                  labelOn="Habilitado"
-                  labelOff="Inactivo"
-                  (changed)="onToggleEstadoTurno(celdas)"
-                />
+                <div class="celda-slot__toolbar">
+                  <app-switch
+                    class="celda-slot__switch"
+                    [checked]="celdas[0].estado_turno !== 'INACTIVO'"
+                    [disabled]="actualizandoCeldaKey() === claveCelda(celdas)"
+                    labelOn="Habilitado"
+                    labelOff="Inactivo"
+                    (changed)="onToggleEstadoTurno(celdas)"
+                  />
+                  <button
+                    type="button"
+                    class="celda-slot__eliminar-btn"
+                    aria-label="Eliminar este horario"
+                    title="Eliminar este horario"
+                    (click)="onAbrirEliminarHorario(celdas)"
+                  >
+                    <span class="material-symbols-outlined" aria-hidden="true">delete</span>
+                  </button>
+                </div>
               }
               @for (turno of celdas; track turno.id) {
                 <div
@@ -100,7 +111,7 @@
                       {{ turno.sexo_ocupante === 'F' ? 'woman' : 'man' }}
                     </span>
                     <div class="celda-slot__info">
-                      <strong>{{ turno.nombreOcupante || 'Publicador asignado' }}</strong>
+                      <strong>{{ turno.nombreCortoOcupante || 'Publicador asignado' }}</strong>
                       <span>{{ turno.movilOcupante || '-' }}</span>
                       <span>{{ turno.congregacionOcupante || '-' }}</span>
                     </div>
@@ -145,14 +156,25 @@
             </div>
             <div class="agenda-item__celda">
               @if (editable() && celdaDelDia(fila).length > 0) {
-                <app-switch
-                  class="celda-slot__switch"
-                  [checked]="celdaDelDia(fila)[0].estado_turno !== 'INACTIVO'"
-                  [disabled]="actualizandoCeldaKey() === claveCelda(celdaDelDia(fila))"
-                  labelOn="Habilitado"
-                  labelOff="Inactivo"
-                  (changed)="onToggleEstadoTurno(celdaDelDia(fila))"
-                />
+                <div class="celda-slot__toolbar">
+                  <app-switch
+                    class="celda-slot__switch"
+                    [checked]="celdaDelDia(fila)[0].estado_turno !== 'INACTIVO'"
+                    [disabled]="actualizandoCeldaKey() === claveCelda(celdaDelDia(fila))"
+                    labelOn="Habilitado"
+                    labelOff="Inactivo"
+                    (changed)="onToggleEstadoTurno(celdaDelDia(fila))"
+                  />
+                  <button
+                    type="button"
+                    class="celda-slot__eliminar-btn"
+                    aria-label="Eliminar este horario"
+                    title="Eliminar este horario"
+                    (click)="onAbrirEliminarHorario(celdaDelDia(fila))"
+                  >
+                    <span class="material-symbols-outlined" aria-hidden="true">delete</span>
+                  </button>
+                </div>
               }
               @for (turno of celdaDelDia(fila); track turno.id) {
                 <div
@@ -165,7 +187,7 @@
                       {{ turno.sexo_ocupante === 'F' ? 'woman' : 'man' }}
                     </span>
                     <div class="celda-slot__info">
-                      <strong>{{ turno.nombreOcupante || 'Publicador asignado' }}</strong>
+                      <strong>{{ turno.nombreCortoOcupante || 'Publicador asignado' }}</strong>
                       <span>{{ turno.movilOcupante || '-' }}</span>
                       <span>{{ turno.congregacionOcupante || '-' }}</span>
                     </div>
@@ -237,6 +259,41 @@
   @if (!horaOrdenValido()) {
     <p class="punto-calendario__nuevo-error">
       La hora de finalización debe ser posterior a la hora de inicio.
+    </p>
+  } @else if (nuevoHorarioConflicto(); as conflicto) {
+    <p class="punto-calendario__nuevo-error">
+      Ya existe un horario de {{ formatHora(conflicto.hora_inicio) }} a
+      {{ formatHora(conflicto.hora_fin) }} los {{ conflicto.dia_nombre }} en este punto, que se
+      solapa con el que intentas crear. Debes eliminar (o ajustar) ese horario antes de continuar.
+    </p>
+  }
+</app-dialog>
+
+<app-dialog
+  [open]="!!eliminarHorarioTurnos()"
+  title="Eliminar horario"
+  (closed)="onCancelarEliminarHorario()"
+>
+  <app-button
+    dialogToolbar
+    type="button"
+    variant="danger"
+    icon="delete"
+    [disabled]="!!eliminandoCeldaKey()"
+    (click)="onConfirmarEliminarHorario()"
+  >
+    {{ eliminandoCeldaKey() ? 'Eliminando…' : 'Eliminar' }}
+  </app-button>
+  <app-button dialogToolbar type="button" variant="secondary" (click)="onCancelarEliminarHorario()">
+    Cancelar
+  </app-button>
+
+  @if (eliminarHorarioTurnos(); as turnos) {
+    <p class="punto-calendario__nuevo-error">
+      Esta acción eliminará permanentemente el horario de
+      {{ formatHora(turnos[0].hora_inicio) }} a {{ formatHora(turnos[0].hora_fin) }} los
+      {{ turnos[0].dia_nombre }}. Si tiene un publicador asignado, primero debes retirarlo
+      (Devolver/Retirar turno) para poder eliminarlo.
     </p>
   }
 </app-dialog>

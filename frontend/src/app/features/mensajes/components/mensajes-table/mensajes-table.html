@@ -3,6 +3,7 @@
     <thead>
       <tr>
         <th>Acciones</th>
+        <th>Categoría</th>
         <th>Tipo</th>
         <th>Mensaje</th>
       </tr>
@@ -21,12 +22,13 @@
               <span class="material-symbols-outlined" aria-hidden="true">edit</span>
             </button>
           </td>
+          <td class="ppam-table__tipo">{{ row.categoria === 'RESPUESTA CASOS' ? 'Respuesta casos' : 'Entrenamiento' }}</td>
           <td class="ppam-table__tipo">{{ row.tipo }}</td>
           <td class="ppam-table__mensaje">{{ row.mensaje }}</td>
         </tr>
       } @empty {
         <tr>
-          <td colspan="3" class="ppam-table__empty">Todavía no hay mensajes registrados.</td>
+          <td colspan="4" class="ppam-table__empty">Todavía no hay mensajes registrados.</td>
         </tr>
       }
     </tbody>

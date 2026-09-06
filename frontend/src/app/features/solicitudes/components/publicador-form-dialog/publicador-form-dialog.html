@@ -471,3 +471,59 @@
     </p>
   }
 </app-dialog>
+
+<app-dialog
+  [open]="retiradoDialogOpen()"
+  title="Esta persona ya existió antes en la PPAM"
+  (closed)="onDismissRetirado()"
+>
+  <p class="duplicate-hint">
+    @if (retiradoCandidates().length === 1) {
+      Encontramos un registro anterior que podría corresponder a la misma persona. Revisa antes de
+      continuar:
+    } @else {
+      Encontramos varios registros anteriores que podrían corresponder a la misma persona.
+      Selecciona uno para continuar:
+    }
+  </p>
+
+  <ul class="duplicate-list">
+    @for (candidate of retiradoCandidates(); track candidate.id) {
+      <li>
+        <label
+          class="duplicate-item"
+          [class.duplicate-item--selected]="selectedRetiradoId() === candidate.id"
+        >
+          <input
+            type="radio"
+            name="retirado-candidate"
+            [checked]="selectedRetiradoId() === candidate.id"
+            (change)="selectedRetiradoId.set(candidate.id)"
+          />
+          <span class="duplicate-item__info">
+            <strong
+              >{{ candidate.primer_nombre }} {{ candidate.segundo_nombre }}
+              {{ candidate.primer_apellido }} {{ candidate.segundo_apellido }}</strong
+            >
+            <span>Móvil: {{ candidate.movil || '-' }}</span>
+            <span
+              >Estuvo en la PPAM desde {{ formatDateShort(candidate.fecha_registro) }} hasta
+              {{ formatDateShort(candidate.fecha_retiro) }}</span
+            >
+            <span>Congregación en ese momento: {{ congregacionNombre(candidate.codigo_congregacion) }}</span>
+            <span>Justificación del retiro: {{ candidate.justificacion }}</span>
+          </span>
+        </label>
+      </li>
+    }
+  </ul>
+
+  <div class="duplicate-actions">
+    <app-button variant="secondary" (click)="onDismissRetirado()">
+      No, continuar como registro nuevo
+    </app-button>
+    <app-button [disabled]="!selectedRetiradoId()" (click)="onConfirmRetirado()">
+      Cargar datos de la persona seleccionada
+    </app-button>
+  </div>
+</app-dialog>

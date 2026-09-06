@@ -314,6 +314,7 @@ export type Database = {
       mensajes: {
         Row: {
           adjunto_asociado: string | null;
+          categoria: string;
           fecha_modificacion: string | null;
           fecha_registro: string | null;
           id: string;
@@ -324,6 +325,7 @@ export type Database = {
         };
         Insert: {
           adjunto_asociado?: string | null;
+          categoria?: string;
           fecha_modificacion?: string | null;
           fecha_registro?: string | null;
           id?: string;
@@ -334,6 +336,7 @@ export type Database = {
         };
         Update: {
           adjunto_asociado?: string | null;
+          categoria?: string;
           fecha_modificacion?: string | null;
           fecha_registro?: string | null;
           id?: string;
@@ -887,6 +890,7 @@ export type Database = {
           estado_solicitud: string | null;
           estado_turno: string | null;
           fecha_aprobacion: string | null;
+          fecha_mensaje_whatsapp: string | null;
           fecha_modificacion: string | null;
           fecha_registro: string | null;
           hora_fin: string;
@@ -895,6 +899,7 @@ export type Database = {
           id_publicador: string | null;
           justificacion: string | null;
           justificacion_aprobacion: string | null;
+          mensaje_whatsapp_enviado: boolean;
           observaciones: string | null;
           pareja_movil: string | null;
           pareja_nombre: string | null;
@@ -910,6 +915,7 @@ export type Database = {
           estado_solicitud?: string | null;
           estado_turno?: string | null;
           fecha_aprobacion?: string | null;
+          fecha_mensaje_whatsapp?: string | null;
           fecha_modificacion?: string | null;
           fecha_registro?: string | null;
           hora_fin: string;
@@ -918,6 +924,7 @@ export type Database = {
           id_publicador?: string | null;
           justificacion?: string | null;
           justificacion_aprobacion?: string | null;
+          mensaje_whatsapp_enviado?: boolean;
           observaciones?: string | null;
           pareja_movil?: string | null;
           pareja_nombre?: string | null;
@@ -933,6 +940,7 @@ export type Database = {
           estado_solicitud?: string | null;
           estado_turno?: string | null;
           fecha_aprobacion?: string | null;
+          fecha_mensaje_whatsapp?: string | null;
           fecha_modificacion?: string | null;
           fecha_registro?: string | null;
           hora_fin?: string;
@@ -941,6 +949,7 @@ export type Database = {
           id_publicador?: string | null;
           justificacion?: string | null;
           justificacion_aprobacion?: string | null;
+          mensaje_whatsapp_enviado?: boolean;
           observaciones?: string | null;
           pareja_movil?: string | null;
           pareja_nombre?: string | null;
@@ -973,6 +982,7 @@ export type Database = {
           dia_numero: number;
           estado_solicitud: string | null;
           fecha_aprobacion: string | null;
+          fecha_mensaje_whatsapp: string | null;
           fecha_modificacion: string | null;
           fecha_registro: string | null;
           hora_fin: string;
@@ -982,6 +992,7 @@ export type Database = {
           justificacion: string | null;
           justificacion_aprobacion: string | null;
           justificacion_solicitud: string | null;
+          mensaje_whatsapp_enviado: boolean;
           observaciones: string | null;
           pareja_movil: string | null;
           pareja_nombre: string | null;
@@ -996,6 +1007,7 @@ export type Database = {
           dia_numero: number;
           estado_solicitud?: string | null;
           fecha_aprobacion?: string | null;
+          fecha_mensaje_whatsapp?: string | null;
           fecha_modificacion?: string | null;
           fecha_registro?: string | null;
           hora_fin: string;
@@ -1005,6 +1017,7 @@ export type Database = {
           justificacion?: string | null;
           justificacion_aprobacion?: string | null;
           justificacion_solicitud?: string | null;
+          mensaje_whatsapp_enviado?: boolean;
           observaciones?: string | null;
           pareja_movil?: string | null;
           pareja_nombre?: string | null;
@@ -1019,6 +1032,7 @@ export type Database = {
           dia_numero?: number;
           estado_solicitud?: string | null;
           fecha_aprobacion?: string | null;
+          fecha_mensaje_whatsapp?: string | null;
           fecha_modificacion?: string | null;
           fecha_registro?: string | null;
           hora_fin?: string;
@@ -1028,6 +1042,7 @@ export type Database = {
           justificacion?: string | null;
           justificacion_aprobacion?: string | null;
           justificacion_solicitud?: string | null;
+          mensaje_whatsapp_enviado?: boolean;
           observaciones?: string | null;
           pareja_movil?: string | null;
           pareja_nombre?: string | null;

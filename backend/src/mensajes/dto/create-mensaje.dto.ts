@@ -1,6 +1,11 @@
-import { IsNotEmpty, IsOptional, IsString, IsUrl, MaxLength } from 'class-validator';
+import { IsIn, IsNotEmpty, IsOptional, IsString, IsUrl, MaxLength } from 'class-validator';
+
+const CATEGORIA_VALUES = ['ENTRENAMIENTO', 'RESPUESTA CASOS'] as const;
 
 export class CreateMensajeDto {
+  @IsIn(CATEGORIA_VALUES)
+  categoria!: (typeof CATEGORIA_VALUES)[number];
+
   @IsString()
   @IsNotEmpty()
   @MaxLength(50)

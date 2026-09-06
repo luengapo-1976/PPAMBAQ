@@ -10,6 +10,15 @@ const RETIRO_COLUMNS =
   'id, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, movil, codigo_congregacion, ' +
   'fecha_nacimiento, fecha_bautismo, privilegio_ser, justificacion, fecha_retiro, estado_solicitud_retiro, ' +
   'valida_retiro, observaciones_retiro, fecha_validacion_retiro';
+/** Columnas necesarias para "Nueva solicitud" en Gestión de solicitudes: tanto para
+ * mostrarle al administrador el resumen (desde/hasta, congregación, justificación de
+ * retiro) como para poder precargar el formulario con los datos de la persona si
+ * decide continuar el registro. */
+const BUSQUEDA_RETIRADO_COLUMNS =
+  'id, primer_apellido, segundo_apellido, primer_nombre, segundo_nombre, direccion, codigo_departamento, ' +
+  'codigo_municipio, correo_electronico, movil, codigo_congregacion, fecha_nacimiento, sexo, fecha_bautismo, ' +
+  'estado_civil, nombre_conyuge, apellido_casada, privilegio_min, privilegio_ser, participo_antes, ' +
+  'fecha_registro, fecha_retiro, justificacion, estado_solicitud_retiro';
 
 export interface PublicadorRetirado {
   id: string;
@@ -29,11 +38,38 @@ export interface PublicadorRetirado {
   observaciones_retiro: string | null;
   fecha_validacion_retiro: string | null;
 }
+
+export interface PublicadorRetiradoBusqueda {
+  id: string;
+  primer_apellido: string | null;
+  segundo_apellido: string | null;
+  primer_nombre: string | null;
+  segundo_nombre: string | null;
+  direccion: string | null;
+  codigo_departamento: string | null;
+  codigo_municipio: string | null;
+  correo_electronico: string | null;
+  movil: string | null;
+  codigo_congregacion: number | null;
+  fecha_nacimiento: string | null;
+  sexo: string | null;
+  fecha_bautismo: string | null;
+  estado_civil: string | null;
+  nombre_conyuge: string | null;
+  apellido_casada: string | null;
+  privilegio_min: string | null;
+  privilegio_ser: string | null;
+  participo_antes: string | null;
+  fecha_registro: string | null;
+  fecha_retiro: string | null;
+  justificacion: string;
+  estado_solicitud_retiro: string | null;
+}
 /** Supabase/PostgREST limita cada consulta a un máximo de filas (por defecto 1000),
  * así que hay que paginar con .range() para traer la tabla completa. */
 const PAGE_SIZE = 1000;
 const AUTH_PROFILE_COLUMNS =
-  'id, login, movil, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, fecha_actualizacion_datos';
+  'id, login, movil, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, fecha_actualizacion_datos, estado';
 
 export interface PublicadorAuthProfile {
   id: string;
@@ -44,6 +80,7 @@ export interface PublicadorAuthProfile {
   primer_apellido: string | null;
   segundo_apellido: string | null;
   fecha_actualizacion_datos: string | null;
+  estado: string | null;
 }
 
 @Injectable()
@@ -281,6 +318,48 @@ export class PublicadoresRepository {
     if (error) {
       throw new InternalServerErrorException('No se pudo registrar la solicitud de baja.');
     }
+  }
+
+  /** Usado por "Nueva solicitud" en Gestión de solicitudes para detectar si la persona
+   * ya existió antes en la PPAM (se retiró en el pasado). Dos consultas separadas (no
+   * un solo .or()) para no depender de escapar comas/paréntesis en el valor dentro del
+   * string de filtro de PostgREST. El móvil se compara exacto (así se guarda); el
+   * correo, sin distinguir mayúsculas. */
+  async findRetiradosPorMovilOCorreo(
+    movil: string | null,
+    correo: string | null,
+  ): Promise<PublicadorRetiradoBusqueda[]> {
+    const resultados = new Map<string, PublicadorRetiradoBusqueda>();
+
+    if (movil) {
+      const { data, error } = await this.supabaseService
+        .getClient()
+        .from('publicadores_retirados')
+        .select(BUSQUEDA_RETIRADO_COLUMNS)
+        .eq('movil', movil);
+      if (error) {
+        throw new InternalServerErrorException('No se pudo buscar publicadores retirados por móvil.');
+      }
+      for (const row of (data ?? []) as unknown as PublicadorRetiradoBusqueda[]) {
+        resultados.set(row.id, row);
+      }
+    }
+
+    if (correo) {
+      const { data, error } = await this.supabaseService
+        .getClient()
+        .from('publicadores_retirados')
+        .select(BUSQUEDA_RETIRADO_COLUMNS)
+        .ilike('correo_electronico', correo);
+      if (error) {
+        throw new InternalServerErrorException('No se pudo buscar publicadores retirados por correo.');
+      }
+      for (const row of (data ?? []) as unknown as PublicadorRetiradoBusqueda[]) {
+        resultados.set(row.id, row);
+      }
+    }
+
+    return [...resultados.values()];
   }
 
   async findRetirosPendientes(): Promise<PublicadorRetirado[]> {

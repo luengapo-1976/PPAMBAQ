@@ -527,5 +527,27 @@ Al guardar debe cerrarse la ventana flotante del formulario, limpiarse sus campo
 
 
 
+# DESPLIEGUE / "REFRESH" DEL REPOSITORIO EN GITHUB
+
+Cuando se pida "refrescar" o "subir los cambios al repositorio de GitHub", tener en cuenta que esto tiene DOS partes independientes, y hay que confirmar con el usuario cuál(es) aplica(n):
+
+1. **Código fuente** → rama `main` (push normal con git). Esto NO actualiza el sitio en producción.
+2. **Sitio en producción (GitHub Pages)** → rama `gh-pages`, servida en `https://luengapo-1976.github.io/PPAMBAQ/`. Es un build compilado aparte, publicado con `angular-cli-ghpages`. Solo se actualiza si se reconstruye y se vuelve a publicar explícitamente:
+
+   ```
+   cd frontend
+   MSYS_NO_PATHCONV=1 npx ng build --configuration production --base-href /PPAMBAQ/
+   npx angular-cli-ghpages --dir=dist/frontend/browser --branch=gh-pages
+   ```
+
+   - El `base-href` DEBE quedar `/PPAMBAQ/` (repo project page, sin dominio custom). Verificar siempre después del build con `grep '<base href' dist/frontend/browser/index.html` antes de publicar.
+   - **Gotcha de Git Bash en Windows**: cualquier argumento que empiece con `/` (como `/PPAMBAQ/`) puede ser reinterpretado por MSYS como una ruta de archivo de Windows (ej. termina siendo `C:/Program Files/Git/PPAMBAQ/`), lo que rompe el `base href` y deja la app completamente en blanco (ni el login carga). Por eso el build SIEMPRE debe correr con `MSYS_NO_PATHCONV=1` delante cuando se use `--base-href` en Git Bash.
+   - Backend de producción: `https://ppambaq.onrender.com` (Render). Su CORS solo permite el origin `https://luengapo-1976.github.io`, así que pruebas locales contra ese backend (`localhost`) fallarán por CORS — es esperado, no es un bug real.
+   - Después de publicar, GitHub Pages puede tardar ~1 minuto en refrescar el CDN. Verificar con `curl` (con un query param cache-buster) o Playwright antes de concluir que el deploy no sirvió.
+
+Si el usuario solo dice "sube/refresca el repo" sin más contexto, y hay cambios de frontend pendientes, preguntar explícitamente si además de subir el código a `main` quiere republicar el sitio en `gh-pages` — son pasos distintos y asumir solo uno puede dejar al usuario probando una versión vieja del sitio.
+
+
+
 
 

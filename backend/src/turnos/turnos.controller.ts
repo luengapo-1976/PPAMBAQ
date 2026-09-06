@@ -1,6 +1,8 @@
 import {
+  BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -46,6 +48,11 @@ export class TurnosController {
     @CurrentUser() user: AuthenticatedUser,
   ) {
     return this.turnosService.actualizarEstadoTurno(id, dto, user);
+  }
+
+  @Delete(':id')
+  eliminarHorario(@Param('id') id: string) {
+    return this.turnosService.eliminarHorario(id);
   }
 
   @Get('conteo-publicador')
@@ -97,6 +104,14 @@ export class TurnosController {
     @CurrentUser() user: AuthenticatedUser,
   ) {
     return this.turnosService.rechazarSolicitudPendiente(id, dto, user);
+  }
+
+  @Patch('validacion/:estado/:id/whatsapp-enviado')
+  marcarMensajeWhatsappEnviado(@Param('estado') estado: string, @Param('id') id: string) {
+    if (estado !== 'aprobados' && estado !== 'rechazados') {
+      throw new BadRequestException('El estado indicado no es válido.');
+    }
+    return this.turnosService.marcarMensajeWhatsappEnviado(estado, id);
   }
 
   @Post(':id/solicitar')

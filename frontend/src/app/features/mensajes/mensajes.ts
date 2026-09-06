@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { MensajeForm } from './components/mensaje-form/mensaje-form';
 import { MensajesTable } from './components/mensajes-table/mensajes-table';
 import { Button } from '../../shared/ui/button/button';
@@ -21,10 +21,6 @@ export class Mensajes {
 
   protected readonly dialogOpen = signal(false);
   protected readonly dialogMode = signal<'create' | 'edit'>('create');
-
-  protected readonly tipos = computed(() =>
-    [...new Set(this.mensajes().map((m) => m.tipo))].sort(),
-  );
 
   constructor() {
     this.loadMensajes();

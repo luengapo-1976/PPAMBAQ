@@ -5,7 +5,7 @@ import { TablesInsert, TablesUpdate } from '../supabase/database.types';
 const SELECT_WITH_SEXO =
   '*, publicadores(primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, sexo, movil, congregaciones(nombre_congregacion))';
 const SELECT_VALIDACION =
-  '*, puntos(nombre_punto), publicadores(primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, fecha_nacimiento, sexo, estado_civil, nombre_conyuge, movil)';
+  '*, puntos(nombre_punto, encargado, movil), publicadores(primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, fecha_nacimiento, sexo, estado_civil, nombre_conyuge, movil)';
 
 export interface TurnoConSexo {
   id: string;
@@ -112,7 +112,8 @@ export interface TurnoValidacion {
   aprobado_por: string | null;
   justificacion_aprobacion: string | null;
   fecha_aprobacion: string | null;
-  puntos: { nombre_punto: string } | null;
+  mensaje_whatsapp_enviado: boolean;
+  puntos: { nombre_punto: string; encargado: string | null; movil: string | null } | null;
   publicadores: {
     primer_nombre: string | null;
     segundo_nombre: string | null;
@@ -308,6 +309,27 @@ export class TurnosRepository {
     }
 
     return data;
+  }
+
+  /** Elimina definitivamente un cupo (horario) del calendario de un punto. Usado por
+   * "Eliminar horario", después de que el servicio ya validó que no tiene publicador
+   * asignado — la condición se repite aquí (.is('id_publicador', null)) como defensa
+   * adicional contra condiciones de carrera. */
+  async eliminar(id: string): Promise<boolean> {
+    const { data, error } = await this.supabaseService
+      .getClient()
+      .from('turnos')
+      .delete()
+      .eq('id', id)
+      .is('id_publicador', null)
+      .select('id')
+      .maybeSingle();
+
+    if (error) {
+      throw new InternalServerErrorException('No se pudo eliminar el horario.');
+    }
+
+    return !!data;
   }
 
   /** Update condicionado a que el turno siga libre (id_publicador IS NULL), para evitar
@@ -545,20 +567,75 @@ export class TurnosRepository {
   }
 
   /** Copia de auditoría de una solicitud ya procesada (aprobada, rechazada o devuelta),
-   * usada por Casos por validar, Retirar/Devolver turno y sus equivalentes. */
+   * usada por Casos por validar, Retirar/Devolver turno y sus equivalentes. Devuelve el
+   * id de la fila creada porque, para los casos rechazados, ese id (no el del turno
+   * original, que ya quedó liberado) es el que identifica el registro histórico en la
+   * grilla "Turnos rechazados" y el que hay que marcar cuando se envía el WhatsApp. */
   async registrarApRechaz(
     payload: TablesInsert<'turnos_apro_rechaz'>,
-  ): Promise<void> {
-    const { error } = await this.supabaseService
+  ): Promise<{ id: string }> {
+    const { data, error } = await this.supabaseService
       .getClient()
       .from('turnos_apro_rechaz')
-      .insert(payload);
+      .insert(payload)
+      .select('id')
+      .single();
 
     if (error) {
       throw new InternalServerErrorException(
         'No se pudo registrar el histórico de la solicitud.',
       );
     }
+
+    return data;
+  }
+
+  /** Marca como enviado el WhatsApp de respuesta de un caso ya APROBADO: ese histórico
+   * sigue viviendo en turnos (aprobadosValidacion lee de ahí, no de turnos_apro_rechaz),
+   * por eso se actualiza esta tabla y no la otra. */
+  async marcarWhatsappEnviadoAprobado(id: string, fecha: string): Promise<boolean> {
+    const { data, error } = await this.supabaseService
+      .getClient()
+      .from('turnos')
+      .update({
+        mensaje_whatsapp_enviado: true,
+        fecha_mensaje_whatsapp: fecha,
+      })
+      .eq('id', id)
+      .select('id')
+      .maybeSingle();
+
+    if (error) {
+      throw new InternalServerErrorException(
+        'No se pudo registrar el envío del mensaje de WhatsApp.',
+      );
+    }
+
+    return !!data;
+  }
+
+  /** Marca como enviado el WhatsApp de respuesta de un caso RECHAZADO: a diferencia de
+   * los aprobados, el turno original se liberó y su histórico vive solo en
+   * turnos_apro_rechaz, así que ahí se actualiza. */
+  async marcarWhatsappEnviadoRechazado(id: string, fecha: string): Promise<boolean> {
+    const { data, error } = await this.supabaseService
+      .getClient()
+      .from('turnos_apro_rechaz')
+      .update({
+        mensaje_whatsapp_enviado: true,
+        fecha_mensaje_whatsapp: fecha,
+      })
+      .eq('id', id)
+      .select('id')
+      .maybeSingle();
+
+    if (error) {
+      throw new InternalServerErrorException(
+        'No se pudo registrar el envío del mensaje de WhatsApp.',
+      );
+    }
+
+    return !!data;
   }
 
   /** Update condicionado a que el turno siga PENDIENTE, para evitar rechazarlo dos veces.

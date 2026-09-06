@@ -12,6 +12,7 @@ export const NAV_ITEMS: NavItem[] = [
       { label: 'Asignar turno', icon: 'event_available', route: '/admin-asignar-turno' },
       { label: 'Retirar turno', icon: 'event_busy', route: '/admin-retirar-turno' },
       { label: 'Informe de turno', icon: 'post_add', route: '/admin-informe-turno' },
+      { label: 'Retirar de la PPAM', icon: 'person_remove', route: '/admin-retirar-ppam' },
     ],
   },
   {

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { PublicadoresService } from './publicadores.service';
 import { CreatePublicadorDto } from './dto/create-publicador.dto';
 import { UpdatePublicadorDto } from './dto/update-publicador.dto';
@@ -25,6 +25,11 @@ export class PublicadoresController {
   @Get('me')
   misDatos(@CurrentUser() user: AuthenticatedUser) {
     return this.publicadoresService.misDatos(user);
+  }
+
+  @Get('retirados/buscar')
+  buscarRetirados(@Query('movil') movil?: string, @Query('correo') correo?: string) {
+    return this.publicadoresService.buscarRetirados(movil?.trim() || null, correo?.trim() || null);
   }
 
   @Post()
@@ -70,6 +75,15 @@ export class PublicadoresController {
   @Post('me/solicitar-baja')
   solicitarBaja(@Body() dto: SolicitarBajaDto, @CurrentUser() user: AuthenticatedUser) {
     return this.publicadoresService.solicitarBaja(dto, user);
+  }
+
+  @Post(':id/solicitar-baja')
+  solicitarBajaAdmin(
+    @Param('id') id: string,
+    @Body() dto: SolicitarBajaDto,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.publicadoresService.solicitarBajaAdmin(id, dto, user);
   }
 
   @Get('retiros/pendientes')

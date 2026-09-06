@@ -8,6 +8,11 @@
   gap: var(--ppam-space-lg);
 }
 
+.casos-page__toolbar {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .casos-page__kpis {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -81,6 +86,23 @@
 .ppam-table__row:focus-visible {
   background: var(--ppam-surface-container);
   outline: none;
+}
+
+.casos-page__whatsapp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: var(--ppam-radius-control);
+  background: transparent;
+  color: #25d366;
+  cursor: pointer;
+}
+
+.casos-page__whatsapp-btn:hover {
+  background: var(--ppam-surface-container);
 }
 
 .ppam-table__empty {
